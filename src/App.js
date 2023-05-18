@@ -1,4 +1,16 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
+import Vending from "./pages/Vending";
 function App() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+  return (
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<Vending />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 }
 export default App;

@@ -1,4 +1,11 @@
 import React, { useEffect, useState } from "react";
+
+const Account = {
+  data: {
+    outlet: "VM Karbol 1",
+  },
+};
+
 const TopHeader = () => {
   const [isOnline, setIsOnline] = useState(true);
 
@@ -15,13 +22,13 @@ const TopHeader = () => {
   }, [isOnline]);
 
   return (
-    <div className="200 w-screen">
+    <div className="w-screen">
       <div className="flex w-full">
-        <div className="flex flex-grow items-center justify-between shadow-md">
+        <div className="flex flex-grow items-center justify-between">
           <div className="flex items-center "></div>
           <div className="flex items-center "></div>
           <div className="flex items-center pl-2 pr-2 m-1">
-            <div className="block">Content Right</div>
+            <div className="block font-bold">{Account.data.outlet}</div>
             <div className="block ml-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -1,14 +1,27 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require("tailwindcss/defaultTheme");
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    screens: {
-      sm: "480px",
-      md: "768px",
-      lg: "976px",
-      xl: "1440px",
-    },
     extend: {
+      animation: {
+        marquee: "marquee 25s linear infinite",
+        marquee2: "marquee2 25s linear infinite",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
+        marquee2: {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0%)" },
+        },
+      },
+      screens: {
+        xs: "370px",
+        ...defaultTheme.screens,
+      },
       colors: {
         hollandtints: {
           100: "#f9d9d3",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -15,6 +15,8 @@ const afterDiscount = (value, discount) =>
 
 const Content = (props) => {
   const { items, addTransaction } = props;
+  const [style, setStyle] = useState("cont");
+  const clickAddTransaction = () => {};
   return (
     <div className="flex justify-center">
       <div className="content-center">
@@ -49,10 +51,14 @@ const Content = (props) => {
                   </p>
                   {Menu.stock > 0 ? (
                     <div
+                      id={`itemdiv${Menu.id}`}
                       className="w-full h-full bg-hollandtints-700 text-white transition duration-500 cursor-pointer "
                       onClick={() => addTransaction(Menu)}
                     >
-                      <p className="px-1 py-1 mx-auto text-xl justify-center">
+                      <p
+                        id={`pdiv${Menu.id}`}
+                        className="px-1 py-1 mx-auto text-xl justify-center"
+                      >
                         {afterDiscount(Menu.price, Menu.disc)}
                       </p>
                     </div>

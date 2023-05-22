@@ -7,11 +7,15 @@ import RunningText from "../components/RunningText";
 import ContentFooter from "../components/ContentFooter";
 import { Products } from "../data";
 import Modal from "../components/Modal";
+import ModalConfirmation from "../components/ModalConfirmation";
+import ModalBeli from "../components/ModalBeli";
 
 const Vending = () => {
   const [items] = useState(Products);
   const [transaction, setTransaction] = useState([]);
   const [openCart, setopenCart] = useState(false);
+  const [confirmation, setConfirm] = useState(false);
+  const [modalBeli, setmodalBeli] = useState(false);
 
   useEffect(() => {
     setTransaction(JSON.parse(localStorage.getItem("transaction")));
@@ -20,11 +24,17 @@ const Vending = () => {
   useEffect(() => {
     localStorage.setItem("transaction", JSON.stringify(transaction));
   });
-  // const sortedEmployees = transaction.sort((a, b) =>
-  //   a.name < b.name ? -1 : 1
-  // );
   const setToOpenCart = () => {
     setopenCart(true);
+  };
+  const setToCloseCart = () => {
+    setopenCart(false);
+  };
+  const setConfirmation = (confirm) => {
+    setConfirm(confirm);
+  };
+  const setBuy = (confirm) => {
+    setmodalBeli(confirm);
   };
   const addTransaction = (item) => {
     const existItem = transaction.find((product) => product.id === item.id);
@@ -65,14 +75,6 @@ const Vending = () => {
       );
     }
   };
-  const [modalOn, setModalOn] = useState(false);
-  const [choice, setChoice] = useState(false);
-  const [product, setProducts] = useState(null);
-
-  const clicked = (Items) => {
-    setModalOn(true);
-    setProducts(Items);
-  };
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="portrait:hidden">Landscape</div>
@@ -88,17 +90,31 @@ const Vending = () => {
         <Footer />
         {openCart && (
           <Modal
-            setModalOn={setModalOn}
-            setChoice={setChoice}
+            className="transition-transform delay-700 duration-700 ease-in-out"
+            setCloseCart={setToCloseCart}
             itemsTransaction={transaction}
             addTransaction={addTransaction}
+            setConfirm={setConfirmation}
+            setBuy={setBuy}
           />
         )}
-        {/* <Header />
-        <RunningText />
-        <Content />
-        <ContentFooter />
-        <Footer /> */}
+        {confirmation && (
+          <ModalConfirmation
+            className="transition-transform delay-700 duration-700 ease-in-out"
+            itemsTransaction={transaction}
+            addTransaction={addTransaction}
+            setConfirm={setConfirmation}
+            setBuy={setBuy}
+          />
+        )}
+        {modalBeli && (
+          <ModalBeli
+            className="transition-transform delay-700 duration-700 ease-in-out"
+            itemsTransaction={transaction}
+            addTransaction={addTransaction}
+            setBuy={setBuy}
+          />
+        )}
       </div>
     </div>
   );

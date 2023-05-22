@@ -12,7 +12,7 @@ const ContentFooter = (props) => {
   return (
     <div className="flex justify-center mt-4 mb-4">
       <button
-        className={`w-full ml-4 mr-4 mt-2 mb-2 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg`}
+        className={`relative w-full ml-4 mr-4 mt-2 mb-2 bg-hollandtints-800 text-white transition delay-200 duration-200 ease-in-out rounded-2xl hover:opacity-80 hover:shadow-lg`}
         onClick={() => handleCancelClick()}
       >
         <div
@@ -42,7 +42,7 @@ const ContentFooter = (props) => {
           </span>
           {itemsTransaction.length > 0 && (
             <span className="items-center ml-2">
-              <h3 className="text-3xl font-medium justify-center p-1 ml-4 h-12 w-12 rounded-full shadow-lg bg-hollandshades-700">
+              <h3 className="text-3xl font-medium justify-center p-1 ml-4 h-12 w-12 rounded-full shadow-lg bg-hollandshades-700 -translate-y-10">
                 {itemsTransaction.length}
               </h3>
             </span>

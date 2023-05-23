@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Tooltip } from "react-tooltip";
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -21,7 +21,6 @@ const Modal = (props) => {
     setToOpenBeli,
     setToOpenCart,
   } = props;
-
   const handleModal = (status) => {
     setToOpenCart(status);
   };
@@ -51,8 +50,6 @@ const Modal = (props) => {
       status: status,
     });
   };
-  let total = 0;
-  const [subTotal, setSubTotal] = useState(0);
   const MyItems = ({ Data }) => {
     const handleRemoveItem = (Data, status) => {
       handleModalConfirm({
@@ -178,6 +175,7 @@ const Modal = (props) => {
                 </div>
                 <div className="">
                   <input
+                    id={Data.id}
                     type="text"
                     value={Data.qty}
                     disabled
@@ -259,8 +257,6 @@ const Modal = (props) => {
           <div className="flex-1 no-scrollbar overflow-y-auto">
             <ul>
               {itemsTransaction.map((item, index) => (
-                total += item.price * item.qty;
-                setSubTotal(total);
                 <MyItems key={index} Data={item} />
               ))}
             </ul>
@@ -306,7 +302,7 @@ const Modal = (props) => {
                   <div className="w-full ml-4 mr-4 mt-2 mb-4">
                     <span className="flex justify-end p-1">
                       <h3 className="text-3xl font-bold items-end mr-2 text-hollandtints-800">
-                        {subTotal}
+                        Total Rupiah
                       </h3>
                     </span>
                     <span className="flex justify-end">

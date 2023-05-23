@@ -1,4 +1,3 @@
-import { click } from "@testing-library/user-event/dist/click";
 import React, { useState } from "react";
 
 const numberFormat = (value) =>
@@ -20,6 +19,7 @@ const Content = (props) => {
     const [colorSet, setColorSet] = useState(
       "w-full h-full bg-hollandtints-800 text-white cursor-pointer"
     );
+    const [isOpen, setisOpen] = useState(false);
     const [price, setPrice] = useState(afterDiscount(Data.price, Data.disc));
     const [clickButton, setclickButton] = useState(true);
 
@@ -30,19 +30,21 @@ const Content = (props) => {
           "w-full h-full transition duration-700 ease-in-out bg-hollandtints-800 text-white cursor-pointer"
         );
         setPrice(afterDiscount(Data.price, Data.disc));
+        setclickButton(true);
       }, 1000);
-      setclickButton(true);
     };
     const handleAddTransaction = () => {
-      setclickButton(false);
-      setColorSet(
-        "w-full h-full transition duration-500 ease-in-out -translate-y-2 bg-green-600 text-white cursor-pointer"
-      );
-      setPrice("add to cart");
+      // setclickButton(false);
+      // setColorSet(
+      //   "w-full h-full transition duration-500 ease-in-out -translate-y-2 bg-green-600 text-white cursor-pointer"
+      // );
+      // setPrice("add to cart");
 
-      runTransition();
+      // runTransition();
+      setisOpen(!isOpen);
+      console.log("CLICK", isOpen);
+      addTransaction(Data, true);
     };
-    console.log(clickButton);
     return (
       <li className="mb-2">
         <div
@@ -78,7 +80,11 @@ const Content = (props) => {
           </p>
           {Data.stock > 0 ? (
             <div
-              className={colorSet}
+              className={
+                isOpen
+                  ? "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
+                  : "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
+              }
               onClick={() => {
                 if (Data.stock > 0) {
                   if (clickButton) {
@@ -103,9 +109,10 @@ const Content = (props) => {
 
   const MyItemsChild = ({ Data }) => {
     const [colorSet, setColorSet] = useState(
-      "w-full h-full bg-hollandtints-800 text-white cursor-pointer"
+      "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
     );
     const [price, setPrice] = useState(afterDiscount(Data.price, Data.disc));
+    const [isOpen, setisOpen] = useState(false);
     const runTransition = async () => {
       setTimeout(() => {
         addTransaction(Data, true);
@@ -116,11 +123,14 @@ const Content = (props) => {
       }, 1000);
     };
     const handleAddTransaction = () => {
-      setColorSet(
-        "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
-      );
-      setPrice("to cart");
-      runTransition();
+      // setColorSet(
+      //   "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
+      // );
+      // setPrice("to cart");
+      // runTransition();
+      setisOpen(!isOpen);
+      addTransaction(Data, true);
+      console.log("CLICK", isOpen);
     };
     return (
       <li>
@@ -154,7 +164,14 @@ const Content = (props) => {
             {numberFormat(Data.price)}
           </p>
           {Data.stock > 0 ? (
-            <div className={colorSet} onClick={() => handleAddTransaction()}>
+            <div
+              className={
+                isOpen
+                  ? "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
+                  : "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
+              }
+              onClick={() => handleAddTransaction()}
+            >
               <p className="px-1 py-1 text-base justify-center">{price}</p>
             </div>
           ) : (

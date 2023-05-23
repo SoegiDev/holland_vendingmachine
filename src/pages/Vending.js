@@ -29,7 +29,6 @@ const Vending = () => {
     setOpenCart(cart);
   };
   const setToOpenConfirmation = (props) => {
-    console.log(props);
     setOpenConfirmation(props.status);
     setDataConfirmation(props);
   };
@@ -37,6 +36,7 @@ const Vending = () => {
     setOpenBeli(confirm);
   };
   const addTransaction = (item, tambah) => {
+    console.log(item, tambah);
     const existItem = transaction.find((product) => product.id === item.id);
     if (!existItem) {
       setTransaction([

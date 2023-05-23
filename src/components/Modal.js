@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -13,13 +13,18 @@ const afterDiscount = (value, discount) =>
   }).format(value - value * (discount / 100));
 
 const Modal = (props) => {
-  const { itemsTransaction, addTransaction, setCloseCart, setConfirm, setBuy } =
-    props;
+  const {
+    itemsTransaction,
+    addTransaction,
+    setToOpenConfirmation,
+    setToOpenBeli,
+    setToOpenCart,
+  } = props;
 
-  const handleCloseModal = () => {
+  const handleModal = (status) => {
     //setChoice(false);
     console.log("Close");
-    setCloseCart(false);
+    setToOpenCart(status);
   };
   const ClickMinus = () => {
     //setChoice(false);
@@ -34,13 +39,13 @@ const Modal = (props) => {
       addTransaction(Menu);
     }
   };
-  const handleModalBeli = () => {
-    setBuy(true);
+  const handleModalBeli = (status) => {
+    setToOpenBeli(status);
     console.log("Click Beli");
   };
-  const clickeConfirm = () => {
+  const handleModalConfirm = (status) => {
     console.log("TEST click");
-    setConfirm(true);
+    setToOpenConfirmation(true);
   };
   return (
     <>
@@ -60,17 +65,17 @@ const Modal = (props) => {
                 {itemsTransaction.map((item, index) => (
                   <li key={index} className="mb-2">
                     <div className="flex flex-grow h-48">
-                      <span className="flex items-center ml-4">
+                      <span className=" max-h-[96x] max-w-[96x] flex items-center ml-4">
                         <img
                           src={item.imageUrl}
                           alt="Landing Page"
-                          className="h-24 w-24 content-center border rounded-3xl shadow-lg"
+                          className="h-full w-full content-center border rounded-3xl shadow-lg"
                         />
                       </span>
                       <div className="flex flex-col ml-4 mt-4 mb-4 items-start">
-                        <h3 className="text-3xl font-bold pb-4 pl-2 pt-2">
+                        <p className="text-3xl font-bold text-ellipsis overflow-hidden">
                           {item.title}
-                        </h3>
+                        </p>
                         <h3
                           className={`text-2xl font-sans mt-5 pl-2 ${
                             item.disc > 0 &&
@@ -83,19 +88,19 @@ const Modal = (props) => {
                           {afterDiscount(item.price, item.disc)}
                         </h3>
                       </div>
-                      <div className="flex flex-grow ml-4 mt-4 mb-4 justify-end">
+                      <div className="flex flex-grow ml-4 mr-4 mt-4 mb-4 justify-end">
                         <div className="flex items-end mb-4 mr-4">
                           <p className="text-2xl font-sans pl-2 text-hollandtints-900 align-bottom">
                             Sisa {item.stock - item.qty}
                           </p>
                         </div>
-                        <div className="flex items-end m-4">
+                        <div className="flex items-baseline translate-x-36 mb-4 mr-4">
                           <svg
                             fill="#e4543a"
                             viewBox="0 0 32 32"
                             version="1.1"
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-10 w-10"
+                            className="h-14 w-14"
                           >
                             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                             <g
@@ -230,7 +235,7 @@ const Modal = (props) => {
                       <span className="flex justify-center p-2">
                         <h3
                           className="text-2xl font-medium items-center"
-                          onClick={() => clickeConfirm()}
+                          onClick={() => handleModalConfirm(true)}
                         >
                           Kosongkan Keranjang
                         </h3>
@@ -238,7 +243,7 @@ const Modal = (props) => {
                     </button>
                     <button
                       className="w-full ml-4 mr-4 mt-2 mb-4 bg-slate-100 border-2 border-slate-400 text-black transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                      onClick={() => handleCloseModal()}
+                      onClick={() => handleModal(false)}
                     >
                       <span className="flex justify-center p-2">
                         <h3 className="text-2xl font-medium items-center">
@@ -269,7 +274,7 @@ const Modal = (props) => {
                     </div>
                     <button
                       className="w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                      onClick={() => handleModalBeli()}
+                      onClick={() => handleModalBeli(true)}
                     >
                       <span className="flex justify-center p-2">
                         <h3 className="text-3xl font-serif items-center">

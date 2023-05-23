@@ -1,5 +1,4 @@
-import { isDisabled } from "@testing-library/user-event/dist/utils";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 const ContentFooter = (props) => {
   const { itemsTransaction, setToOpenCart } = props;
@@ -12,7 +11,7 @@ const ContentFooter = (props) => {
   return (
     <div className="flex justify-center mt-4 mb-4">
       <button
-        className={`relative w-full ml-4 mr-4 mt-2 mb-2 bg-hollandtints-800 text-white transition delay-200 duration-200 ease-in-out rounded-2xl hover:opacity-80 hover:shadow-lg`}
+        className={`relative w-full ml-4 mr-4 mt-2 mb-2 bg-hollandtints-800 text-white rounded-2xl border-2 border-yellow-500`}
         onClick={() => handleCancelClick()}
       >
         <div

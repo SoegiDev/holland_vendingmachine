@@ -15,8 +15,137 @@ const afterDiscount = (value, discount) =>
 
 const Content = (props) => {
   const { items, addTransaction } = props;
-  const [style, setStyle] = useState("cont");
-  const clickAddTransaction = () => {};
+  const MyItems = ({ Data }) => {
+    console.log(Data.title);
+    const [colorSet, setColorSet] = useState(
+      "w-full h-full bg-hollandtints-800 text-white cursor-pointer"
+    );
+    const [price, setPrice] = useState(afterDiscount(Data.price, Data.disc));
+    const handleAddTransaction = () => {
+      setColorSet(
+        "w-full h-full transition duration-500 ease-in-out -translate-y-2 bg-green-600 text-white cursor-pointer"
+      );
+      setPrice("add to cart");
+      setTimeout(function () {
+        setColorSet(
+          "w-full h-full transition duration-700 ease-in-out bg-hollandtints-800 text-white cursor-pointer"
+        );
+        setPrice(afterDiscount(Data.price, Data.disc));
+        addTransaction(Data);
+      }, 1000);
+    };
+    return (
+      <li className="mb-2">
+        <div
+          className={`relative w-44 h-full ml-1 mr-1 overflow-hidden text-center rounded-bl-2xl rounded-tr-2xl ${
+            Data.stock === 0
+              ? "opacity-70 bg-opacity-70"
+              : "shadow-2xl bg-white "
+          }`}
+        >
+          <div
+            className={`absolute h-8 w-16 rounded-br-2xl bg-hollandtints-700 text-2xl`}
+          >
+            <p className="text-lg font-bold text-white">{Data.id}</p>
+          </div>
+          <img
+            src={Data.imageUrl}
+            alt="Landing Page"
+            className="h-40 w-full"
+            onClick={() => {
+              if (Data.stock > 0) {
+                handleAddTransaction();
+              }
+            }}
+          />
+          <p
+            className={`mx-auto p-1 text-xl justify-center ${
+              Data.disc > 0 && "line-through text-hollandtints-900"
+            }`}
+          >
+            {numberFormat(Data.price)}
+          </p>
+          {Data.stock > 0 ? (
+            <div className={colorSet} onClick={() => handleAddTransaction()}>
+              <p className="px-1 py-1 mx-auto text-xl justify-center">
+                {price}
+              </p>
+            </div>
+          ) : (
+            <div className="w-full h-full bg-hollandtints-700 text-white">
+              <p className="mx-auto px-1 py-1 justify-center text-xl">HABIS</p>
+            </div>
+          )}
+        </div>
+      </li>
+    );
+  };
+
+  const MyItemsChild = ({ Data }) => {
+    const [colorSet, setColorSet] = useState(
+      "w-full h-full bg-hollandtints-800 text-white cursor-pointer"
+    );
+    const [price, setPrice] = useState(afterDiscount(Data.price, Data.disc));
+    const handleAddTransaction = () => {
+      setColorSet(
+        "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
+      );
+      setPrice("to cart");
+      setTimeout(function () {
+        setColorSet(
+          "w-full h-full transition duration-700 ease-in-out bg-hollandtints-800 text-white cursor-pointer"
+        );
+        setPrice(afterDiscount(Data.price, Data.disc));
+        addTransaction(Data);
+      }, 1000);
+    };
+    return (
+      <li>
+        <div
+          className={`relative h-25 ml-1 mr-1 overflow-hidden text-center ${
+            Data.stock === 0
+              ? "opacity-70 bg-opacity-70"
+              : "shadow-2xl bg-white "
+          }`}
+        >
+          <div
+            className={`absolute h-8 w-7 rounded-br-2xl bg-hollandtints-700 text-2xl`}
+          >
+            <p className="text-lg font-bold text-white">{Data.id}</p>
+          </div>
+          <img
+            src={Data.imageUrl}
+            alt="Landing Page"
+            className="w-22 h-20"
+            onClick={() => {
+              if (Data.stock > 0) {
+                handleAddTransaction();
+              }
+            }}
+          />
+          <p
+            className={`mx-auto px-1 py-1 text-base justify-center ${
+              Data.disc > 0 && "line-through text-hollandtints-900"
+            }`}
+          >
+            {numberFormat(Data.price)}
+          </p>
+          {Data.stock > 0 ? (
+            <div className={colorSet} onClick={() => handleAddTransaction()}>
+              <p className="px-1 py-1 text-base justify-center">{price}</p>
+            </div>
+          ) : (
+            <div className="w-full h-full bg-hollandtints-700 text-white">
+              <p className="mx-auto px-1 py-1 justify-center text-base">
+                HABIS
+              </p>
+            </div>
+          )}
+        </div>
+      </li>
+    );
+  };
+
   return (
     <div className="flex justify-center">
       <div className="content-center">
@@ -24,102 +153,14 @@ const Content = (props) => {
           {items
             .filter((item, index) => index <= 24)
             .map((Menu, index) => (
-              <li key={index} className="mb-2">
-                <div
-                  className={`relative w-44 h-full ml-1 mr-1 overflow-hidden text-center rounded-bl-2xl rounded-tr-2xl ${
-                    Menu.stock === 0
-                      ? "opacity-70 bg-opacity-70"
-                      : "shadow-2xl bg-white "
-                  }`}
-                >
-                  <div
-                    className={`absolute h-8 w-16 rounded-br-2xl bg-hollandtints-700 text-2xl`}
-                  >
-                    <p className="text-lg font-bold text-white">{Menu.id}</p>
-                  </div>
-                  <img
-                    src={Menu.imageUrl}
-                    alt="Landing Page"
-                    className="h-40 w-full"
-                  />
-                  <p
-                    className={`mx-auto p-1 text-xl justify-center ${
-                      Menu.disc > 0 && "line-through text-hollandtints-900"
-                    }`}
-                  >
-                    {numberFormat(Menu.price)}
-                  </p>
-                  {Menu.stock > 0 ? (
-                    <div
-                      id={`itemdiv${Menu.id}`}
-                      className="w-full h-full bg-hollandtints-700 text-white transition duration-500 cursor-pointer "
-                      onClick={() => addTransaction(Menu)}
-                    >
-                      <p
-                        id={`pdiv${Menu.id}`}
-                        className="px-1 py-1 mx-auto text-xl justify-center"
-                      >
-                        {afterDiscount(Menu.price, Menu.disc)}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="w-full h-full bg-hollandtints-700 text-white">
-                      <p className="mx-auto px-1 py-1 justify-center text-xl">
-                        HABIS
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </li>
+              <MyItems key={index} Data={Menu} />
             ))}
         </ul>
         <ul className="grid grid-cols-2 gap-1 md:grid-cols-10 lg:grid-cols-10 2xl:grid-cols-7 mb-2">
           {items
             .filter((item, index) => index >= 25)
             .map((Menu, index) => (
-              <li key={index}>
-                <div
-                  className={`relative h-25 ml-1 mr-1 overflow-hidden text-center ${
-                    Menu.stock === 0
-                      ? "opacity-70 bg-opacity-70"
-                      : "shadow-2xl bg-white "
-                  }`}
-                >
-                  <div
-                    className={`absolute h-8 w-7 rounded-br-2xl bg-hollandtints-700 text-2xl`}
-                  >
-                    <p className="text-lg font-bold text-white">{Menu.id}</p>
-                  </div>
-                  <img
-                    src={Menu.imageUrl}
-                    alt="Landing Page"
-                    className="w-22 h-20"
-                  />
-                  <p
-                    className={`mx-auto px-1 py-1 text-base justify-center ${
-                      Menu.disc > 0 && "line-through text-hollandtints-900"
-                    }`}
-                  >
-                    {numberFormat(Menu.price)}
-                  </p>
-                  {Menu.stock > 0 ? (
-                    <div
-                      className="w-full h-full bg-hollandtints-700 text-white transition duration-500 hover:bg-opacity-50 focus:bg-hollandtints-300 hover:shadow-lg cursor-pointer"
-                      onClick={() => addTransaction(Menu)}
-                    >
-                      <p className="hover:text-hollandshades-700 px-1 py-1 active:text-hollandshades-900 focus:outline-none focus:ring focus:text-hollandtints-500 mx-auto text-base justify-center">
-                        {afterDiscount(Menu.price, Menu.disc)}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="w-full h-full bg-hollandtints-700 text-white">
-                      <p className="mx-auto px-1 py-1 justify-center text-base">
-                        HABIS
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </li>
+              <MyItemsChild key={index} Data={Menu} />
             ))}
         </ul>
       </div>

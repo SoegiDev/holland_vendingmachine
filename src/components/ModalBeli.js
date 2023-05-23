@@ -13,12 +13,18 @@ const afterDiscount = (value, discount) =>
   }).format(value - value * (discount / 100));
 
 const ModalBeli = (props) => {
-  const { itemsTransaction, addTransaction, setBuy } = props;
+  const {
+    itemsTransaction,
+    addTransaction,
+    setToOpenConfirmation,
+    setToOpenBeli,
+    setToOpenCart,
+  } = props;
 
-  const handleCloseModal = () => {
+  const handleModalBeli = (status) => {
     //setChoice(false);
     console.log("Close");
-    setBuy(false);
+    setToOpenBeli(status);
   };
   return (
     <>
@@ -41,7 +47,7 @@ const ModalBeli = (props) => {
               <div className="flex w-full justify-between">
                 <button
                   className="w-full ml-4 mr-4 mt-2 mb-4 bg-slate-100 border-2 border-slate-400 text-black transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                  onClick={() => handleCloseModal()}
+                  onClick={() => handleModalBeli(false)}
                 >
                   <span className="flex justify-center p-2">
                     <h3 className="text-2xl font-medium items-center ">
@@ -49,7 +55,10 @@ const ModalBeli = (props) => {
                     </h3>
                   </span>
                 </button>
-                <button className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg">
+                <button
+                  className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
+                  onClick={() => handleModalBeli(false)}
+                >
                   <span className="flex justify-center p-2">
                     <h3 className="text-2xl font-medium items-center">
                       Iya . Kosongkan Keranjang

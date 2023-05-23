@@ -13,9 +13,9 @@ import ModalBeli from "../components/ModalBeli";
 const Vending = () => {
   const [items] = useState(Products);
   const [transaction, setTransaction] = useState([]);
-  const [openCart, setopenCart] = useState(false);
-  const [confirmation, setConfirm] = useState(false);
-  const [modalBeli, setmodalBeli] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [openBeli, setOpenBeli] = useState(false);
 
   useEffect(() => {
     setTransaction(JSON.parse(localStorage.getItem("transaction")));
@@ -24,17 +24,14 @@ const Vending = () => {
   useEffect(() => {
     localStorage.setItem("transaction", JSON.stringify(transaction));
   });
-  const setToOpenCart = () => {
-    setopenCart(true);
+  const setToOpenCart = (cart) => {
+    setOpenCart(cart);
   };
-  const setToCloseCart = () => {
-    setopenCart(false);
+  const setToOpenConfirmation = (confirm) => {
+    setOpenConfirmation(confirm);
   };
-  const setConfirmation = (confirm) => {
-    setConfirm(confirm);
-  };
-  const setBuy = (confirm) => {
-    setmodalBeli(confirm);
+  const setToOpenBeli = (confirm) => {
+    setOpenBeli(confirm);
   };
   const addTransaction = (item) => {
     const existItem = transaction.find((product) => product.id === item.id);
@@ -91,28 +88,31 @@ const Vending = () => {
         {openCart && (
           <Modal
             className="transition-transform delay-700 duration-700 ease-in-out"
-            setCloseCart={setToCloseCart}
             itemsTransaction={transaction}
             addTransaction={addTransaction}
-            setConfirm={setConfirmation}
-            setBuy={setBuy}
+            setToOpenConfirmation={setToOpenConfirmation}
+            setToOpenBeli={setToOpenBeli}
+            setToOpenCart={setToOpenCart}
           />
         )}
-        {confirmation && (
+        {openConfirmation && (
           <ModalConfirmation
             className="transition-transform delay-700 duration-700 ease-in-out"
             itemsTransaction={transaction}
             addTransaction={addTransaction}
-            setConfirm={setConfirmation}
-            setBuy={setBuy}
+            setToOpenConfirmation={setToOpenConfirmation}
+            setToOpenBeli={setToOpenBeli}
+            setToOpenCart={setToOpenCart}
           />
         )}
-        {modalBeli && (
+        {openBeli && (
           <ModalBeli
             className="transition-transform delay-700 duration-700 ease-in-out"
             itemsTransaction={transaction}
             addTransaction={addTransaction}
-            setBuy={setBuy}
+            setToOpenConfirmation={setToOpenConfirmation}
+            setToOpenBeli={setToOpenBeli}
+            setToOpenCart={setToOpenCart}
           />
         )}
       </div>

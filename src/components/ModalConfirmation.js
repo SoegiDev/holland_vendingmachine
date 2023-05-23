@@ -13,16 +13,18 @@ const afterDiscount = (value, discount) =>
   }).format(value - value * (discount / 100));
 
 const ModalConfirmation = (props) => {
-  const { itemsTransaction, addTransaction, setConfirm } = props;
+  const {
+    itemsTransaction,
+    addTransaction,
+    setToOpenConfirmation,
+    setToOpenBeli,
+    setToOpenCart,
+  } = props;
 
-  const handleCloseModal = () => {
+  const handleModalConfirm = (status) => {
     //setChoice(false);
     console.log("Close");
-    setConfirm(false);
-  };
-  const clickeConfirm = () => {
-    console.log("TEST click");
-    setConfirm(true);
+    setToOpenConfirmation(status);
   };
   return (
     <>
@@ -43,7 +45,7 @@ const ModalConfirmation = (props) => {
               <div className="flex w-full justify-between">
                 <button
                   className="w-full ml-4 mr-4 mt-2 mb-4 bg-slate-100 border-2 border-slate-400 text-black transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                  onClick={() => handleCloseModal()}
+                  onClick={() => handleModalConfirm(false)}
                 >
                   <span className="flex justify-center p-2">
                     <h3 className="text-2xl font-medium items-center ">
@@ -51,7 +53,10 @@ const ModalConfirmation = (props) => {
                     </h3>
                   </span>
                 </button>
-                <button className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg">
+                <button
+                  className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
+                  onClick={() => handleModalConfirm(false)}
+                >
                   <span className="flex justify-center p-2">
                     <h3 className="text-2xl font-medium items-center">
                       Iya . Kosongkan Keranjang

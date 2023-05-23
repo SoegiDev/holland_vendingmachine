@@ -3,8 +3,8 @@ import imagesProduct2 from "./assets/img/brownies.jpeg";
 export const Products = [
   {
     id: 1,
-    title: "Roti 1",
-    description: "Roti Smoked Beef Cheese",
+    title: "Roti Kacang Merah Special",
+    description: "Roti Kacang Merah Special",
     category: "Roti",
     price: 25000,
     disc: 15,
@@ -36,7 +36,7 @@ export const Products = [
   },
   {
     id: 4,
-    title: "Roti 4",
+    title: "Roti Kacang Merah Special asdasdasd asdasdasdasd",
     description: "Roti Smoked Beef Cheese",
     category: "Roti",
     price: 12500,

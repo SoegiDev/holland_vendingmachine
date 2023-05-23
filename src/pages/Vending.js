@@ -15,6 +15,7 @@ const Vending = () => {
   const [transaction, setTransaction] = useState([]);
   const [openCart, setOpenCart] = useState(false);
   const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [dataConfirmation, setDataConfirmation] = useState({});
   const [openBeli, setOpenBeli] = useState(false);
 
   useEffect(() => {
@@ -27,13 +28,15 @@ const Vending = () => {
   const setToOpenCart = (cart) => {
     setOpenCart(cart);
   };
-  const setToOpenConfirmation = (confirm) => {
-    setOpenConfirmation(confirm);
+  const setToOpenConfirmation = (props) => {
+    console.log(props);
+    setOpenConfirmation(props.status);
+    setDataConfirmation(props);
   };
   const setToOpenBeli = (confirm) => {
     setOpenBeli(confirm);
   };
-  const addTransaction = (item) => {
+  const addTransaction = (item, tambah) => {
     const existItem = transaction.find((product) => product.id === item.id);
     if (!existItem) {
       setTransaction([
@@ -65,7 +68,7 @@ const Vending = () => {
                 rating: item.rating,
                 stock: item.stock,
                 title: item.title,
-                qty: existItem.qty + 1,
+                qty: tambah ? existItem.qty + 1 : existItem.qty - 1,
               }
             : product
         )
@@ -100,6 +103,7 @@ const Vending = () => {
             className="transition-transform delay-700 duration-700 ease-in-out"
             itemsTransaction={transaction}
             addTransaction={addTransaction}
+            dataConfirmation={dataConfirmation}
             setToOpenConfirmation={setToOpenConfirmation}
             setToOpenBeli={setToOpenBeli}
             setToOpenCart={setToOpenCart}

@@ -1,3 +1,4 @@
+import { click } from "@testing-library/user-event/dist/click";
 import React, { useState } from "react";
 
 const numberFormat = (value) =>
@@ -16,24 +17,32 @@ const afterDiscount = (value, discount) =>
 const Content = (props) => {
   const { items, addTransaction } = props;
   const MyItems = ({ Data }) => {
-    console.log(Data.title);
     const [colorSet, setColorSet] = useState(
       "w-full h-full bg-hollandtints-800 text-white cursor-pointer"
     );
     const [price, setPrice] = useState(afterDiscount(Data.price, Data.disc));
-    const handleAddTransaction = () => {
-      setColorSet(
-        "w-full h-full transition duration-500 ease-in-out -translate-y-2 bg-green-600 text-white cursor-pointer"
-      );
-      setPrice("add to cart");
-      setTimeout(function () {
+    const [clickButton, setclickButton] = useState(true);
+
+    const runTransition = async () => {
+      setTimeout(() => {
+        addTransaction(Data, true);
         setColorSet(
           "w-full h-full transition duration-700 ease-in-out bg-hollandtints-800 text-white cursor-pointer"
         );
         setPrice(afterDiscount(Data.price, Data.disc));
-        addTransaction(Data);
       }, 1000);
+      setclickButton(true);
     };
+    const handleAddTransaction = () => {
+      setclickButton(false);
+      setColorSet(
+        "w-full h-full transition duration-500 ease-in-out -translate-y-2 bg-green-600 text-white cursor-pointer"
+      );
+      setPrice("add to cart");
+
+      runTransition();
+    };
+    console.log(clickButton);
     return (
       <li className="mb-2">
         <div
@@ -54,7 +63,9 @@ const Content = (props) => {
             className="h-40 w-full"
             onClick={() => {
               if (Data.stock > 0) {
-                handleAddTransaction();
+                if (clickButton) {
+                  handleAddTransaction();
+                }
               }
             }}
           />
@@ -66,7 +77,16 @@ const Content = (props) => {
             {numberFormat(Data.price)}
           </p>
           {Data.stock > 0 ? (
-            <div className={colorSet} onClick={() => handleAddTransaction()}>
+            <div
+              className={colorSet}
+              onClick={() => {
+                if (Data.stock > 0) {
+                  if (clickButton) {
+                    handleAddTransaction();
+                  }
+                }
+              }}
+            >
               <p className="px-1 py-1 mx-auto text-xl justify-center">
                 {price}
               </p>
@@ -86,18 +106,21 @@ const Content = (props) => {
       "w-full h-full bg-hollandtints-800 text-white cursor-pointer"
     );
     const [price, setPrice] = useState(afterDiscount(Data.price, Data.disc));
+    const runTransition = async () => {
+      setTimeout(() => {
+        addTransaction(Data, true);
+        setColorSet(
+          "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
+        );
+        setPrice(afterDiscount(Data.price, Data.disc));
+      }, 1000);
+    };
     const handleAddTransaction = () => {
       setColorSet(
         "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-600 text-white cursor-pointer"
       );
       setPrice("to cart");
-      setTimeout(function () {
-        setColorSet(
-          "w-full h-full transition duration-700 ease-in-out bg-hollandtints-800 text-white cursor-pointer"
-        );
-        setPrice(afterDiscount(Data.price, Data.disc));
-        addTransaction(Data);
-      }, 1000);
+      runTransition();
     };
     return (
       <li>
@@ -145,7 +168,6 @@ const Content = (props) => {
       </li>
     );
   };
-
   return (
     <div className="flex justify-center">
       <div className="content-center">

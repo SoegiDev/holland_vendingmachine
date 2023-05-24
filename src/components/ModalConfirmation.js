@@ -1,29 +1,11 @@
-import React, { useState } from "react";
-const numberFormat = (value) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(value);
-const afterDiscount = (value, discount) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(value - value * (discount / 100));
-
+import React from "react";
 const ModalConfirmation = (props) => {
-  const {
-    itemsTransaction,
-    addTransaction,
-    setToOpenConfirmation,
-    setToOpenBeli,
-    setToOpenCart,
-  } = props;
-
-  console.log(props);
-  const handleModalConfirm = ({ status }) => {
-    setToOpenConfirmation({ status });
+  const { setToOpenConfirmation, dataConfirmation } = props;
+  const handleModalConfirm = (props) => {
+    dataConfirmation.deleted = props.deleted;
+    const status = props.status;
+    const Data = dataConfirmation;
+    setToOpenConfirmation({ status, Data });
   };
   return (
     <>
@@ -100,7 +82,9 @@ const ModalConfirmation = (props) => {
               <div className="flex w-full justify-between">
                 <button
                   className="w-full ml-4 mr-4 mt-2 mb-4 bg-slate-100 border-2 border-slate-400 text-black transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                  onClick={() => handleModalConfirm({ status: false })}
+                  onClick={() =>
+                    handleModalConfirm({ status: false, deleted: false })
+                  }
                 >
                   <span className="flex justify-center p-2">
                     <h3 className="text-2xl font-medium items-center ">
@@ -110,7 +94,9 @@ const ModalConfirmation = (props) => {
                 </button>
                 <button
                   className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                  onClick={() => handleModalConfirm({ status: false })}
+                  onClick={() =>
+                    handleModalConfirm({ status: false, deleted: true })
+                  }
                 >
                   <span className="flex justify-center p-2">
                     <h3 className="text-2xl font-medium items-center">Iya</h3>

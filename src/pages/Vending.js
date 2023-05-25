@@ -87,30 +87,48 @@ const Vending = () => {
 
       setsubTotal(subTotal + item.price - item.price * (item.disc / 100));
     } else {
-      setTransaction(
-        transaction.map((product) =>
-          product.id === item.id
-            ? {
-                id: item.id,
-                category: item.category,
-                description: item.description,
-                disc: item.disc,
-                imageUrl: item.imageUrl,
-                price: item.price,
-                rating: item.rating,
-                stock: item.stock,
-                title: item.title,
-                qty: tambah ? existItem.qty + 1 : existItem.qty - 1,
-              }
-            : product
-        )
-      );
       if (tambah) {
         let afterdisc = item.price - (item.price * item.disc) / 100;
         setsubTotal(subTotal + afterdisc);
+        setTransaction(
+          transaction.map((product) =>
+            product.id === item.id
+              ? {
+                  id: item.id,
+                  category: item.category,
+                  description: item.description,
+                  disc: item.disc,
+                  imageUrl: item.imageUrl,
+                  price: item.price,
+                  rating: item.rating,
+                  stock: item.stock,
+                  title: item.title,
+                  qty: existItem.qty + 1,
+                }
+              : product
+          )
+        );
       } else {
         let afterdisc = item.price - (item.price * item.disc) / 100;
         setsubTotal(subTotal - afterdisc);
+        setTransaction(
+          transaction.map((product) =>
+            product.id === item.id
+              ? {
+                  id: item.id,
+                  category: item.category,
+                  description: item.description,
+                  disc: item.disc,
+                  imageUrl: item.imageUrl,
+                  price: item.price,
+                  rating: item.rating,
+                  stock: item.stock,
+                  title: item.title,
+                  qty: existItem.qty - 1,
+                }
+              : product
+          )
+        );
       }
     }
   };

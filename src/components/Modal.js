@@ -285,7 +285,7 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction }) => {
               <div
                 className="ml-4 mr-4"
                 onClick={() => ClickPlus(Data)}
-                data-tooltip-id="tooltip-anchor-hide"
+                data-tooltip-id={`tooltip${Data.id}`}
                 data-tooltip-content="Stock tidak mencukupi"
                 data-tooltip-delay-hide={1000}
               >
@@ -332,7 +332,7 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction }) => {
                 </svg>
               </div>
               <Tooltip
-                id="tooltip-anchor-hide"
+                id={`tooltip${Data.id}`}
                 events={["click"]}
                 isOpen={!isFlagStock}
                 style={{

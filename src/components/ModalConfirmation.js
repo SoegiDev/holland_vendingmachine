@@ -1,11 +1,9 @@
 import React from "react";
 const ModalConfirmation = (props) => {
-  const { setToOpenConfirmation, dataConfirmation } = props;
-  const handleModalConfirm = (props) => {
-    dataConfirmation.deleted = props.deleted;
-    const status = props.status;
-    const Data = dataConfirmation;
-    setToOpenConfirmation({ status, Data });
+  const handleModalConfirm = ({ deleted, status }) => {
+    props.dataConfirmation.deleted = deleted;
+    props.dataConfirmation.status = status;
+    props.setToOpenConfirmation(props.dataConfirmation);
   };
   return (
     <>

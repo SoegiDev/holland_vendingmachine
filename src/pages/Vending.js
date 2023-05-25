@@ -18,9 +18,9 @@ const Vending = () => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [dataConfirmation, setDataConfirmation] = useState({});
   const [openBeli, setOpenBeli] = useState(false);
-  const [subTotal, setsubTotal] = useState(0);
-
+  const [subTotal, setSubTotal] = useState(0);
   const [screensaverActive, setScreensaverActive] = useState(false);
+  let sumSubTotal = 0;
   const handleIdle = () => {
     setScreensaverActive(true);
   };
@@ -31,31 +31,33 @@ const Vending = () => {
     idleTimer.reset();
   };
   useEffect(() => {
-    setTransaction(JSON.parse(localStorage.getItem("transaction")));
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem("transaction", JSON.stringify(transaction));
+    localStorage.setItem("subTotal", subTotal);
   });
+  useEffect(() => {
+    if (localStorage.getItem("transaction") !== null) {
+      console.log("transaction", "tidak null");
+      setTransaction(JSON.parse(localStorage.getItem("transaction")));
+      if (localStorage.getItem("subTotal") !== null) {
+        setSubTotal(localStorage.getItem("subTotal"));
+        console.log("subtotal", "tidak null");
+      }
+    }
+  }, []);
   const setToOpenCart = (cart) => {
     setOpenCart(cart);
   };
-  let afterdisc = 0;
-  let subprice = 0;
+
   const setToOpenConfirmation = (props) => {
     setDataConfirmation(props);
-    if (props.Data.deleted) {
-      if (props.Data.module === "remove-item") {
-        deleteById(props.Data.Data.id);
-        afterdisc =
-          props.Data.Data.price -
-          (props.Data.Data.price * props.Data.Data.disc) / 100;
-        subprice = afterdisc * props.Data.Data.qty;
-        setsubTotal(subTotal - subprice);
+    if (props.deleted) {
+      if (props.module === "remove-all") {
+        setSubTotal(0);
+        setTransaction([]);
+        setOpenCart(false);
       }
-      if (props.Data.module === "remove-all") {
-        deleteAll();
-        setOpenCart(!openCart);
+      if (props.module === "remove-item") {
+        deleteItem(props.Data);
       }
       setOpenConfirmation(props.status);
     } else {
@@ -85,11 +87,14 @@ const Vending = () => {
         },
       ]);
 
-      setsubTotal(subTotal + item.price - item.price * (item.disc / 100));
+      const disc = item.price * (item.disc / 100);
+      sumSubTotal = item.price - disc;
+      setSubTotal(parseInt(subTotal) + sumSubTotal);
     } else {
       if (tambah) {
-        let afterdisc = item.price - (item.price * item.disc) / 100;
-        setsubTotal(subTotal + afterdisc);
+        const disc = item.price * (item.disc / 100);
+        sumSubTotal = item.price - disc;
+        setSubTotal(parseInt(subTotal) + sumSubTotal);
         setTransaction(
           transaction.map((product) =>
             product.id === item.id
@@ -109,40 +114,50 @@ const Vending = () => {
           )
         );
       } else {
-        let afterdisc = item.price - (item.price * item.disc) / 100;
-        setsubTotal(subTotal - afterdisc);
-        setTransaction(
-          transaction.map((product) =>
-            product.id === item.id
-              ? {
-                  id: item.id,
-                  category: item.category,
-                  description: item.description,
-                  disc: item.disc,
-                  imageUrl: item.imageUrl,
-                  price: item.price,
-                  rating: item.rating,
-                  stock: item.stock,
-                  title: item.title,
-                  qty: existItem.qty - 1,
-                }
-              : product
-          )
-        );
+        if (item.qty <= 1) {
+          setToOpenConfirmation({
+            Data: item,
+            module: "remove-item",
+            message: "Yakin untuk Menghapus Product",
+            status: true,
+          });
+        } else {
+          const disc = item.price * (item.disc / 100);
+          sumSubTotal = item.price - disc;
+          setSubTotal(parseInt(subTotal) - sumSubTotal);
+          setTransaction(
+            transaction.map((product) =>
+              product.id === item.id
+                ? {
+                    id: item.id,
+                    category: item.category,
+                    description: item.description,
+                    disc: item.disc,
+                    imageUrl: item.imageUrl,
+                    price: item.price,
+                    rating: item.rating,
+                    stock: item.stock,
+                    title: item.title,
+                    qty: existItem.qty - 1,
+                  }
+                : product
+            )
+          );
+        }
       }
     }
   };
-  const deleteById = (id) => {
-    setTransaction((oldValues) => {
-      return oldValues.filter((items) => items.id !== id);
-    });
+  const deleteItem = (item) => {
+    setTransaction(transaction.filter((cart) => cart.id !== item.id));
+    const disc = item.price * (item.disc / 100);
+    const afterDisc = item.price - disc;
+    sumSubTotal = afterDisc * item.qty;
+    setSubTotal(parseInt(subTotal) - sumSubTotal);
+    if (transaction.length <= 1) {
+      setOpenCart(false);
+    }
   };
-  const deleteAll = () => {
-    subprice = 0;
-    afterdisc = 0;
-    setTransaction([]);
-    setsubTotal(0);
-  };
+
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="portrait:hidden">Landscape</div>

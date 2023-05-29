@@ -7,13 +7,6 @@ const numberFormat = (value) =>
     currency: "IDR",
     minimumFractionDigits: 0,
   }).format(value);
-const afterDiscount = (value, discount) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(value - value * (discount / 100));
-
 const Modal = (props) => {
   const {
     itemsTransaction,
@@ -116,7 +109,9 @@ const Modal = (props) => {
                     </span>
                   </div>
                   <button
-                    className="w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
+                    className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg ${
+                      subTotal === 0 && "hidden"
+                    }`}
                     onClick={() => handleModalBeli(true)}
                   >
                     <span className="flex justify-center p-2">
@@ -153,7 +148,7 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction }) => {
     }
   };
   const ClickPlus = (Menu) => {
-    if (Menu.stock <= Menu.qty) {
+    if (Menu.onhand <= Menu.qty) {
       setisFlagStock(!isFlagStock);
     } else {
       setisFlagStock(true);
@@ -166,7 +161,7 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction }) => {
         <div className="flex w-1/4 h-44 justify-center m-2">
           <span className="flex w-32 items-center">
             <img
-              src={Data.imageUrl}
+              src={Data.image}
               alt="Landing Page"
               className="h-32 w-full border content-center rounded-3xl shadow-lg"
             />
@@ -181,21 +176,24 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction }) => {
           <div className="flex ml-2 mt-4">
             <p
               className={`text-2xl font-sans mt-5 pl-2 ${
-                Data.disc > 0 && "line-through text-hollandtints-900"
+                Data.harga_jual < Data.harga_promo &&
+                "line-through text-hollandtints-900"
               }`}
             >
-              {Data.disc > 0 ? numberFormat(Data.price) : ""}
+              {Data.disc > 0 ? numberFormat(Data.harga_promo) : ""}
             </p>
           </div>
           <div className="flex ml-2">
             <p className="text-3xl font-bold pl-2 text-hollandtints-900">
-              {afterDiscount(Data.price, Data.disc)}
+              {Data.status_promo === "1"
+                ? numberFormat(Data.harga_promo)
+                : numberFormat(Data.harga_jual)}
             </p>
           </div>
           <div className="relative flex ml-2 mt-4 justify-between">
             <div className="flex items-start">
               <p className="text-2xl font-sans pl-2 text-hollandtints-900 align-bottom">
-                Sisa {Data.stock - Data.qty}
+                Sisa {Data.onhand - Data.qty}
               </p>
             </div>
             <div className="flex items-end">

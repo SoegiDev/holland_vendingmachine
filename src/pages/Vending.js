@@ -10,6 +10,8 @@ import Modal from "../components/Modal";
 import ModalConfirmation from "../components/ModalConfirmation";
 import ModalBeli from "../components/ModalBeli";
 import useIdle from "../hooks/useIdleTimeout";
+import loadingGif from "../assets/img/loading.gif";
+import vendingService from "../services/vendingService";
 
 const Vending = () => {
   const [items] = useState(Products);
@@ -20,27 +22,46 @@ const Vending = () => {
   const [openBeli, setOpenBeli] = useState(false);
   const [subTotal, setSubTotal] = useState(0);
   const [screensaverActive, setScreensaverActive] = useState(false);
+  const [slots, setSlot] = useState([]);
+  const [loadingFirst, setLoading] = useState(true);
+
+  const getSlotProduct = () => {
+    vendingService
+      .getListStock()
+      .then((response) => {
+        setSlot(response.data.data);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   let sumSubTotal = 0;
   const handleIdle = () => {
     setScreensaverActive(true);
   };
-  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 20 });
+  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 200 });
 
   const stay = () => {
     setScreensaverActive(false);
     idleTimer.reset();
   };
   useEffect(() => {
+    getSlotProduct();
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem("transaction", JSON.stringify(transaction));
     localStorage.setItem("subTotal", subTotal);
   });
   useEffect(() => {
+    if (localStorage.getItem("slots") !== null) {
+      setSlot(localStorage.getItem("slots"));
+    }
     if (localStorage.getItem("transaction") !== null) {
-      console.log("transaction", "tidak null");
       setTransaction(JSON.parse(localStorage.getItem("transaction")));
       if (localStorage.getItem("subTotal") !== null) {
         setSubTotal(localStorage.getItem("subTotal"));
-        console.log("subtotal", "tidak null");
       }
     }
   }, []);
@@ -69,46 +90,62 @@ const Vending = () => {
   };
 
   const addTransaction = (item, tambah) => {
-    const existItem = transaction.find((product) => product.id === item.id);
+    const existItem = transaction.find((slot) => slot.no_slot === item.no_slot);
     if (!existItem) {
+      var harga = item.status_promo === 1 ? item.harga_promo : item.harga_jual;
       setTransaction([
         ...transaction,
         {
-          id: item.id,
-          category: item.category,
-          description: item.description,
-          disc: item.disc,
-          imageUrl: item.imageUrl,
-          price: item.price,
-          rating: item.rating,
-          stock: item.stock,
-          title: item.title,
+          id_vm: null,
+          documentno: null,
+          no_slot: item.no_slot,
+          kode_produk: item.kode_produk,
+          name_produk: item.name_produk,
+          rear_status: null,
+          timestamp: null,
+          error_no: null,
+          error_msg: null,
           qty: 1,
+          onhand: item.onhand,
+          image: item.image,
+          payment_type: null,
+          verify_no: null,
+          harga: harga,
+          harga_jual: item.harga_jual,
+          issync: 0,
         },
       ]);
 
-      const disc = item.price * (item.disc / 100);
-      sumSubTotal = item.price - disc;
+      const disc = item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+      sumSubTotal = disc;
       setSubTotal(parseInt(subTotal) + sumSubTotal);
     } else {
       if (tambah) {
-        const disc = item.price * (item.disc / 100);
-        sumSubTotal = item.price - disc;
+        const disc =
+          item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+        sumSubTotal = disc;
         setSubTotal(parseInt(subTotal) + sumSubTotal);
         setTransaction(
           transaction.map((product) =>
-            product.id === item.id
+            product.no_slot === item.no_slot
               ? {
-                  id: item.id,
-                  category: item.category,
-                  description: item.description,
-                  disc: item.disc,
-                  imageUrl: item.imageUrl,
-                  price: item.price,
-                  rating: item.rating,
-                  stock: item.stock,
-                  title: item.title,
+                  id_vm: null,
+                  documentno: null,
+                  no_slot: item.no_slot,
+                  kode_produk: item.kode_produk,
+                  name_produk: item.name_produk,
+                  rear_status: null,
+                  timestamp: null,
+                  error_no: null,
+                  error_msg: null,
+                  payment_type: null,
+                  verify_no: null,
+                  harga: harga,
+                  harga_jual: item.harga_jual,
+                  issync: 0,
                   qty: existItem.qty + 1,
+                  onhand: item.onhand,
+                  image: item.image,
                 }
               : product
           )
@@ -122,23 +159,31 @@ const Vending = () => {
             status: true,
           });
         } else {
-          const disc = item.price * (item.disc / 100);
-          sumSubTotal = item.price - disc;
+          const disc =
+            item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+          sumSubTotal = disc;
           setSubTotal(parseInt(subTotal) - sumSubTotal);
           setTransaction(
             transaction.map((product) =>
-              product.id === item.id
+              product.no_slot === item.no_slot
                 ? {
-                    id: item.id,
-                    category: item.category,
-                    description: item.description,
-                    disc: item.disc,
-                    imageUrl: item.imageUrl,
-                    price: item.price,
-                    rating: item.rating,
-                    stock: item.stock,
-                    title: item.title,
+                    id_vm: null,
+                    documentno: null,
+                    no_slot: item.no_slot,
+                    kode_produk: item.kode_produk,
+                    name_produk: item.name_produk,
+                    rear_status: null,
+                    timestamp: null,
+                    error_no: null,
+                    error_msg: null,
+                    payment_type: null,
+                    verify_no: null,
+                    harga: harga,
+                    harga_jual: item.harga_jual,
+                    issync: 0,
                     qty: existItem.qty - 1,
+                    onhand: item.onhand,
+                    image: item.image,
                   }
                 : product
             )
@@ -148,9 +193,9 @@ const Vending = () => {
     }
   };
   const deleteItem = (item) => {
-    setTransaction(transaction.filter((cart) => cart.id !== item.id));
-    const disc = item.price * (item.disc / 100);
-    const afterDisc = item.price - disc;
+    setTransaction(transaction.filter((cart) => cart.no_slot !== item.no_slot));
+    const disc = item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+    const afterDisc = disc;
     sumSubTotal = afterDisc * item.qty;
     setSubTotal(parseInt(subTotal) - sumSubTotal);
     if (transaction.length <= 1) {
@@ -173,12 +218,20 @@ const Vending = () => {
             </p>
           </div>
         </div>
+      ) : loadingFirst ? (
+        <span className="landscape:hidden flex h-full w-full">
+          <img src={loadingGif} alt="" className="flex h-30 w-30 text-center" />
+        </span>
       ) : (
         <div className="landscape:hidden w-screen">
           <TopHeader />
           <Header />
           <RunningText />
-          <Content items={items} addTransaction={addTransaction} />
+          <Content
+            items={items}
+            slots={slots}
+            addTransaction={addTransaction}
+          />
           <ContentFooter
             itemsTransaction={transaction}
             setToOpenCart={setToOpenCart}

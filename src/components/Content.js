@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -39,17 +39,13 @@ const Content = (props) => {
 };
 
 const MyItems = ({ slot, addTransaction }) => {
+  const [isAddItemClass, setAdditemClass] = useState(false);
+
   const handleAddTransaction = () => {
-    const button = document.getElementById("btncart-" + slot.no_slot);
-    console.log(button);
-    //console.log(button);
-    if (!button.classList.contains("item-added")) {
-      button.classList.add("item-added");
-      console.log(button);
-      // setTimeout(() => button.classList.remove("item-added"), 1000);
-      setTimeout(() => console.log("Initial timeout!"), 1000);
-    }
-    console.log(button);
+    setAdditemClass(!isAddItemClass);
+    // setTimeout(() => button.classList.remove("item-added"), 1000);
+    setTimeout(() => setAdditemClass(false), 1000);
+
     addTransaction(slot, true);
   };
   return (
@@ -86,7 +82,11 @@ const MyItems = ({ slot, addTransaction }) => {
         {slot.onhand > 0 ? (
           <div
             id={"btncart-" + slot.no_slot}
-            className="w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
+            className={`${
+              isAddItemClass
+                ? "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-500 text-white cursor-pointer"
+                : "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
+            }`}
             onClick={() => {
               if (slot.onhand > 0) {
                 handleAddTransaction();
@@ -94,7 +94,9 @@ const MyItems = ({ slot, addTransaction }) => {
             }}
           >
             <p className="px-1 py-1 mx-auto text-xl justify-center">
-              {slot.status_promo === "1"
+              {isAddItemClass
+                ? "Add Item"
+                : slot.status_promo === "1"
                 ? numberFormat(slot.harga_promo)
                 : numberFormat(slot.harga_jual)}
             </p>

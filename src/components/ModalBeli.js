@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import PaymentGateway from "../assets/img/payment-gateway.png";
 import qris__template from "../assets/img/template-qris.png";
+import { useQrious } from "react-qrious";
+import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 const ModalBeli = (props) => {
   const {
@@ -10,7 +12,38 @@ const ModalBeli = (props) => {
     setToOpenBeli,
     setToOpenCart,
   } = props;
+  const minuteSeconds = 60;
+  const hourSeconds = 3600;
+  const daySeconds = 86400;
+  const timerProps = {
+    isPlaying: true,
+    size: 120,
+    strokeWidth: 6,
+  };
+  const getTimeSeconds = (time) => (minuteSeconds - time) | 0;
+  const getTimeMinutes = (time) => ((time % hourSeconds) / minuteSeconds) | 0;
+  const getTimeHours = (time) => ((time % daySeconds) / hourSeconds) | 0;
+  const getTimeDays = (time) => (time / daySeconds) | 0;
 
+  const stratTime = Date.now() / 1000; // use UNIX timestamp in seconds
+  const endTime = stratTime + 243248; // use UNIX timestamp in seconds
+
+  const remainingTime = endTime - stratTime;
+  const days = Math.ceil(remainingTime / daySeconds);
+  const daysDuration = days * daySeconds;
+
+  const renderTime = (dimension, time) => {
+    return (
+      <div className="time-wrapper">
+        <div className="time">{time}</div>
+        <div>{dimension}</div>
+      </div>
+    );
+  };
+  const [value, setValue] = useState(
+    "asdkjaskdjalksdjlk1209382190askdjsakdjlksajlksajdlksaj"
+  );
+  const [dataUrl, _qrious] = useQrious({ value });
   const handleModalBeli = ({ deleted, status }) => {
     //setChoice(false);
     console.log("Close");
@@ -34,40 +67,57 @@ const ModalBeli = (props) => {
                 className="w-[90%] px-32 mb-6 items-center"
               />
             </div>
-            <div className="flex h-max[192px] w-full">
-              <div className="flex w-1/2 h-64 justify-center m-2">
-                <span className="flex w-32 items-center">
+            <div className="flex justify-around max-[192px]">
+              <div className="flex flex-col h-96">
+                <span className="flex w-full h-full items-center">
                   <img
-                    src={PaymentGateway}
+                    src={dataUrl}
                     alt="Landing Page"
-                    className="h-64  w-64 content-center"
+                    className="h-64 w-64 content-center"
                   />
                 </span>
+                <span className="h-20 w-64 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
+                  <p className="text-3xl font-medium justify-center mt-2">
+                    Scan QR
+                  </p>
+                </span>
               </div>
-              <div className="flex w-1/2  mt-4 mr-20 justify-end">
-                <div className="flex flex-col">
-                  <div className="flex ml-2 mb-2 ">
-                    <span className="flex w-44 items-center">
-                      <img
-                        src={PaymentGateway}
-                        alt="Landing Page"
-                        className="h-44  w-44 content-center"
-                      />
-                    </span>
-                  </div>
-                  <button
-                    className="w-full ml-4 mr-4 mt-2 mb-4 bg-slate-100 border-2 border-slate-400 text-black transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
+              <div className="flex flex-col h-96">
+                <span className="flex w-full h-full items-center">
+                  {/* <img
+                    src={dataUrl}
+                    alt="Landing Page"
+                    className="h-64 w-64 content-center"
+                  /> */}
+                  <CountdownCircleTimer
+                    className="h-64 w-64 content-center"
+                    isPlaying
+                    colors="#ea7a66"
+                    duration={minuteSeconds}
+                    strokeWidth={23}
+                    size={250}
+                    onComplete={() => {
+                      // do your stuff here
+                      handleModalBeli({ status: false, deleted: false });
+                    }}
+                  >
+                    {({ elapsedTime, color }) => (
+                      <span className="text-3xl font-sans text-hollandtints-500">
+                        {renderTime("Detik", getTimeSeconds(elapsedTime))}
+                      </span>
+                    )}
+                  </CountdownCircleTimer>
+                </span>
+                <span className="h-20 w-64 rounded-full justify-center bg-slate-800 border-4 border-slate-200 text-slate-50 ">
+                  <p
+                    className="text-3xl font-medium content-center mt-2"
                     onClick={() =>
                       handleModalBeli({ status: false, deleted: false })
                     }
                   >
-                    <span className="flex justify-center p-2">
-                      <h3 className="text-2xl font-medium items-center opacity-60">
-                        Tutup
-                      </h3>
-                    </span>
-                  </button>
-                </div>
+                    Tutup
+                  </p>
+                </span>
               </div>
             </div>
 

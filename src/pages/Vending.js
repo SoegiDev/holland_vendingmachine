@@ -24,10 +24,11 @@ const Vending = () => {
   const [screensaverActive, setScreensaverActive] = useState(false);
   const [slots, setSlot] = useState([]);
   const [loadingFirst, setLoading] = useState(true);
+  const [totalItemCart, setTotalItemCart] = useState(0);
 
   const getSlotProduct = () => {
     vendingService
-      .getListStock()
+      .getListStockOffline()
       .then((response) => {
         setSlot(response.data.data);
         setLoading(false);
@@ -74,6 +75,7 @@ const Vending = () => {
     if (props.deleted) {
       if (props.module === "remove-all") {
         setSubTotal(0);
+        setTotalItemCart(0);
         setTransaction([]);
         setOpenCart(false);
       }
@@ -119,6 +121,7 @@ const Vending = () => {
       const disc = item.status_promo === 1 ? item.harga_promo : item.harga_jual;
       sumSubTotal = disc;
       setSubTotal(parseInt(subTotal) + sumSubTotal);
+      setTotalItemCart(totalItemCart + 1);
     } else {
       if (tambah) {
         const disc =
@@ -150,6 +153,7 @@ const Vending = () => {
               : product
           )
         );
+        setTotalItemCart(totalItemCart + 1);
       } else {
         if (item.qty <= 1) {
           setToOpenConfirmation({
@@ -188,6 +192,7 @@ const Vending = () => {
                 : product
             )
           );
+          setTotalItemCart(totalItemCart - 1);
         }
       }
     }
@@ -201,6 +206,7 @@ const Vending = () => {
     if (transaction.length <= 1) {
       setOpenCart(false);
     }
+    setTotalItemCart(totalItemCart - 1);
   };
 
   return (
@@ -235,6 +241,7 @@ const Vending = () => {
           <ContentFooter
             itemsTransaction={transaction}
             setToOpenCart={setToOpenCart}
+            totalItemCart={totalItemCart}
           />
           <Footer />
           {openCart && (
@@ -246,6 +253,7 @@ const Vending = () => {
               setToOpenBeli={setToOpenBeli}
               setToOpenCart={setToOpenCart}
               subTotal={subTotal}
+              totalItemCart={totalItemCart}
             />
           )}
           {openConfirmation && (
@@ -257,6 +265,7 @@ const Vending = () => {
               setToOpenConfirmation={setToOpenConfirmation}
               setToOpenBeli={setToOpenBeli}
               setToOpenCart={setToOpenCart}
+              totalItemCart={totalItemCart}
             />
           )}
           {openBeli && (
@@ -267,6 +276,7 @@ const Vending = () => {
               setToOpenConfirmation={setToOpenConfirmation}
               setToOpenBeli={setToOpenBeli}
               setToOpenCart={setToOpenCart}
+              totalItemCart={totalItemCart}
             />
           )}
         </div>

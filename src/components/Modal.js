@@ -170,7 +170,7 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction }) => {
         <div className="flex flex-col w-full mt-4 mr-4">
           <div className="flex ml-2 mb-2">
             <p className="truncate text-3xl font-bold w-96 text-left">
-              {Data.title}
+              {Data.name_produk}
             </p>
           </div>
           <div className="flex ml-2 mt-4">

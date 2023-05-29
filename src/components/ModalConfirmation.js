@@ -70,7 +70,7 @@ const ModalConfirmation = (props) => {
                 {props.dataConfirmation.message}
               </p>
               <p className="text-4xl font-serif mt-4 mb-4 mr-8 ml-8 line-clamp-none line-through text-hollandtints-900">
-                {props.dataConfirmation.Data.title} ?
+                {props.dataConfirmation.Data.name_produk} ?
               </p>
             </div>
             <div className="flex bg-hollandtints-800">

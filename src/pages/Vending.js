@@ -155,7 +155,7 @@ const Vending = () => {
           setToOpenConfirmation({
             Data: item,
             module: "remove-item",
-            message: "Yakin untuk Menghapus Product",
+            message: "Anda ingin Menghapus ",
             status: true,
           });
         } else {

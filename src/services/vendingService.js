@@ -1,15 +1,25 @@
 import http from "../http-commons";
 
-const getListStock = () => {
-  return http.get("vend/liststock");
+const getSlotOnline = () => {
+  return http.get("api/get-slot");
 };
 
-const getListStockOffline = () => {
-  return http.get("vend/liststock_offline");
+const getSlotOffline = () => {
+  return http.get("vending/get-slot");
+};
+
+const getBannerImageOnline = () => {
+  return http.get("api/get-banner-image");
+};
+
+const getBannerImageOffline = () => {
+  return http.get("vending/get-banner-image");
 };
 
 const vendingService = {
-  getListStock,
-  getListStockOffline,
+  getSlotOnline,
+  getSlotOffline,
+  getBannerImageOnline,
+  getBannerImageOffline,
 };
 export default vendingService;

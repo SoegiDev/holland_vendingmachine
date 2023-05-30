@@ -109,7 +109,7 @@ const Modal = (props) => {
                     </span>
                   </div>
                   <button
-                    className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg ${
+                    className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl ${
                       subTotal === 0 && "hidden"
                     }`}
                     onClick={() => handleModalBeli(true)}

@@ -108,7 +108,7 @@ const ModalBeli = (props) => {
                     )}
                   </CountdownCircleTimer>
                 </span>
-                <span className="h-20 w-64 rounded-full justify-center bg-slate-800 border-4 border-slate-200 text-slate-50 ">
+                <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
                   <p
                     className="text-3xl font-medium content-center mt-2"
                     onClick={() =>

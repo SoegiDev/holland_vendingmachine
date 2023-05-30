@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import loadingGif from "../assets/img/loading.gif";
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -7,33 +7,41 @@ const numberFormat = (value) =>
     minimumFractionDigits: 0,
   }).format(value);
 const Content = (props) => {
-  const { slots, addTransaction } = props;
+  const { slots, addTransaction, loadingFirst } = props;
+  const [isLoading, setisLoading] = useState(loadingFirst);
+  console.log(loadingFirst);
   return (
     <div className="flex justify-center">
-      <div className="content-center">
-        <ul className="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 mt-2 mb-1">
-          {slots
-            .filter((item, idx) => idx <= 24)
-            .map((slot, index) => (
-              <MyItems
-                key={index}
-                slot={slot}
-                addTransaction={addTransaction}
-              />
-            ))}
-        </ul>
-        <ul className="grid grid-cols-2 gap-1 md:grid-cols-10 lg:grid-cols-10 2xl:grid-cols-7 mb-2">
-          {slots
-            .filter((item, index) => index >= 25)
-            .map((slot, index) => (
-              <MyItemsChild
-                key={index}
-                slot={slot}
-                addTransaction={addTransaction}
-              />
-            ))}
-        </ul>
-      </div>
+      {isLoading || slots !== undefined || slots !== null ? (
+        <div className="content-center">
+          <ul className="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 mt-2 mb-1">
+            {slots
+              .filter((item, idx) => idx <= 24)
+              .map((slot, index) => (
+                <MyItems
+                  key={index}
+                  slot={slot}
+                  addTransaction={addTransaction}
+                />
+              ))}
+          </ul>
+          <ul className="grid grid-cols-2 gap-1 md:grid-cols-10 lg:grid-cols-10 2xl:grid-cols-7 mb-2">
+            {slots
+              .filter((item, index) => index >= 25)
+              .map((slot, index) => (
+                <MyItemsChild
+                  key={index}
+                  slot={slot}
+                  addTransaction={addTransaction}
+                />
+              ))}
+          </ul>
+        </div>
+      ) : (
+        <div className="content-center">
+          <img src={loadingGif} alt="" className="flex h-64 w-64 text-center" />
+        </div>
+      )}
     </div>
   );
 };

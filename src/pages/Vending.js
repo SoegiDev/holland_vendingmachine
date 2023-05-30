@@ -23,15 +23,26 @@ const Vending = () => {
   const [subTotal, setSubTotal] = useState(0);
   const [screensaverActive, setScreensaverActive] = useState(false);
   const [slots, setSlot] = useState([]);
+  const [banners, setBanner] = useState([]);
   const [loadingFirst, setLoading] = useState(true);
   const [totalItemCart, setTotalItemCart] = useState(0);
 
-  const getSlotProduct = () => {
+  const getInitSlot = () => {
     vendingService
-      .getListStockOffline()
+      .getSlotOffline()
       .then((response) => {
-        setSlot(response.data.data);
-        setLoading(false);
+        setSlot(response.data.results.data);
+        setLoading(!loadingFirst);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+  const getInitImage = () => {
+    vendingService
+      .getBannerImageOnline()
+      .then((response) => {
+        setBanner(response.data.results.data);
       })
       .catch((e) => {
         console.log(e);
@@ -48,8 +59,8 @@ const Vending = () => {
     idleTimer.reset();
   };
   useEffect(() => {
-    getSlotProduct();
-  }, []);
+    if (slots.length === 0) getInitImage() && getInitSlot();
+  });
 
   useEffect(() => {
     localStorage.setItem("transaction", JSON.stringify(transaction));
@@ -58,6 +69,9 @@ const Vending = () => {
   useEffect(() => {
     if (localStorage.getItem("slots") !== null) {
       setSlot(localStorage.getItem("slots"));
+    }
+    if (localStorage.getItem("banner") !== null) {
+      setSlot(localStorage.getItem("banner"));
     }
     if (localStorage.getItem("transaction") !== null) {
       setTransaction(JSON.parse(localStorage.getItem("transaction")));
@@ -224,20 +238,27 @@ const Vending = () => {
             </p>
           </div>
         </div>
-      ) : loadingFirst ? (
-        <span className="landscape:hidden flex h-full w-full">
-          <img src={loadingGif} alt="" className="flex h-30 w-30 text-center" />
-        </span>
       ) : (
         <div className="landscape:hidden w-screen">
           <TopHeader />
           <Header />
           <RunningText />
-          <Content
-            items={items}
-            slots={slots}
-            addTransaction={addTransaction}
-          />
+          {loadingFirst ? (
+            <div className="flex justify-center">
+              <img
+                src={loadingGif}
+                alt=""
+                className="flex h-64 w-64 items-center"
+              />
+            </div>
+          ) : (
+            <Content
+              loadingFirst={loadingFirst}
+              items={items}
+              slots={slots}
+              addTransaction={addTransaction}
+            />
+          )}
           <ContentFooter
             itemsTransaction={transaction}
             setToOpenCart={setToOpenCart}

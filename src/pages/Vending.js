@@ -29,12 +29,14 @@ const Vending = () => {
 
   const getInitSlot = () => {
     vendingService
-      .getSlotOffline()
+      .getSlotOnline()
       .then((response) => {
         setSlot(response.data.results.data);
         setLoading(!loadingFirst);
+        ///  getInitImage();
       })
       .catch((e) => {
+        console.log("TIDAK OK");
         console.log(e);
       });
   };
@@ -59,19 +61,21 @@ const Vending = () => {
     idleTimer.reset();
   };
   useEffect(() => {
-    if (slots.length === 0) getInitImage() && getInitSlot();
+    if (slots === undefined || slots.length === 0) getInitSlot();
   });
 
   useEffect(() => {
     localStorage.setItem("transaction", JSON.stringify(transaction));
     localStorage.setItem("subTotal", subTotal);
+    localStorage.setItem("slots", JSON.stringify(slots));
+    localStorage.setItem("banners", JSON.stringify(banners));
   });
   useEffect(() => {
     if (localStorage.getItem("slots") !== null) {
       setSlot(localStorage.getItem("slots"));
     }
-    if (localStorage.getItem("banner") !== null) {
-      setSlot(localStorage.getItem("banner"));
+    if (localStorage.getItem("banners") !== null) {
+      setSlot(localStorage.getItem("banners"));
     }
     if (localStorage.getItem("transaction") !== null) {
       setTransaction(JSON.parse(localStorage.getItem("transaction")));

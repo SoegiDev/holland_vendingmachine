@@ -25,7 +25,7 @@ const Content = (props) => {
               />
             ))}
         </ul>
-        <ul className="grid grid-cols-2 gap-1 md:grid-cols-10 lg:grid-cols-10 2xl:grid-cols-7 mb-2">
+        <ul className="grid grid-cols-2 gap-1 md:grid-cols-10 lg:grid-cols-10 2xl:grid-cols-7 mb-">
           {slots
             .filter((item, index) => index >= 25)
             .map((slot, index) => (
@@ -135,7 +135,7 @@ const MyItemsChild = ({ slot, addTransaction }) => {
         <img
           src={slot.image}
           alt="Landing Page"
-          className="w-22 h-20"
+          className="w-full h-20"
           onClick={() => {
             if (slot.onhand > 0) {
               handleAddTransaction();

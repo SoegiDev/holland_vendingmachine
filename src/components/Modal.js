@@ -20,8 +20,8 @@ const Modal = (props) => {
     setToOpenCart(status);
   };
 
-  const handleModalBeli = (status) => {
-    setToOpenBeli(status);
+  const handleModalBeli = (status, payment) => {
+    setToOpenBeli(status, payment);
   };
   const handleModalConfirm = ({ Data, module, message, status, deleted }) => {
     setToOpenConfirmation({ Data, module, message, status, deleted });
@@ -112,7 +112,7 @@ const Modal = (props) => {
                     className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl ${
                       subTotal === 0 && "hidden"
                     }`}
-                    onClick={() => handleModalBeli(true)}
+                    onClick={() => handleModalBeli(true, true)}
                   >
                     <span className="flex justify-center p-2">
                       <h3 className="text-3xl font-serif items-center">Beli</h3>

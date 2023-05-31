@@ -16,10 +16,15 @@ const getBannerImageOffline = () => {
   return http.get("vending/get-banner-image");
 };
 
+const getQRShopee = (url = "") => {
+  return http.get(url);
+};
+
 const vendingService = {
   getSlotOnline,
   getSlotOffline,
   getBannerImageOnline,
   getBannerImageOffline,
+  getQRShopee,
 };
 export default vendingService;

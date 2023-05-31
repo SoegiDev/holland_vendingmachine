@@ -12,7 +12,8 @@ import ModalBeli from "../components/ModalBeli";
 import useIdle from "../hooks/useIdleTimeout";
 import loadingGif from "../assets/img/loading.gif";
 import vendingService from "../services/vendingService";
-
+var VM_ID = process.env.REACT_APP_VM_ID;
+var VM_NAME = process.env.REACT_APP_VM_NAME;
 const Vending = () => {
   const [items] = useState(Products);
   const [transaction, setTransaction] = useState([]);
@@ -26,7 +27,9 @@ const Vending = () => {
   const [banners, setBanner] = useState([]);
   const [loadingFirst, setLoading] = useState(true);
   const [totalItemCart, setTotalItemCart] = useState(0);
-
+  const [contentQr, setContentQr] = useState(null);
+  const [statusQR, setStatusQR] = useState(false);
+  const [trxCode, setTrxCode] = useState(null);
   const getInitSlot = () => {
     vendingService
       .getSlotOnline()
@@ -105,8 +108,12 @@ const Vending = () => {
       setOpenConfirmation(props.status);
     }
   };
-  const setToOpenBeli = (confirm) => {
-    setOpenBeli(confirm);
+  const setToOpenBeli = (confirm, payment) => {
+    if (payment) {
+      setPaymentQR(totalItemCart, subTotal, confirm);
+    } else {
+      setOpenBeli(confirm);
+    }
   };
 
   const addTransaction = (item, tambah) => {
@@ -227,6 +234,94 @@ const Vending = () => {
     setTotalItemCart(totalItemCart - 1);
   };
 
+  const setPaymentQR = (jumlahItem = 0, jumlahBayar = 0, confirm = false) => {
+    var trxCode =
+      VM_ID +
+      "-" +
+      formatDate(new Date()) +
+      Math.random().toString(36).substr(2, 9);
+    var apiQRCode = "payment/qr-shopee?";
+    apiQRCode += "trx_code=" + trxCode + "&";
+
+    var product_name = "";
+    var TotalBayar = 0;
+
+    if (TotalBayar !== jumlahBayar) {
+      //return false;
+    }
+
+    for (let i = 0; i < transaction.length; i++) {
+      var data = transaction[i];
+      product_name += data.name_produk + ",";
+      TotalBayar += data.onhand * data.harga_jual;
+    }
+
+    apiQRCode += "product_name=" + product_name + "&";
+    apiQRCode += "qty_product=" + jumlahItem + "&";
+    //console.log(rawItemData[itemNo].nama);
+    var amount = jumlahBayar;
+    apiQRCode += "amount=" + amount;
+
+    var timestamp = new Date().getUTCMilliseconds();
+    vendingService
+      .getQRShopee(apiQRCode)
+      .then((response) => {
+        if (response.data.message === "SUCCESS") {
+          setStatusQR(true);
+          setContentQr(response.data.results.qrcode);
+          setTrxCode(trxCode);
+          setOpenBeli(true);
+        } else {
+          setStatusQR(false);
+          setContentQr("https://www.hollandbakery.co.id");
+          setOpenBeli(true);
+        }
+      })
+      .catch((e) => {
+        setOpenBeli(false);
+        console.log(e);
+      });
+  };
+  function formatDate(d) {
+    //return the string "MMddyy"
+    return getYear(d) + getMonth(d);
+  }
+
+  function getMonth(d) {
+    //get the month
+    var month = d.getMonth();
+
+    //increment month by 1 since it is 0 indexed
+    //converts month to a string
+    //if month is 1-9 pad right with a 0 for two digits
+    month = (month + 1).toString().padStart(2, "0");
+
+    return month;
+  }
+
+  // function getDay with 1 parameter expecting date
+  // This function returns a string of type dd (example: 09 = The 9th day of the month)
+  function getDay(d) {
+    //get the day
+    //convert day to string
+    //if day is between 1-9 pad right with a 0 for two digits
+    var day = d.getDate().toString().padStart(2, "0");
+
+    return day;
+  }
+
+  // function getYear with 1 parameter expecting date
+  // This function returns the year in format yy (example: 21 = 2021)
+  function getYear(d) {
+    //get the year
+    var year = d.getFullYear();
+
+    //pull the last two digits of the year
+    year = year.toString().substr(-2);
+
+    return year;
+  }
+
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="portrait:hidden">Landscape</div>
@@ -302,6 +397,8 @@ const Vending = () => {
               setToOpenBeli={setToOpenBeli}
               setToOpenCart={setToOpenCart}
               totalItemCart={totalItemCart}
+              contentQr={contentQr}
+              statusQr={statusQR}
             />
           )}
         </div>

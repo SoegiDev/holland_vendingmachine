@@ -68,11 +68,11 @@ const Modal = (props) => {
               <div className="flex justify-items-start m-4">
                 <div className="flex flex-col items-center mt-12">
                   <button className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg">
-                    <span className="flex justify-center p-2">
-                      <h3
-                        className="text-2xl font-medium items-center"
-                        onClick={() => handleRemoveAll(itemsTransaction, true)}
-                      >
+                    <span
+                      className="flex justify-center p-2"
+                      onClick={() => handleRemoveAll(itemsTransaction, true)}
+                    >
+                      <h3 className="text-2xl font-medium items-center">
                         Kosongkan Keranjang
                       </h3>
                     </span>

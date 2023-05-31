@@ -143,14 +143,15 @@ const Vending = () => {
         },
       ]);
 
-      const disc = item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+      const disc =
+        item.status_promo === "1" ? item.harga_promo : item.harga_jual;
       sumSubTotal = disc;
       setSubTotal(parseInt(subTotal) + sumSubTotal);
       setTotalItemCart(totalItemCart + 1);
     } else {
       if (tambah) {
         const disc =
-          item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+          item.status_promo === "1" ? item.harga_promo : item.harga_jual;
         sumSubTotal = disc;
         setSubTotal(parseInt(subTotal) + sumSubTotal);
         setTransaction(
@@ -189,7 +190,7 @@ const Vending = () => {
           });
         } else {
           const disc =
-            item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+            item.status_promo === "1" ? item.harga_promo : item.harga_jual;
           sumSubTotal = disc;
           setSubTotal(parseInt(subTotal) - sumSubTotal);
           setTransaction(
@@ -224,7 +225,7 @@ const Vending = () => {
   };
   const deleteItem = (item) => {
     setTransaction(transaction.filter((cart) => cart.no_slot !== item.no_slot));
-    const disc = item.status_promo === 1 ? item.harga_promo : item.harga_jual;
+    const disc = item.status_promo === "1" ? item.harga_promo : item.harga_jual;
     const afterDisc = disc;
     sumSubTotal = afterDisc * item.qty;
     setSubTotal(parseInt(subTotal) - sumSubTotal);

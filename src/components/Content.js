@@ -121,14 +121,14 @@ const MyItemsChild = ({ slot, addTransaction }) => {
   return (
     <li>
       <div
-        className={`relative h-25 ml-1 mr-1 overflow-hidden text-center ${
+        className={`relative w-20 h-25 ml-1 mr-1 overflow-hidden text-center ${
           slot.onhand === 0
             ? "opacity-70 bg-opacity-70"
             : "shadow-2xl bg-white "
         }`}
       >
         <div
-          className={`absolute h-8 w-7 rounded-br-2xl bg-hollandtints-700 text-2xl`}
+          className={`absolute h-8 w-8 rounded-br-2xl bg-hollandtints-700 text-2xl`}
         >
           <p className="text-lg font-bold text-white">{slot.no_slot}</p>
         </div>

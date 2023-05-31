@@ -8,9 +8,6 @@ const numberFormat = (value) =>
   }).format(value);
 const Content = (props) => {
   const { slots, addTransaction, loadingFirst } = props;
-  const [isLoading, setisLoading] = useState(loadingFirst);
-  console.log(loadingFirst);
-  console.log(slots);
   return (
     <div className="flex justify-center">
       <div className="content-center">

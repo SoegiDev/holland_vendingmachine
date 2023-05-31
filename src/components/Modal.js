@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Tooltip } from "react-tooltip";
-
+import loadingGif from "../assets/img/loading.gif";
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
   }).format(value);
+
 const Modal = (props) => {
+  const [openPayment, setOpenPayment] = useState(false);
+
   const {
     itemsTransaction,
     addTransaction,
@@ -21,6 +24,11 @@ const Modal = (props) => {
   };
 
   const handleModalBeli = (status, payment) => {
+    setOpenPayment(true);
+    setTimeout(() => TutupLoading(status, payment), 5000);
+  };
+  const TutupLoading = (status, payment) => {
+    setOpenPayment(false);
     setToOpenBeli(status, payment);
   };
   const handleModalConfirm = ({ Data, module, message, status, deleted }) => {
@@ -48,6 +56,7 @@ const Modal = (props) => {
               KERANJANG BELANJA
             </h3>
           </header>
+
           <div className="flex-1 no-scrollbar overflow-y-auto">
             <ul>
               {itemsTransaction.map((item, index) => (
@@ -70,7 +79,11 @@ const Modal = (props) => {
                   <button className="w-full ml-4 mr-4 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg">
                     <span
                       className="flex justify-center p-2"
-                      onClick={() => handleRemoveAll(itemsTransaction, true)}
+                      onClick={() => {
+                        if (!openPayment) {
+                          handleRemoveAll(itemsTransaction, true);
+                        }
+                      }}
                     >
                       <h3 className="text-2xl font-medium items-center">
                         Kosongkan Keranjang
@@ -79,7 +92,11 @@ const Modal = (props) => {
                   </button>
                   <button
                     className="w-full ml-4 mr-4 mt-2 mb-4 bg-slate-100 border-2 border-slate-400 text-black transition duration-500 rounded-2xl hover:opacity-80 hover:shadow-lg"
-                    onClick={() => handleModal(false)}
+                    onClick={() => {
+                      if (!openPayment) {
+                        handleModal(false);
+                      }
+                    }}
                   >
                     <span className="flex justify-center p-2">
                       <h3 className="text-2xl font-medium items-center">
@@ -108,16 +125,28 @@ const Modal = (props) => {
                       <hr className="border-y bg-hollandtints-800 w-2/3 mr-2"></hr>
                     </span>
                   </div>
-                  <button
-                    className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl ${
-                      subTotal === 0 && "hidden"
-                    }`}
-                    onClick={() => handleModalBeli(true, true)}
-                  >
-                    <span className="flex justify-center p-2">
-                      <h3 className="text-3xl font-serif items-center">Beli</h3>
-                    </span>
-                  </button>
+                  {openPayment ? (
+                    <div className="w-64 ml-4 mr-2 mt-2 mb-4 justify-center bg-white transition duration-500 rounded-2xl">
+                      <img
+                        src={loadingGif}
+                        alt=""
+                        className="flex items-center p-2"
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl ${
+                        subTotal === 0 && "hidden"
+                      }`}
+                      onClick={() => handleModalBeli(true, true)}
+                    >
+                      <span className="flex justify-center p-2">
+                        <h3 className="text-3xl font-serif items-center">
+                          Beli
+                        </h3>
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

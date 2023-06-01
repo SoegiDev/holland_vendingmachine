@@ -18,6 +18,7 @@ import sha256 from "crypto-js/sha256";
 import hmacSHA512 from "crypto-js/hmac-sha512";
 import Base64 from "crypto-js/enc-base64";
 import { Transition } from "@headlessui/react";
+import useEscape from "../model/UseEscape";
 var CryptoJS = require("crypto-js");
 var VM_ID = process.env.REACT_APP_VM_ID;
 var VM_NAME = process.env.REACT_APP_VM_NAME;
@@ -53,6 +54,38 @@ const Vending = () => {
   const [actionStatus, setActionStatus] = useState("");
 
   const [loadingFirst, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  useEscape(() => setIsOpen(false));
+  // useEffect(() => {
+  //   // function handleContextMenu(e) {
+  //   //   e.preventDefault(); // prevents the default right-click menu from appearing
+  //   // }
+  //   // // add the event listener to the component's root element
+  //   // const rootElement = document.getElementById("root");
+  //   // rootElement.addEventListener("contextmenu", handleContextMenu);
+  //   // // remove the event listener when the component is unmounted
+
+  //   // return () => {
+  //   //   rootElement.removeEventListener("contextmenu", handleContextMenu);
+  //   // };
+  //   const rootElement = document.getElementById("root");
+  //   const handleEsc = (event) => {
+  //     if (
+  //       event.ctrlKey === true &&
+  //       (event.which === "61" ||
+  //         event.which === "107" ||
+  //         event.which === "173" ||
+  //         event.which === "109" ||
+  //         event.which === "172" ||
+  //         event.which === "189")
+  //     ) {
+  //       console.log("Close");
+  //     }
+  //   };
+  //   return () => {
+  //     window.removeEventListener("keydown", handleEsc);
+  //   };
+  // }, []);
 
   useEffect(() => {
     var slotsLocal = localStorage.getItem("slots");
@@ -667,7 +700,10 @@ const Vending = () => {
     return QR_whatsApp;
   }
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden">
+    <div
+      className="flex flex-col h-screen w-full overflow-hidden"
+      id="my-component"
+    >
       <div className="portrait:hidden">Landscape</div>
       {screensaverActive ? (
         <div

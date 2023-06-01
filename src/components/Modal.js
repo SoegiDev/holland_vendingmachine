@@ -15,7 +15,7 @@ const Modal = (props) => {
     itemsTransaction,
     addTransaction,
     setToOpenConfirmation,
-    setToOpenBeli,
+    setPaymentQR,
     setToOpenCart,
     subTotal,
   } = props;
@@ -28,8 +28,8 @@ const Modal = (props) => {
     setTimeout(() => TutupLoading(status, payment), 5000);
   };
   const TutupLoading = (status, payment) => {
-    setOpenPayment(false);
-    setToOpenBeli(status, payment);
+    setPaymentQR(status, payment);
+    setTimeout(() => setOpenPayment(false), 1000);
   };
   const handleModalConfirm = ({ Data, module, message, status, deleted }) => {
     setToOpenConfirmation({ Data, module, message, status, deleted });
@@ -126,13 +126,62 @@ const Modal = (props) => {
                     </span>
                   </div>
                   {openPayment ? (
-                    <div className="w-64 ml-4 mr-2 mt-2 mb-4 justify-center bg-white transition duration-500 rounded-2xl">
-                      <img
-                        src={loadingGif}
-                        alt=""
-                        className="flex items-center p-2"
-                      />
-                    </div>
+                    <button className="w-64 ml-4 mr-2 mt-2 mb-4 text-white border-2 border-slate-500 transition duration-500 rounded-2xl ">
+                      <span className="flex justify-center p-2">
+                        <svg
+                          className="animate-spin h-8 w-8 text-hollandtints-800"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 1V5"
+                            stroke="#1C1C1C"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M19.4246 18.9246L16.5961 16.0962"
+                            stroke="#e4543a"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M22.5 11.5L18.5 11.5"
+                            stroke="#e4543a"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M12 18V22"
+                            stroke="#e4543a"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M7.40381 6.90381L4.57538 4.07538"
+                            stroke="#e4543a"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M5.5 11.5L1.5 11.5"
+                            stroke="#e4543a"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M7.40381 16.0962L4.57538 18.9246"
+                            stroke="#e4543a"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <p className="text-xl font-serif text-hollandtints-800">
+                          Processing...
+                        </p>
+                      </span>
+                    </button>
                   ) : (
                     <button
                       className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl ${

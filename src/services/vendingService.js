@@ -1,23 +1,27 @@
 import http from "../http-commons";
 
 const getSlotOnline = () => {
-  return http.get("api/get-slot");
+  return http.NodeJsAPI("api/get-slot");
 };
 
 const getSlotOffline = () => {
-  return http.get("vending/get-slot");
+  return http.NodeJsAPI("vending/get-slot");
 };
 
 const getBannerImageOnline = () => {
-  return http.get("api/get-banner-image");
+  return http.NodeJsAPI("api/get-banner-image");
 };
 
 const getBannerImageOffline = () => {
-  return http.get("vending/get-banner-image");
+  return http.NodeJsAPI("vending/get-banner-image");
 };
 
 const getQRShopee = (url = "") => {
-  return http.get(url);
+  return http.NodeJsAPI(url);
+};
+
+const VMEngine = (url = "") => {
+  return http.VMMachine(url);
 };
 
 const vendingService = {
@@ -26,5 +30,6 @@ const vendingService = {
   getBannerImageOnline,
   getBannerImageOffline,
   getQRShopee,
+  VMEngine,
 };
 export default vendingService;

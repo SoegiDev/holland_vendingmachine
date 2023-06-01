@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default axios.create({
+const NodeJsAPI = axios.create({
   baseURL: "http://localhost:3000/",
   timeout: 30000,
   headers: {
@@ -8,3 +8,18 @@ export default axios.create({
     "Access-Control-Allow-Origin": "*",
   },
 });
+
+const VMMachine = axios.create({
+  baseURL: "http://localhost:2605/",
+  timeout: 4500,
+  headers: {
+    "Content-type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  },
+});
+const API = {
+  NodeJsAPI,
+  VMMachine,
+};
+
+export default API;

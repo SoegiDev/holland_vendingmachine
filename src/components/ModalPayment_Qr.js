@@ -79,11 +79,6 @@ const ModalBeli = (props) => {
               </div>
               <div className="flex flex-col h-96">
                 <span className="flex w-full h-full items-center">
-                  {/* <img
-                    src={dataUrl}
-                    alt="Landing Page"
-                    className="h-64 w-64 content-center"
-                  /> */}
                   <CountdownCircleTimer
                     className="h-64 w-64 content-center"
                     isPlaying

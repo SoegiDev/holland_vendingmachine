@@ -286,6 +286,7 @@ const Vending = () => {
     setSubTotal(0);
     setTotalItemCart(0);
     setTransaction([]);
+    setTotalItemCart(0);
     setOpenQRPayment(false);
     clearTimeout(parmStatusPaymentinterval);
     clearTimeout(parmStatusPaymentcheckPaymentStatus);
@@ -519,7 +520,7 @@ const Vending = () => {
                       setTitleStatus("TRANSAKSI BERHASIL");
                       setDescStatus(`Silahkan ambil produk anda dibawah`);
                       setActionStatus("TUTUP");
-                      cancelTransation();
+                      cancelTransation(false);
                     } else {
                       vmStatus = 0;
                       errorCode = response.data.buffer;
@@ -540,7 +541,7 @@ const Vending = () => {
                         `Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih`
                       );
                       setActionStatus("TUTUP");
-                      cancelTransation();
+                      cancelTransation(false);
                       if (jumlahErrorVend > 0) {
                         paramRefund["note"] =
                           paramRefund["note"] +
@@ -589,6 +590,8 @@ const Vending = () => {
     if (jumlahError > 0) {
       //sett qr WA
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
+      setContentQr(QR_refund_wa);
+      setRefundQR(true);
       setTIMEOUTVR = setTimeout(() => {
         setSubTotal(0);
         setTotalItemCart(0);
@@ -600,9 +603,7 @@ const Vending = () => {
         setTitleStatus("Waktu Scan Refund Habis!");
         setDescStatus(`Silahkan Hubungi Call Center Jika Ada kendala`);
         setActionStatus("TUTUP");
-        setContentQr(QR_refund_wa);
-        setRefundQR(true);
-      }, 80 * 1000);
+      }, 3000);
       clearTimeout(setTIMEOUTVR);
     } else {
       setTIMEOUTVR = setTimeout(() => {
@@ -614,7 +615,7 @@ const Vending = () => {
         setOpenQRPayment(false);
         setContentQr(QR_refund_wa);
         setOpenConfirmation(false);
-      }, 5000);
+      }, 3000);
       clearTimeout(setTIMEOUTVR);
     }
   }

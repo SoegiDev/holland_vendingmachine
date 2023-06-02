@@ -489,6 +489,7 @@ const Vending = () => {
                 vendingService
                   .VMEngine(apiVend)
                   .then((response) => {
+                    console.log(response);
                     textCounterItem =
                       "Product ke " + jumlahItemVend + " / " + totalItemCart;
                     if (response.status) {
@@ -517,9 +518,7 @@ const Vending = () => {
                       setModalStatus(true);
                       setTypeModalStatus("SUCCESS");
                       setTitleStatus("TRANSAKSI BERHASIL");
-                      setDescStatus(
-                        `Silahkan ambil produk anda dibawah ${textCounterItem}`
-                      );
+                      setDescStatus(`Silahkan ambil produk anda dibawah`);
                       setActionStatus("TUTUP");
                     } else {
                       vmStatus = 0;

@@ -11,7 +11,6 @@ const NodeJsAPI = axios.create({
 
 const VMMachine = axios.create({
   baseURL: "http://localhost:2605/",
-  timeout: 4500,
 });
 const API = {
   NodeJsAPI,

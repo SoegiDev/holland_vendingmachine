@@ -508,7 +508,7 @@ const Vending = () => {
                     console.log("VMENGINE 123", response);
                     textCounterItem =
                       "Product ke " + jumlahItemVend + " / " + totalItemCart;
-                    if (response.data.status) {
+                    if (response) {
                       apiStockOffline =
                         "vm-stock?slot=" + transaction[index].no_slot;
                       vendingService
@@ -520,8 +520,8 @@ const Vending = () => {
                           console.log(e);
                         });
                       vmStatus = 1;
-                      errorCode = response.data.buffer;
-                      errStatus = response.data.message;
+                      errorCode = response.buffer;
+                      errStatus = response.message;
                       vmStock(
                         index,
                         vmStatus,
@@ -539,8 +539,8 @@ const Vending = () => {
                       cancelTransation(false);
                     } else {
                       vmStatus = 0;
-                      errorCode = response.data.buffer;
-                      errStatus = response.data.message;
+                      errorCode = response.buffer;
+                      errStatus = response.message;
                       vmStock(
                         index,
                         vmStatus,

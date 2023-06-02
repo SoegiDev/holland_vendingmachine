@@ -282,6 +282,17 @@ const Vending = () => {
     setTotalItemCart(totalItemCart - 1);
   };
 
+  const cancelTransation = (status) => {
+    setSubTotal(0);
+    setTotalItemCart(0);
+    setTransaction([]);
+    setOpenQRPayment(false);
+    clearInterval(parmStatusPaymentinterval);
+    clearInterval(parmStatusPaymentcheckPaymentStatus);
+    clearInterval(parmStatusPaymenttimeout);
+    clearInterval(parmStatusPaymentcheckPaymentTimeout);
+    clearInterval(parmStatusPaymentintervalRefund);
+  };
   const setPaymentQR = () => {
     setOpenCart(false);
     var trxCode = VM_ID + "-" + formatDate();
@@ -398,7 +409,7 @@ const Vending = () => {
         }, 5000);
         clearInterval(TIMEOUTTRANSACTION);
         //console.log("Waktu Habis")
-      }, 15 * 1000);
+      }, 12 * 1000);
     }, 115 * 1000);
   };
 
@@ -780,6 +791,7 @@ const Vending = () => {
               className="transition-transform delay-700 duration-700 ease-in-out"
               itemsTransaction={transaction}
               addTransaction={addTransaction}
+              cancelTransation={cancelTransation}
               setToOpenConfirmation={setToOpenConfirmation}
               setOpenQRPayment={setOpenQRPayment}
               setToOpenCart={setToOpenCart}

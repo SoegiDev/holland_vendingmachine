@@ -524,15 +524,15 @@ const Vending = () => {
                       vmStatus = 1;
                       errorCode = response.data.buffer;
                       errStatus = response.data.message;
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
+                      // vmStock(
+                      //   index,
+                      //   vmStatus,
+                      //   errorCode,
+                      //   errStatus,
+                      //   trxCode,
+                      //   payment_type,
+                      //   verify_no
+                      // );
                       setModalStatus(true);
                       setTypeModalStatus("SUCCESS");
                       setTitleStatus("TRANSAKSI BERHASIL");
@@ -543,15 +543,15 @@ const Vending = () => {
                       vmStatus = 0;
                       errorCode = response.data.buffer;
                       errStatus = response.data.message;
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
+                      // vmStock(
+                      //   index,
+                      //   vmStatus,
+                      //   errorCode,
+                      //   errStatus,
+                      //   trxCode,
+                      //   payment_type,
+                      //   verify_no
+                      // );
                       setModalStatus(true);
                       setTypeModalStatus("INFO");
                       setTitleStatus("VENDING MACHINE ISSUE");

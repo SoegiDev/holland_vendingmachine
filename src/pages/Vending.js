@@ -590,7 +590,7 @@ const Vending = () => {
 
                 resolve(true);
                 setjumlahItemVend(0);
-              }, 1000);
+              }, 2000);
             });
           }
         }

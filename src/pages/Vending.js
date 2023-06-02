@@ -508,82 +508,82 @@ const Vending = () => {
                   .VMEngine(apiVend)
                   .then((response) => {
                     console.log("MASUK", response);
-                    textCounterItem =
-                      "Product ke " + jumlahItemVend + " / " + totalItemCart;
-                    if (response.data.status) {
-                      apiStockOffline =
-                        "vm-stock?slot=" + transaction[index].no_slot;
-                      vendingService
-                        .getQRShopee(apiStockOffline)
-                        .then((response) => {
-                          console.log("API STOCK OFFLINE", response);
-                        })
-                        .catch((e) => {
-                          console.log(e);
-                        });
-                      vmStatus = 1;
-                      errorCode = response.data.buffer;
-                      errStatus = response.data.message;
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      setModalStatus(true);
-                      setTypeModalStatus("SUCCESS");
-                      setTitleStatus("TRANSAKSI BERHASIL");
-                      setDescStatus(`Silahkan ambil produk anda dibawah`);
-                      setActionStatus("TUTUP");
-                      cancelTransation(false);
-                    } else {
-                      console.log("VMENGINE ELSE ", response);
-                      vmStatus = 0;
-                      errorCode = response.data.buffer;
-                      errStatus = response.data.message;
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      setModalStatus(true);
-                      setTypeModalStatus("INFO");
-                      setTitleStatus("VENDING MACHINE ISSUE");
-                      setDescStatus(
-                        `Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih`
-                      );
-                      setActionStatus("TUTUP");
-                      cancelTransation(false);
-                      if (jumlahErrorVend > 0) {
-                        paramRefund["note"] =
-                          paramRefund["note"] +
-                          "product code: " +
-                          transaction[index].kode_produk +
-                          ", error code: " +
-                          errorCode +
-                          ", message: " +
-                          errStatus +
-                          "%0A";
-                      } else {
-                        paramRefund["note"] =
-                          "product code: " +
-                          transaction[index].kode_produk +
-                          ", error code: " +
-                          errorCode +
-                          ", message: " +
-                          errStatus +
-                          "%0A";
-                      }
+                    // textCounterItem =
+                    //   "Product ke " + jumlahItemVend + " / " + totalItemCart;
+                    // if (response.data.status) {
+                    //   apiStockOffline =
+                    //     "vm-stock?slot=" + transaction[index].no_slot;
+                    //   vendingService
+                    //     .getQRShopee(apiStockOffline)
+                    //     .then((response) => {
+                    //       console.log("API STOCK OFFLINE", response);
+                    //     })
+                    //     .catch((e) => {
+                    //       console.log(e);
+                    //     });
+                    //   vmStatus = 1;
+                    //   errorCode = response.data.buffer;
+                    //   errStatus = response.data.message;
+                    //   vmStock(
+                    //     index,
+                    //     vmStatus,
+                    //     errorCode,
+                    //     errStatus,
+                    //     trxCode,
+                    //     payment_type,
+                    //     verify_no
+                    //   );
+                    //   setModalStatus(true);
+                    //   setTypeModalStatus("SUCCESS");
+                    //   setTitleStatus("TRANSAKSI BERHASIL");
+                    //   setDescStatus(`Silahkan ambil produk anda dibawah`);
+                    //   setActionStatus("TUTUP");
+                    //   cancelTransation(false);
+                    // } else {
+                    //   console.log("VMENGINE ELSE ", response);
+                    //   vmStatus = 0;
+                    //   errorCode = response.data.buffer;
+                    //   errStatus = response.data.message;
+                    //   vmStock(
+                    //     index,
+                    //     vmStatus,
+                    //     errorCode,
+                    //     errStatus,
+                    //     trxCode,
+                    //     payment_type,
+                    //     verify_no
+                    //   );
+                    //   setModalStatus(true);
+                    //   setTypeModalStatus("INFO");
+                    //   setTitleStatus("VENDING MACHINE ISSUE");
+                    //   setDescStatus(
+                    //     `Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih`
+                    //   );
+                    //   setActionStatus("TUTUP");
+                    //   cancelTransation(false);
+                    //   if (jumlahErrorVend > 0) {
+                    //     paramRefund["note"] =
+                    //       paramRefund["note"] +
+                    //       "product code: " +
+                    //       transaction[index].kode_produk +
+                    //       ", error code: " +
+                    //       errorCode +
+                    //       ", message: " +
+                    //       errStatus +
+                    //       "%0A";
+                    //   } else {
+                    //     paramRefund["note"] =
+                    //       "product code: " +
+                    //       transaction[index].kode_produk +
+                    //       ", error code: " +
+                    //       errorCode +
+                    //       ", message: " +
+                    //       errStatus +
+                    //       "%0A";
+                    //   }
 
-                      setjumlahErrorVend(jumlahErrorVend + 1);
-                    }
+                    //   setjumlahErrorVend(jumlahErrorVend + 1);
+                    // }
                   })
                   .catch((e) => {
                     console.log("gagal", e);

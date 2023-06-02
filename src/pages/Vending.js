@@ -19,6 +19,8 @@ import hmacSHA512 from "crypto-js/hmac-sha512";
 import Base64 from "crypto-js/enc-base64";
 import { Transition } from "@headlessui/react";
 import useEscape from "../model/UseEscape";
+import { Slide } from "react-slideshow-image";
+import "react-slideshow-image/dist/styles.css";
 var CryptoJS = require("crypto-js");
 var VM_ID = process.env.REACT_APP_VM_ID;
 var VM_NAME = process.env.REACT_APP_VM_NAME;
@@ -54,39 +56,12 @@ const Vending = () => {
   const [actionStatus, setActionStatus] = useState("");
 
   const [loadingFirst, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-  useEscape(() => setIsOpen(false));
-  // useEffect(() => {
-  //   // function handleContextMenu(e) {
-  //   //   e.preventDefault(); // prevents the default right-click menu from appearing
-  //   // }
-  //   // // add the event listener to the component's root element
-  //   // const rootElement = document.getElementById("root");
-  //   // rootElement.addEventListener("contextmenu", handleContextMenu);
-  //   // // remove the event listener when the component is unmounted
-
-  //   // return () => {
-  //   //   rootElement.removeEventListener("contextmenu", handleContextMenu);
-  //   // };
-  //   const rootElement = document.getElementById("root");
-  //   const handleEsc = (event) => {
-  //     if (
-  //       event.ctrlKey === true &&
-  //       (event.which === "61" ||
-  //         event.which === "107" ||
-  //         event.which === "173" ||
-  //         event.which === "109" ||
-  //         event.which === "172" ||
-  //         event.which === "189")
-  //     ) {
-  //       console.log("Close");
-  //     }
-  //   };
-  //   return () => {
-  //     window.removeEventListener("keydown", handleEsc);
-  //   };
-  // }, []);
-
+  var parmStatusPaymentinterval = "";
+  var parmStatusPaymentcheckPaymentStatus = "";
+  var parmStatusPaymenttimeout = "";
+  var parmStatusPaymentcheckPaymentTimeout = "";
+  var parmStatusPaymentintervalRefund = "";
+  var setTIMEOUTVR = "";
   useEffect(() => {
     var slotsLocal = localStorage.getItem("slots");
     var bannersLocal = localStorage.getItem("banners");
@@ -151,7 +126,7 @@ const Vending = () => {
   const handleIdle = () => {
     setScreensaverActive(true);
   };
-  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 200 });
+  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 3000 });
   const stay = () => {
     setScreensaverActive(false);
     idleTimer.reset();
@@ -307,21 +282,20 @@ const Vending = () => {
     setTotalItemCart(totalItemCart - 1);
   };
 
-  const setPaymentQR = (jumlahItem = 0, payment) => {
+  const setPaymentQR = () => {
+    setOpenCart(false);
     var trxCode = VM_ID + "-" + formatDate();
     var apiQRCode = "payment/qr-shopee?";
     apiQRCode += "trx_code=" + trxCode + "&";
     var product_name = "";
-    var TotalBayar = 0;
 
     for (let i = 0; i < transaction.length; i++) {
       var data = transaction[i];
       product_name += data.name_produk + ",";
-      TotalBayar += data.onhand * data.harga_jual;
     }
 
     apiQRCode += "product_name=" + product_name + "&";
-    apiQRCode += "qty_product=" + jumlahItem + "&";
+    apiQRCode += "qty_product=" + totalItemCart + "&";
     apiQRCode += "amount=" + subTotal;
     vendingService
       .getQRShopee(apiQRCode)
@@ -330,9 +304,9 @@ const Vending = () => {
           setContentQr(response.data.results.qrcode);
           setReadyQR(true);
           setTrxCode(trxCode);
-          setTimeout(() => {
-            checkQRPayment(trxCode, jumlahItem, subTotal, "SHOPEEPAY");
-          }, 5000);
+          parmStatusPaymentinterval = setTimeout(() => {
+            checkQRPayment(trxCode, totalItemCart, subTotal, "SHOPEEPAY");
+          }, 3000);
         } else {
           setReadyQR(false);
           setModalStatus(true);
@@ -364,6 +338,8 @@ const Vending = () => {
       .then((response) => {
         if (response.data.message === "SUCCESS") {
           PaymentSuccess(trxCode, payment_type);
+          clearInterval(parmStatusPaymentinterval);
+          clearInterval(parmStatusPaymentcheckPaymentStatus);
         } else {
           console.log("CHECK PAYMENT ", response);
         }
@@ -371,13 +347,15 @@ const Vending = () => {
       .catch((e) => {
         console.log(e);
       });
-    setInterval(() => {
+    parmStatusPaymentcheckPaymentStatus = setInterval(() => {
       vendingService
         .getQRShopee(apicheck)
         .then((response) => {
           console.log(response);
-          if (response.status === "SUCCESS") {
+          if (response.data.message === "SUCCESS") {
             PaymentSuccess(trxCode, payment_type);
+            clearInterval(parmStatusPaymentcheckPaymentStatus);
+            setOpenQRPayment(false);
           } else {
             console.log("CHECK PAYMENT ", response);
           }
@@ -396,20 +374,29 @@ const Vending = () => {
     }, 11600);
 
     //set waktu habis bayar
-    setTimeout(() => {
+    parmStatusPaymenttimeout = setTimeout(() => {
       setModalStatus(true);
       setTypeModalStatus("INFO");
       setTitleStatus("Yahhh, Waktu Transaksi Habis!");
       setDescStatus("Silahkan coba kembali");
       setActionStatus("TUTUP");
-      setTimeout(() => {
+      setOpenQRPayment(false);
+      clearInterval(parmStatusPaymenttimeout);
+      parmStatusPaymentcheckPaymentTimeout = setTimeout(() => {
         afterQR("0", "408", "Payment timeout", trxCode, payment_type);
         setSubTotal(0);
         setTotalItemCart(0);
         setTransaction([]);
-        setTimeout(() => {
+        setOpenQRPayment(false);
+        clearInterval(parmStatusPaymentinterval);
+        clearInterval(parmStatusPaymentcheckPaymentStatus);
+        clearInterval(parmStatusPaymenttimeout);
+        clearInterval(parmStatusPaymentcheckPaymentTimeout);
+        clearInterval(parmStatusPaymentintervalRefund);
+        var TIMEOUTTRANSACTION = setTimeout(() => {
           console.log("TIME OUT TRANSACTION");
         }, 5000);
+        clearInterval(TIMEOUTTRANSACTION);
         //console.log("Waktu Habis")
       }, 15 * 1000);
     }, 115 * 1000);
@@ -421,6 +408,7 @@ const Vending = () => {
     setTitleStatus("PEMBAYARAN SUKSES");
     setDescStatus("Pembayaran Berhasil, Mohon Ditunggu Ya!!!");
     setActionStatus("TUTUP");
+    clearTimeout(parmStatusPaymenttimeout);
     cartVendProcess(trxCode, payment_type);
   };
 
@@ -589,19 +577,21 @@ const Vending = () => {
     if (jumlahError > 0) {
       //sett qr WA
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
-      setTimeout(() => {
+      setTIMEOUTVR = setTimeout(() => {
         setSubTotal(0);
         setTotalItemCart(0);
         setTransaction([]);
         setOpenCart(false);
+        setPaymentQR(false);
         setModalStatus(true);
         setTypeModalStatus("INFO");
         setTitleStatus("Waktu Scan Refund Habis!");
         setDescStatus(`Silahkan Hubungi Call Center Jika Ada kendala`);
         setActionStatus("TUTUP");
       }, 80 * 1000);
+      clearInterval(setTIMEOUTVR);
     } else {
-      setTimeout(() => {
+      setTIMEOUTVR = setTimeout(() => {
         setSubTotal(0);
         setTotalItemCart(0);
         setTransaction([]);
@@ -610,6 +600,7 @@ const Vending = () => {
         setOpenQRPayment(false);
         setOpenConfirmation(false);
       }, 7000);
+      clearInterval(setTIMEOUTVR);
     }
   }
 
@@ -695,6 +686,10 @@ const Vending = () => {
 
     return QR_whatsApp;
   }
+  for (let index = 0; index < banners.length; index++) {
+    const element = banners[index];
+    console.log(element);
+  }
   return (
     <div
       className="flex flex-col h-screen w-full overflow-hidden"
@@ -707,11 +702,7 @@ const Vending = () => {
           className="landscape:hidden w-screen h-full"
           onClick={stay}
         >
-          <div className="flex h-full w-full bg-hollandtints-800 ">
-            <p className="flex text-4xl font-sans text-white items-center">
-              ScreenSaver
-            </p>
-          </div>
+          <img className="h-full w-full" src={banners[0].banner_url} alt="" />
         </div>
       ) : (
         <div className="landscape:hidden w-screen">

@@ -68,7 +68,7 @@ const ModalBeli = (props) => {
                   <img
                     src={dataUrl}
                     alt="Landing Page"
-                    className="h- w-80 content-center"
+                    className="h-96 w-96 content-center"
                   />
                 </span>
                 <span className="h-20 w-80 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
@@ -88,9 +88,10 @@ const ModalBeli = (props) => {
                     size={250}
                     onComplete={() => {
                       // do your stuff here
-                      handleQRModel({
-                        status: false,
-                      });
+                      // handleQRModel({
+                      //   status: false,
+                      // });
+                      console.log("TIMER SUDAH HABIS");
                     }}
                   >
                     {({ elapsedTime, color }) => (

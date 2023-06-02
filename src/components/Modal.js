@@ -23,12 +23,12 @@ const Modal = (props) => {
     setToOpenCart(status);
   };
 
-  const handleModalBeli = (status, payment) => {
+  const handleModalBeli = () => {
     setOpenPayment(true);
-    setTimeout(() => TutupLoading(status, payment), 5000);
+    setTimeout(() => TutupLoading(), 5000);
   };
-  const TutupLoading = (status, payment) => {
-    setPaymentQR(status, payment);
+  const TutupLoading = () => {
+    setPaymentQR();
     setTimeout(() => setOpenPayment(false), 1000);
   };
   const handleModalConfirm = ({ Data, module, message, status, deleted }) => {
@@ -187,7 +187,7 @@ const Modal = (props) => {
                       className={`w-64 ml-4 mr-2 mt-2 mb-4 bg-hollandtints-800 text-white transition duration-500 rounded-2xl ${
                         subTotal === 0 && "hidden"
                       }`}
-                      onClick={() => handleModalBeli(true, true)}
+                      onClick={() => handleModalBeli()}
                     >
                       <span className="flex justify-center p-2">
                         <h3 className="text-3xl font-serif items-center">

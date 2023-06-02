@@ -307,7 +307,7 @@ const Vending = () => {
     setTotalItemCart(totalItemCart - 1);
   };
 
-  const setPaymentQR = (jumlahItem = 0, jumlahBayar = 0) => {
+  const setPaymentQR = (jumlahItem = 0, payment) => {
     var trxCode = VM_ID + "-" + formatDate();
     var apiQRCode = "payment/qr-shopee?";
     apiQRCode += "trx_code=" + trxCode + "&";
@@ -331,7 +331,7 @@ const Vending = () => {
           setReadyQR(true);
           setTrxCode(trxCode);
           setTimeout(() => {
-            checkQRPayment(trxCode, jumlahItem, jumlahBayar, "SHOPEEPAY");
+            checkQRPayment(trxCode, jumlahItem, subTotal, "SHOPEEPAY");
           }, 5000);
         } else {
           setReadyQR(false);

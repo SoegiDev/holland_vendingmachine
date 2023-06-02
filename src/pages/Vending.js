@@ -488,7 +488,7 @@ const Vending = () => {
                 vendingService
                   .VMEngine(apiVend)
                   .then((response) => {
-                    console.log(response);
+                    console.log("VMENGINE", response);
                     textCounterItem =
                       "Product ke " + jumlahItemVend + " / " + totalItemCart;
                     if (response.status) {

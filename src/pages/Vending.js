@@ -351,8 +351,11 @@ const Vending = () => {
       .then((response) => {
         if (response.data.message === "SUCCESS") {
           PaymentSuccess(trxCode, payment_type);
-          clearInterval(parmStatusPaymentinterval);
-          clearInterval(parmStatusPaymentcheckPaymentStatus);
+          clearTimeout(parmStatusPaymentinterval);
+          clearTimeout(parmStatusPaymentcheckPaymentStatus);
+          clearTimeout(parmStatusPaymenttimeout);
+          clearTimeout(parmStatusPaymentcheckPaymentTimeout);
+          clearTimeout(parmStatusPaymentintervalRefund);
         } else {
           console.log("CHECK PAYMENT ", response);
         }
@@ -367,7 +370,11 @@ const Vending = () => {
           console.log(response);
           if (response.data.message === "SUCCESS") {
             PaymentSuccess(trxCode, payment_type);
-            clearInterval(parmStatusPaymentcheckPaymentStatus);
+            clearTimeout(parmStatusPaymentinterval);
+            clearTimeout(parmStatusPaymentcheckPaymentStatus);
+            clearTimeout(parmStatusPaymenttimeout);
+            clearTimeout(parmStatusPaymentcheckPaymentTimeout);
+            clearTimeout(parmStatusPaymentintervalRefund);
             setOpenQRPayment(false);
           } else {
             console.log("CHECK PAYMENT ", response);
@@ -394,7 +401,11 @@ const Vending = () => {
       setDescStatus("Silahkan coba kembali");
       setActionStatus("TUTUP");
       setOpenQRPayment(false);
+      clearTimeout(parmStatusPaymentinterval);
+      clearTimeout(parmStatusPaymentcheckPaymentStatus);
       clearTimeout(parmStatusPaymenttimeout);
+      clearTimeout(parmStatusPaymentcheckPaymentTimeout);
+      clearTimeout(parmStatusPaymentintervalRefund);
       parmStatusPaymentcheckPaymentTimeout = setTimeout(() => {
         afterQR("0", "408", "Payment timeout", trxCode, payment_type);
         setSubTotal(0);
@@ -421,7 +432,11 @@ const Vending = () => {
     setTitleStatus("PEMBAYARAN SUKSES");
     setDescStatus("Pembayaran Berhasil, Mohon Ditunggu Ya!!!");
     setActionStatus("TUTUP");
+    clearTimeout(parmStatusPaymentinterval);
+    clearTimeout(parmStatusPaymentcheckPaymentStatus);
     clearTimeout(parmStatusPaymenttimeout);
+    clearTimeout(parmStatusPaymentcheckPaymentTimeout);
+    clearTimeout(parmStatusPaymentintervalRefund);
     cartVendProcess(trxCode, payment_type);
   };
 

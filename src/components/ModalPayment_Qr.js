@@ -4,7 +4,7 @@ import qris__template from "../assets/img/template-qris.png";
 import { useQrious } from "react-qrious";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
-const ModalBeli = (props) => {
+const ModalPayment_Qr = (props) => {
   const {
     itemsTransaction,
     addTransaction,
@@ -12,6 +12,7 @@ const ModalBeli = (props) => {
     setOpenQRPayment,
     setToOpenCart,
     contentQr,
+    cancelTransation,
     statusQr,
   } = props;
   const minuteSeconds = 120;
@@ -42,7 +43,7 @@ const ModalBeli = (props) => {
   const handleQRModel = ({ status }) => {
     //setChoice(false);
     console.log("Close");
-    setOpenQRPayment(status);
+    cancelTransation(status);
   };
   return (
     <>
@@ -68,7 +69,7 @@ const ModalBeli = (props) => {
                   <img
                     src={dataUrl}
                     alt="Landing Page"
-                    className="h- w-80 content-center"
+                    className="h-96 w-96 content-center"
                   />
                 </span>
                 <span className="h-20 w-80 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
@@ -91,6 +92,7 @@ const ModalBeli = (props) => {
                       handleQRModel({
                         status: false,
                       });
+                      console.log("TIMER SUDAH HABIS");
                     }}
                   >
                     {({ elapsedTime, color }) => (
@@ -131,4 +133,4 @@ const ModalBeli = (props) => {
   );
 };
 
-export default ModalBeli;
+export default ModalPayment_Qr;

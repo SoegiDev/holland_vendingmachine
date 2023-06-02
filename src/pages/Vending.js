@@ -287,11 +287,11 @@ const Vending = () => {
     setTotalItemCart(0);
     setTransaction([]);
     setOpenQRPayment(false);
-    clearInterval(parmStatusPaymentinterval);
-    clearInterval(parmStatusPaymentcheckPaymentStatus);
-    clearInterval(parmStatusPaymenttimeout);
-    clearInterval(parmStatusPaymentcheckPaymentTimeout);
-    clearInterval(parmStatusPaymentintervalRefund);
+    clearTimeout(parmStatusPaymentinterval);
+    clearTimeout(parmStatusPaymentcheckPaymentStatus);
+    clearTimeout(parmStatusPaymenttimeout);
+    clearTimeout(parmStatusPaymentcheckPaymentTimeout);
+    clearTimeout(parmStatusPaymentintervalRefund);
   };
   const setPaymentQR = () => {
     setOpenCart(false);
@@ -392,22 +392,22 @@ const Vending = () => {
       setDescStatus("Silahkan coba kembali");
       setActionStatus("TUTUP");
       setOpenQRPayment(false);
-      clearInterval(parmStatusPaymenttimeout);
+      clearTimeout(parmStatusPaymenttimeout);
       parmStatusPaymentcheckPaymentTimeout = setTimeout(() => {
         afterQR("0", "408", "Payment timeout", trxCode, payment_type);
         setSubTotal(0);
         setTotalItemCart(0);
         setTransaction([]);
         setOpenQRPayment(false);
-        clearInterval(parmStatusPaymentinterval);
-        clearInterval(parmStatusPaymentcheckPaymentStatus);
-        clearInterval(parmStatusPaymenttimeout);
-        clearInterval(parmStatusPaymentcheckPaymentTimeout);
-        clearInterval(parmStatusPaymentintervalRefund);
+        clearTimeout(parmStatusPaymentinterval);
+        clearTimeout(parmStatusPaymentcheckPaymentStatus);
+        clearTimeout(parmStatusPaymenttimeout);
+        clearTimeout(parmStatusPaymentcheckPaymentTimeout);
+        clearTimeout(parmStatusPaymentintervalRefund);
         var TIMEOUTTRANSACTION = setTimeout(() => {
           console.log("TIME OUT TRANSACTION");
         }, 5000);
-        clearInterval(TIMEOUTTRANSACTION);
+        clearTimeout(TIMEOUTTRANSACTION);
         //console.log("Waktu Habis")
       }, 12 * 1000);
     }, 115 * 1000);
@@ -519,6 +519,7 @@ const Vending = () => {
                       setTitleStatus("TRANSAKSI BERHASIL");
                       setDescStatus(`Silahkan ambil produk anda dibawah`);
                       setActionStatus("TUTUP");
+                      cancelTransation();
                     } else {
                       vmStatus = 0;
                       errorCode = response.data.buffer;
@@ -539,6 +540,7 @@ const Vending = () => {
                         `Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih`
                       );
                       setActionStatus("TUTUP");
+                      cancelTransation();
                       if (jumlahErrorVend > 0) {
                         paramRefund["note"] =
                           paramRefund["note"] +
@@ -569,7 +571,7 @@ const Vending = () => {
 
                 resolve(true);
                 setjumlahItemVend(0);
-              }, 3000);
+              }, 1000);
             });
           }
         }
@@ -598,8 +600,10 @@ const Vending = () => {
         setTitleStatus("Waktu Scan Refund Habis!");
         setDescStatus(`Silahkan Hubungi Call Center Jika Ada kendala`);
         setActionStatus("TUTUP");
+        setContentQr(QR_refund_wa);
+        setRefundQR(true);
       }, 80 * 1000);
-      clearInterval(setTIMEOUTVR);
+      clearTimeout(setTIMEOUTVR);
     } else {
       setTIMEOUTVR = setTimeout(() => {
         setSubTotal(0);
@@ -608,9 +612,10 @@ const Vending = () => {
         setOpenCart(false);
         setModalStatus(false);
         setOpenQRPayment(false);
+        setContentQr(QR_refund_wa);
         setOpenConfirmation(false);
-      }, 7000);
-      clearInterval(setTIMEOUTVR);
+      }, 5000);
+      clearTimeout(setTIMEOUTVR);
     }
   }
 

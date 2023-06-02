@@ -375,6 +375,7 @@ const Vending = () => {
       vendingService
         .getQRShopee(apicheck)
         .then((response) => {
+          console.log(response);
           if (response.status === "SUCCESS") {
             PaymentSuccess(trxCode, payment_type);
           } else {
@@ -382,6 +383,7 @@ const Vending = () => {
           }
         })
         .catch((e) => {
+          console.log(e);
           setReadyQR(false);
           setModalStatus(true);
           setTypeModalStatus("FAILED SERVER");
@@ -390,7 +392,6 @@ const Vending = () => {
             "Mohon maaf ya.. Ada kesalahan di dalam sistem Vending Machine"
           );
           setActionStatus("TUTUP");
-          console.log(e);
         });
     }, 11600);
 

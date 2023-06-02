@@ -8,6 +8,7 @@ const numberFormat = (value) =>
     minimumFractionDigits: 0,
   }).format(value);
 
+var permTimeout1 = "";
 const Modal = (props) => {
   const [openPayment, setOpenPayment] = useState(false);
 
@@ -25,9 +26,10 @@ const Modal = (props) => {
 
   const handleModalBeli = () => {
     setOpenPayment(true);
-    setTimeout(() => TutupLoading(), 5000);
+    permTimeout1 = setTimeout(() => TutupLoading(), 5000);
   };
   const TutupLoading = () => {
+    clearTimeout(permTimeout1);
     setPaymentQR();
     setTimeout(() => setOpenPayment(false), 1000);
   };

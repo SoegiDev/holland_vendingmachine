@@ -497,15 +497,17 @@ const Vending = () => {
               trxCode +
               "&hmac=" +
               encodeuri;
+            console.log(apiVend);
             await new Promise(function (resolve, reject) {
               setTimeout(function () {
                 setjumlahItemVend(jumlahItemVend + 1);
                 //console.log("iteration: " + index);
                 //buat encrypt slot
+                console.log("ATAS", apiVend);
                 vendingService
                   .VMEngine(apiVend)
                   .then((response) => {
-                    console.log("VMENGINE 123", response);
+                    console.log("VMENGINE ", response);
                     textCounterItem =
                       "Product ke " + jumlahItemVend + " / " + totalItemCart;
                     if (response) {
@@ -538,6 +540,7 @@ const Vending = () => {
                       setActionStatus("TUTUP");
                       cancelTransation(false);
                     } else {
+                      console.log("VMENGINE ELSE ", response);
                       vmStatus = 0;
                       errorCode = response.buffer;
                       errStatus = response.message;
@@ -583,7 +586,7 @@ const Vending = () => {
                     }
                   })
                   .catch((e) => {
-                    console.log(e);
+                    console.log("gagal", apiVend);
                   });
 
                 resolve(true);

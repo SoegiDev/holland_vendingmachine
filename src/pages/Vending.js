@@ -507,9 +507,10 @@ const Vending = () => {
                 vendingService
                   .VMEngine(apiVend)
                   .then((response) => {
+                    console.log(response);
                     textCounterItem =
                       "Product ke " + jumlahItemVend + " / " + totalItemCart;
-                    if (response["data"]["status"] === true) {
+                    if (response.data.status === true) {
                       apiStockOffline =
                         "vm-stock?slot=" + transaction[index].no_slot;
                       vendingService

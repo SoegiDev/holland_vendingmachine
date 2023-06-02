@@ -21,6 +21,7 @@ import { Transition } from "@headlessui/react";
 import useEscape from "../model/UseEscape";
 import { Slide } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
+import ModalCheckPayment from "../components/ModalCheckPayment";
 var CryptoJS = require("crypto-js");
 var VM_ID = process.env.REACT_APP_VM_ID;
 var VM_NAME = process.env.REACT_APP_VM_NAME;

@@ -314,10 +314,6 @@ const Vending = () => {
     var product_name = "";
     var TotalBayar = 0;
 
-    if (TotalBayar !== jumlahBayar) {
-      //return false;
-    }
-
     for (let i = 0; i < transaction.length; i++) {
       var data = transaction[i];
       product_name += data.name_produk + ",";
@@ -326,8 +322,7 @@ const Vending = () => {
 
     apiQRCode += "product_name=" + product_name + "&";
     apiQRCode += "qty_product=" + jumlahItem + "&";
-    var amount = jumlahBayar;
-    apiQRCode += "amount=" + amount;
+    apiQRCode += "amount=" + subTotal;
     vendingService
       .getQRShopee(apiQRCode)
       .then((response) => {

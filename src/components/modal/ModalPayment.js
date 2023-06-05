@@ -40,7 +40,7 @@ const ModalPayment = (props) => {
   }, 3000);
   const handleQRModel = ({ status }) => {
     //setChoice(false);
-    console.log("Close");
+    cancelTransaction();
   };
   const CheckPembayaran = () => {
     //setChoice(false);

@@ -390,6 +390,10 @@ const Vending = () => {
       clearCart();
       setOpenModalCart(false);
       setOpenModalPayment(false);
+      clearInterval(timerInterval);
+      clearTimeout(timer);
+      clearInterval(timerInterval);
+      clearTimeout(timer3);
       Swal.fire({
         title: "Transaksi Batal!",
         text: "Anda Telah membatalkan Transaksi.",
@@ -906,8 +910,9 @@ const Vending = () => {
           }
         }
         return true;
-      };
-
+      }.then((res) => {
+        afterCartVendProcess(jumlahError, paramRefund, payment_type);
+      });
       looper().then(function () {
         //console.log(paramRefund);
         afterCartVendProcess(jumlahError, paramRefund, payment_type);
@@ -918,6 +923,7 @@ const Vending = () => {
   function afterCartVendProcess(jumlahError, paramRefund, payment_type) {
     if (jumlahError > 0) {
       //sett qr WA
+      console.log("AFTERCART");
       setOpenModalPayment(false);
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);

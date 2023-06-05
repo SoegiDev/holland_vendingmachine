@@ -7,12 +7,12 @@ const ModalCheckPayment = (props) => {
     descriptionStatus,
     actionStatus,
     titleStatus,
+    setPaymentManual,
   } = props;
   console.log("TAMPIL MODAL STATUS");
   const handleClose = ({ status }) => {
-    setModalStatus(status);
+    setPaymentManual(status);
   };
-  setTimeout(() => handleClose({ status: false }), 5000);
   return (
     <>
       <div

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-
+import VMINIT from "../services/init";
 const Account = {
   data: {
-    outlet: "VM Karbol 1",
+    outlet: VMINIT.getName(),
   },
 };
 
@@ -11,12 +11,12 @@ const TopHeader = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch("https://www.google.com/", {
+      fetch("https://vm.hollandbakery.co.id", {
         mode: "no-cors",
       })
         .then(() => !isOnline && setIsOnline(true))
         .catch(() => isOnline && setIsOnline(false));
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [isOnline]);

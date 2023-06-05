@@ -10,6 +10,7 @@ const useIdleTimeout = ({ onIdle, idleTime = 1 }) => {
   const [isIdle, setIdle] = useState(false);
   const handleIdle = () => {
     setIdle(true);
+    console.log("IDLE");
   };
 
   const idleTimer = useIdleTimer({

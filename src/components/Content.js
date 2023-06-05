@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import loadingGif from "../assets/img/loading.gif";
 const numberFormat = (value) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -7,7 +6,7 @@ const numberFormat = (value) =>
     minimumFractionDigits: 0,
   }).format(value);
 const Content = (props) => {
-  const { slots, addTransaction, loadingFirst } = props;
+  const { slots, addCart } = props;
   return (
     <div className="flex justify-center">
       <div className="content-center">
@@ -15,22 +14,14 @@ const Content = (props) => {
           {slots
             .filter((item, idx) => idx <= 24)
             .map((slot, index) => (
-              <MyItems
-                key={index}
-                slot={slot}
-                addTransaction={addTransaction}
-              />
+              <MyItems key={index} slot={slot} addTransaction={addCart} />
             ))}
         </ul>
         <ul className="grid grid-cols-2 gap-1 md:grid-cols-10 lg:grid-cols-10 2xl:grid-cols-7 mb-">
           {slots
             .filter((item, index) => index >= 25)
             .map((slot, index) => (
-              <MyItemsChild
-                key={index}
-                slot={slot}
-                addTransaction={addTransaction}
-              />
+              <MyItemsChild key={index} slot={slot} addTransaction={addCart} />
             ))}
         </ul>
       </div>
@@ -112,7 +103,11 @@ const MyItems = ({ slot, addTransaction }) => {
 };
 
 const MyItemsChild = ({ slot, addTransaction }) => {
+  const [isAddItemClass, setAdditemClass] = useState(false);
+
   const handleAddTransaction = () => {
+    setAdditemClass(!isAddItemClass);
+    setTimeout(() => setAdditemClass(false), 1000);
     addTransaction(slot, true);
   };
   return (
@@ -148,8 +143,17 @@ const MyItemsChild = ({ slot, addTransaction }) => {
         </p>
         {slot.onhand > 0 ? (
           <div
-            className="w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
-            onClick={() => handleAddTransaction()}
+            id={"btncart-" + slot.no_slot}
+            className={`${
+              isAddItemClass
+                ? "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-green-500 text-white cursor-pointer"
+                : "w-full h-full transition duration-500 ease-in-out -translate-y-0.5 bg-hollandtints-800 text-white cursor-pointer"
+            }`}
+            onClick={() => {
+              if (slot.onhand > 0) {
+                handleAddTransaction();
+              }
+            }}
           >
             <p className="px-1 py-1 text-base justify-center">
               {slot.status_promo === "1"

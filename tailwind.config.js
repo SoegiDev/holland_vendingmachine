@@ -49,5 +49,8 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  corePlugins: {
+    // ...
+    pointerEvents: false,
+  },
 };

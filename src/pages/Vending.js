@@ -46,6 +46,7 @@ const Vending = () => {
 
   const timer = useRef(null);
   const timer2 = useRef(null);
+  const timer3 = useRef(null);
   const timerInterval = useRef(null);
   var paramRefund = {};
   useEffect(() => {
@@ -409,6 +410,7 @@ const Vending = () => {
     setTotalItemCart(0);
     clearTimeout(timer);
     clearInterval(timerInterval);
+    clearTimeout(timer3);
     setUpdateData(true);
   };
 
@@ -555,7 +557,7 @@ const Vending = () => {
     }, 12000);
 
     //set waktu habis bayar
-    const timer3 = setTimeout(() => {
+    timer3.current = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -565,9 +567,10 @@ const Vending = () => {
         allowOutsideClick: false,
         timer: 3000,
       }).then(() => {
-        clearTimeout(timer3);
+        clearTimeout(timer3.current);
         clearCart();
         setOpenModalPayment(false);
+        clearInterval(timer3.current);
         setContentQR(null);
         afterQR("0", "408", "Payment timeout", trxCode, payment_type);
 
@@ -721,7 +724,7 @@ const Vending = () => {
   }
 
   const PaymentSuccess = (trxCode, payment_type) => {
-    Swal({
+    Swal.fire({
       title: "PEMBAYARAN SUKSES",
       text: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
       icon: "success",
@@ -828,7 +831,7 @@ const Vending = () => {
                       text: myhtml,
                       icon: "error",
                       allowOutsideClick: false,
-                      timer: 3000,
+                      timer: 5000,
                     }).then(() => {});
                     if (jumlahError > 0) {
                       paramRefund.note =
@@ -875,7 +878,7 @@ const Vending = () => {
                     content: myhtml,
                     icon: "error",
                     allowOutsideClick: false,
-                    timer: 3000,
+                    timer: 5000,
                   }).then(() => {});
                   if (jumlahError > 0) {
                     paramRefund.note =
@@ -915,9 +918,11 @@ const Vending = () => {
   function afterCartVendProcess(jumlahError, paramRefund, payment_type) {
     if (jumlahError > 0) {
       //sett qr WA
+      setOpenModalPayment(false);
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
-      setModalRefund(true);
+      setModalRefund(!openModalRefund);
+
       setTimeout(() => {
         Swal.fire({
           title: "Waktu Scan Refund Habis!",

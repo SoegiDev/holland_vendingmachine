@@ -137,12 +137,12 @@ const ModalPayment = (props) => {
                   </p>
                   <div className="flex flex-col w-full items-center p-2">
                     <button
-                      className="text-3xl font-sans items-center rounded-3xl bg-slate-600 w-44 h-20  content-center"
+                      className="text-3xl font-sans items-center rounded-3xl bg-slate-600 w-56 h-20  content-center"
                       onClick={() => {
                         CheckPembayaran();
                       }}
                     >
-                      Cek Pembayaran
+                      Cek Payment
                     </button>
                   </div>
                 </div>

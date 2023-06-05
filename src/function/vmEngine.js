@@ -9,7 +9,7 @@ async function RunEngine(param) {
     //  body: JSON.stringify({ title: "React POST Request Example" }),
   };
   const response = await fetch(
-    VMINIT.getURLLocal() + PATH + paramAPI,
+    VMINIT.getURLEngine() + paramAPI,
     requestOptions
   );
   const data = await response.json();

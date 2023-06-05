@@ -99,10 +99,6 @@ const ModalPayment = (props) => {
                     strokeWidth={23}
                     size={250}
                     onComplete={() => {
-                      // do your stuff here
-                      handleQRModel({
-                        status: false,
-                      });
                       console.log("TIMER SUDAH HABIS");
                     }}
                   >

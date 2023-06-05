@@ -44,10 +44,8 @@ const Vending = () => {
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
 
-  const timer = useRef(null);
-  const timer2 = useRef(null);
-  const timer3 = useRef(null);
-  const timerInterval = useRef(null);
+  let timerTimeout = useRef(null);
+  let timerInterval = useRef(null);
   var paramRefund = {};
   useEffect(() => {
     const getbanners = () =>
@@ -55,8 +53,8 @@ const Vending = () => {
         console.log("Running Get Banners");
         console.log(res);
         if (res.message === "No Data") {
-          timer.current = setTimeout(() => {
-            clearTimeout(timer.current);
+          timerTimeout.current = setTimeout(() => {
+            clearTimeout(timerTimeout.current);
             crud
               .initBanners()
               .then((res) => {
@@ -81,8 +79,8 @@ const Vending = () => {
         console.log("Running Get SLOTS");
         console.log(res);
         if (res.message === "No Data") {
-          timer.current = setTimeout(() => {
-            clearTimeout(timer.current);
+          timerTimeout.current = setTimeout(() => {
+            clearTimeout(timerTimeout.current);
             crud
               .initSlots()
               .then((res) => {
@@ -109,8 +107,8 @@ const Vending = () => {
         console.log("Running Get Banners");
         console.log(res);
         if (res.message === "No Data") {
-          timer.current = setTimeout(() => {
-            clearTimeout(timer.current);
+          timerTimeout.current = setTimeout(() => {
+            clearTimeout(timerTimeout.current);
             crud.getDataBannersImage().then((res) => {
               console.log("Running Get Banners LOCAL");
               console.log(res.results.data);
@@ -127,10 +125,10 @@ const Vending = () => {
       crud.initSlots().then((res) => {
         console.log("Running Get SLOTS");
         console.log(res);
-        timer.current = setTimeout(() => {
-          clearTimeout(timer.current);
-          timer.current = setTimeout(() => {
-            clearTimeout(timer.current);
+        timerTimeout.current = setTimeout(() => {
+          clearTimeout(timerTimeout.current);
+          timerTimeout.current = setTimeout(() => {
+            clearTimeout(timerTimeout.current);
             crud.getSlots().then((res) => {
               console.log("Running Get Slots LOCAL");
               console.log(res.results.data);
@@ -140,23 +138,24 @@ const Vending = () => {
           }, 1000);
         }, 1000);
       });
-    timer.current = setTimeout(() => {
+    timerTimeout.current = setTimeout(() => {
+      clearTimeout(timerTimeout.current);
       if (!isSyncBanners && !isSyncSlot) {
         if (isUpdateData) {
           console.log("UPDATE DATA TRUE");
           setLoading(true);
-          timer.current = setTimeout(() => {
-            clearTimeout(timer.current);
+          timerTimeout.current = setTimeout(() => {
+            clearTimeout(timerTimeout.current);
             console.log("Update Data");
             initBanners();
             clearCart();
           }, 2000);
         } else {
           console.log("UPDATE DATA False");
-          clearTimeout(timer.current);
+          clearTimeout(timerTimeout.current);
           setLoading(true);
-          timer.current = setTimeout(() => {
-            clearTimeout(timer.current);
+          timerTimeout.current = setTimeout(() => {
+            clearTimeout(timerTimeout.current);
             getbanners();
           }, 2000);
         }
@@ -387,22 +386,23 @@ const Vending = () => {
       allowOutsideClick: false,
       confirmButtonText: "Ya Batalkan",
     }).then((result) => {
-      clearCart();
-      setOpenModalCart(false);
-      setOpenModalPayment(false);
-      clearInterval(timerInterval);
-      clearTimeout(timer);
-      clearInterval(timerInterval);
-      clearTimeout(timer3);
-      Swal.fire({
-        title: "Transaksi Batal!",
-        text: "Anda Telah membatalkan Transaksi.",
-        icon: "success",
-        timer: 3000,
-      });
-      if (TrxCode !== null) {
-        afterQR("0", "107", "Transaction Cancelled", TrxCode, "SHOPEEPAY");
-        setTrxCode(null);
+      if (result.isConfirmed) {
+        clearCart();
+        setOpenModalCart(false);
+        setOpenModalPayment(false);
+        clearInterval(timerInterval);
+        clearTimeout(timerTimeout);
+        Swal.fire({
+          title: "Transaksi Batal!",
+          text: "Anda Telah membatalkan Transaksi.",
+          icon: "success",
+          timer: 3000,
+        });
+        if (TrxCode !== null) {
+          afterQR("0", "107", "Transaction Cancelled", TrxCode, "SHOPEEPAY");
+          setTrxCode(null);
+        }
+      } else {
       }
     });
   };
@@ -412,9 +412,8 @@ const Vending = () => {
     setTotalItemCart(0);
     setTransaction([]);
     setTotalItemCart(0);
-    clearTimeout(timer);
+    clearTimeout(timerTimeout);
     clearInterval(timerInterval);
-    clearTimeout(timer3);
     setUpdateData(true);
   };
 
@@ -439,7 +438,7 @@ const Vending = () => {
         setTotalItemCart(0);
         setTransaction([]);
         setTotalItemCart(0);
-        clearTimeout(timer);
+        clearTimeout(timerTimeout);
         clearInterval(timerInterval);
         setModalRefund(false);
         setUpdateData(true);
@@ -457,8 +456,8 @@ const Vending = () => {
   const setPaymentQR = () => {
     Swal.fire({
       icon: "info",
-      title: "Proses QR Code",
-      text: "harap Menunggu !",
+      title: "Proses QR",
+      text: "......",
       showConfirmButton: false,
       allowOutsideClick: false,
       timer: 3000,
@@ -480,20 +479,22 @@ const Vending = () => {
       crud
         .CreateQRShopee(apiQRCode)
         .then((res) => {
+          console.log("HASIL", res);
           setLoading(false);
           console.log(res);
           if (res.message === "SUCCESS") {
             setContentQR(res.results.qrcode);
             setTrxCode(trxCode);
             setOpenModalPayment(true);
-            timer.current = setTimeout(() => {
+            timerTimeout.current = setTimeout(() => {
+              clearTimeout(timerTimeout.current);
               checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
-              clearTimeout(timer.current);
             }, 3000);
           } else {
+            console.log("TIDAK MUNCUL");
             var errInfo = "Yahh, QR Tidak Muncul!";
             var errText = "Silahkan coba kembali..";
-            error("460", res.status, errText, errInfo, trxCode, "SHOPEEPAY");
+            error("460", res.message, errText, errInfo, trxCode, "SHOPEEPAY");
             failedQR();
           }
           // getSlots();
@@ -501,8 +502,7 @@ const Vending = () => {
         .catch((er) => {
           setLoading(false);
           console.log(er);
-          timer.current = setTimeout(function () {
-            clearTimeout(timer.current);
+          setTimeout(() => {
             //--> set logic success/error/time out
             var errInfo = "Waduh, Waktu Habis!";
             var errText = "Silahkan coba kembali.";
@@ -522,16 +522,17 @@ const Vending = () => {
 
   const checkQRPayment = (trxCode, jumlahItem, jumlahBayar, payment_type) => {
     var apicheck = "trx_code=" + trxCode + "&";
-    timer.current = setTimeout(() => {
-      clearTimeout(timer.current);
+    console.log("CHECK ", apicheck);
+    timerTimeout.current = setTimeout(() => {
+      clearTimeout(timerTimeout.current);
       crud
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
             PaymentSuccess(trxCode, payment_type);
             setTrxCode(trxCode);
-            timer.current = setTimeout(() => {
-              clearTimeout(timer.current);
+            timerTimeout.current = setTimeout(() => {
+              clearTimeout(timerTimeout.current);
               checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
             }, 3000);
           } else {
@@ -544,12 +545,12 @@ const Vending = () => {
           console.error("There was an error!", error);
         });
     }, 1000);
-    timerInterval.current = setInterval(() => {
+    timerInterval = setInterval(() => {
       crud
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
-            clearInterval(timerInterval.current);
+            clearInterval(timerInterval);
             PaymentSuccess(trxCode, payment_type);
           } else {
             console.log(res);
@@ -561,7 +562,7 @@ const Vending = () => {
     }, 12000);
 
     //set waktu habis bayar
-    timer3.current = setTimeout(() => {
+    timerTimeout = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -571,10 +572,10 @@ const Vending = () => {
         allowOutsideClick: false,
         timer: 3000,
       }).then(() => {
-        clearTimeout(timer3.current);
+        clearTimeout(timerTimeout);
         clearCart();
         setOpenModalPayment(false);
-        clearInterval(timer3.current);
+        clearInterval(timerInterval);
         setContentQR(null);
         afterQR("0", "408", "Payment timeout", trxCode, payment_type);
 
@@ -585,14 +586,16 @@ const Vending = () => {
 
   const checkPayment = () => {
     setLoading(true);
-    var apicheck = "trx_code=" + TrxCode;
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    var apicheck = "trx_code=" + TrxCode + "&";
     crud
       .VM_CHECKPAYMENT(apicheck)
       .then((res) => {
         setLoading(false);
         if (res.message === "SUCCESS") {
-          clearTimeout(timer.current);
-          clearTimeout(timer2.current);
+          clearTimeout(timerTimeout);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
           new Swal({
@@ -602,8 +605,7 @@ const Vending = () => {
             allowOutsideClick: false,
             timer: 2500,
           }).then(() => {
-            clearTimeout(timer.current);
-            clearTimeout(timer2.current);
+            clearTimeout(timerTimeout);
             setOpenModalPayment(false);
             setContentQR(null);
             afterQR("0", "409", "Check Payment Pending", TrxCode, "SHOPEEPAY");
@@ -617,6 +619,7 @@ const Vending = () => {
   };
   const afterQR = (vmStatus, errorCode, errStatus, trxCode, payment_type) => {
     //set verify_no
+    console.log(vmStatus, errorCode, errStatus, trxCode, payment_type);
     var verify_no = Math.floor(Date.now() / 1000);
 
     for (let i = 0; i < transactions.length; i++) {
@@ -682,28 +685,12 @@ const Vending = () => {
   };
 
   function failedQR() {
-    Swal.fire({
-      title: "Harap Menunggu",
-      html: "Jeda <b></b>",
-      timer: 2000,
-      timerProgressBar: true,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-        const b = Swal.getHtmlContainer().querySelector("b");
-        timerInterval.current = setInterval(() => {
-          b.textContent = Swal.getTimerLeft();
-        }, 100);
-      },
-      willClose: () => {
-        clearInterval(timerInterval.current);
-      },
-    }).then((result) => {
-      /* Read more about handling dismissals below */
-      if (result.dismiss === Swal.DismissReason.timer) {
-        console.log("I was closed by the timer");
-      }
-    });
+    setLoading(true);
+    clearInterval(timerInterval);
+    clearTimeout(timerTimeout);
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
   }
 
   function error(
@@ -715,13 +702,21 @@ const Vending = () => {
     payment_type
   ) {
     var vmStatus = 0;
-
-    new Swal({
+    console.log(
+      "ERROR",
+      errorCode,
+      errStatus,
+      errText,
+      errInfo,
+      trxCode,
+      payment_type
+    );
+    Swal.fire({
       title: errInfo,
-      text: errText + " [auto close]",
+      text: errText,
       icon: "error",
       allowOutsideClick: false,
-      timer: 1500,
+      timer: 2000,
     }).then(() => {
       afterQR(vmStatus, errorCode, errStatus, trxCode, payment_type);
     });
@@ -736,7 +731,7 @@ const Vending = () => {
       timer: 3000,
     });
     clearInterval(timerInterval.current);
-    clearTimeout(timer.current);
+    clearTimeout(timerTimeout.current);
     cartVendProcess(trxCode, payment_type);
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
@@ -776,7 +771,7 @@ const Vending = () => {
               "&hmac=" +
               encodeuri;
 
-            timer.current = setTimeout((jumlahItem, jumlahError) => {
+            timerTimeout.current = setTimeout((jumlahItem, jumlahError) => {
               jumlahItem++;
               EngineVM.RunEngine(apiVend)
                 .then((resp) => {
@@ -927,8 +922,7 @@ const Vending = () => {
       setOpenModalPayment(false);
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
-      setModalRefund(!openModalRefund);
-
+      setModalRefund(true);
       setTimeout(() => {
         Swal.fire({
           title: "Waktu Scan Refund Habis!",

@@ -1,7 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-
+import { handelRightClick } from "./function/AppUtility";
 import Vending from "./pages/Vending";
 function App() {
+  document.addEventListener("contextmenu", handelRightClick);
+
   return (
     <>
       <BrowserRouter>

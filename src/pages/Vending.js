@@ -43,6 +43,7 @@ const Vending = () => {
   const [openModalRefund, setModalRefund] = useState(false);
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
+  let timerPayment = useRef(null);
 
   let timerTimeout = useRef(null);
   let timerInterval = useRef(null);
@@ -390,6 +391,7 @@ const Vending = () => {
         setOpenModalPayment(false);
         clearInterval(timerInterval);
         clearTimeout(timerTimeout);
+        clearTimeout(timerPayment);
         Swal.fire({
           title: "Transaksi Batal!",
           text: "Anda Telah membatalkan Transaksi.",
@@ -412,6 +414,7 @@ const Vending = () => {
     setTotalItemCart(0);
     clearTimeout(timerTimeout);
     clearInterval(timerInterval);
+    clearTimeout(timerPayment);
     setUpdateData(true);
   };
 
@@ -566,7 +569,7 @@ const Vending = () => {
 
   const setCountDownTimer = () => {
     clearTimeout(timerTimeout);
-    timerTimeout = setTimeout(() => {
+    timerPayment = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -586,6 +589,8 @@ const Vending = () => {
         /* Read more about handling dismissals below */
       });
     }, 115 * 1000);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
   };
 
   const checkPayment = () => {
@@ -599,7 +604,7 @@ const Vending = () => {
       .then((res) => {
         setLoading(false);
         if (res.message === "SUCCESS") {
-          clearTimeout(timerTimeout);
+          clearTimeout(timerPayment);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
           new Swal({
@@ -609,7 +614,7 @@ const Vending = () => {
             allowOutsideClick: false,
             timer: 2500,
           }).then(() => {
-            clearTimeout(timerTimeout);
+            clearTimeout(timerPayment);
             setOpenModalPayment(false);
             setContentQR(null);
             afterQR("0", "409", "Check Payment Pending", TrxCode, "SHOPEEPAY");
@@ -729,6 +734,7 @@ const Vending = () => {
   const PaymentSuccess = (trxCode, payment_type) => {
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
+    clearTimeout(timerPayment);
     setOpenModalPayment(false);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
@@ -746,6 +752,7 @@ const Vending = () => {
   const cartVendProcess = (trxCode, payment_type) => {
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
+    clearTimeout(timerPayment);
     var jumlahItem, jumlahError;
     let totalItem = transactions.length;
     if (totalItem > 0) {

@@ -14,6 +14,7 @@ const ModalPayment = (props) => {
     setOpenModalPayment,
     checkPayment,
     contentQr,
+    setCountDownTimer,
   } = props;
   const minuteSeconds = 120;
   const getTimeSeconds = (time) => (minuteSeconds - time) | 0;
@@ -34,6 +35,7 @@ const ModalPayment = (props) => {
     if (contentQr !== null) {
       setLoading(false);
       setValue(contentQr);
+      setCountDownTimer();
     }
   }, [contentQr]);
   const handleQRModel = ({ status }) => {
@@ -59,7 +61,7 @@ const ModalPayment = (props) => {
               <img
                 src={qris__template}
                 alt="paymentGateWay"
-                className="w-[90%] px-32 mb-6 items-center"
+                className="w-[90%] px-32 mb-2 items-center"
               />
             </div>
             <div className="flex justify-around max-[192px]">

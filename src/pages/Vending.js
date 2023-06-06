@@ -518,7 +518,6 @@ const Vending = () => {
 
   const checkQRPayment = (trxCode, jumlahItem, jumlahBayar, payment_type) => {
     var apicheck = "trx_code=" + trxCode + "&";
-    console.log("CHECK ", apicheck);
     timerTimeout.current = setTimeout(() => {
       clearTimeout(timerTimeout.current);
       crud
@@ -560,6 +559,9 @@ const Vending = () => {
     }, 12000);
 
     //set waktu habis bayar
+  };
+
+  const setCountDownTimer = () => {
     timerTimeout = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
@@ -575,7 +577,7 @@ const Vending = () => {
         setOpenModalPayment(false);
         clearInterval(timerInterval);
         setContentQR(null);
-        afterQR("0", "408", "Payment timeout", trxCode, payment_type);
+        afterQR("0", "408", "Payment timeout", TrxCode, "SHOPEEPAY");
 
         /* Read more about handling dismissals below */
       });
@@ -1049,6 +1051,7 @@ const Vending = () => {
               setOpenModalPayment={setOpenModalPayment}
               contentQr={ContentQR}
               checkPayment={checkPayment}
+              setCountDownTimer={setCountDownTimer}
             />
           </Transition>
           <Transition

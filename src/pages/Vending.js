@@ -37,9 +37,9 @@ const Vending = () => {
   const [openModalCart, setOpenModalCart] = useState(false);
 
   const [vendTotalItem, setVendTotalItem] = useState(0);
-  const [vendTotalError, setVendTotalError] = useState(0);
-  const [vendTotalJumlah, setVendTotalJumlah] = useState(0);
-  const [vendCounterItem, setVendCounterItem] = useState(0);
+  let [vendTotalError, setVendTotalError] = useState(0);
+  let [vendTotalJumlah, setVendTotalJumlah] = useState(0);
+  let [vendCounterItem, setVendCounterItem] = useState(0);
   const [openModalRefund, setModalRefund] = useState(false);
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
@@ -722,10 +722,9 @@ const Vending = () => {
   }
 
   const PaymentSuccess = (trxCode, payment_type) => {
-    clearTimeout(timerInterval);
-    clearInterval(timerInterval);
     clearTimeout(timerTimeout);
     setOpenModalPayment(false);
+    clearInterval(timerInterval);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
       text: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
@@ -757,8 +756,8 @@ const Vending = () => {
 
       var looper = async function () {
         for (let index = 0; index < transactions.length; index++) {
-          jumlahError = 0;
-          jumlahItem = 0;
+          setVendTotalError(0);
+          setVendTotalItem(0);
           for (
             let jumProduct = 0;
             jumProduct < transactions[index].qty;
@@ -777,6 +776,7 @@ const Vending = () => {
               encodeuri;
             await new Promise(function (resolve, reject) {
               setTimeout(function () {
+                setVendTotalItem(vendTotalItem + 1);
                 EngineVM.RunEngine(apiVend)
                   .then((resp) => {
                     console.log("MASUK BUFFER", resp["buffer"]);
@@ -817,6 +817,7 @@ const Vending = () => {
                         timer: 2000,
                       }).then(() => {});
                     } else {
+                      setVendTotalError(vendTotalError + 1);
                       console.log("PRODUK ERROR");
                       vmStatus = 0;
                       errorCode = resp["buffer"];
@@ -840,29 +841,30 @@ const Vending = () => {
                         allowOutsideClick: false,
                         timer: 5000,
                       }).then(() => {});
-                      // if (jumlahError > 0) {
-                      //   paramRefund.note =
-                      //     paramRefund.note +
-                      //     "product code: " +
-                      //     transactions[index].kode_produk +
-                      //     ", error code: " +
-                      //     errorCode +
-                      //     ", message: " +
-                      //     errStatus +
-                      //     "%0A";
-                      // } else {
-                      //   paramRefund.note =
-                      //     "product code: " +
-                      //     transactions[index].kode_produk +
-                      //     ", error code: " +
-                      //     errorCode +
-                      //     ", message: " +
-                      //     errStatus +
-                      //     "%0A";
-                      // }
+                      if (vendTotalError > 0) {
+                        paramRefund["note"] =
+                          paramRefund["note"] +
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      } else {
+                        paramRefund["note"] =
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      }
                     }
                   })
                   .catch((err) => {
+                    setVendTotalError(vendTotalError + 1);
                     var vmStatus = 0;
                     var errorCode = 444;
                     var errStatus = "VM_NOT_RESPONDING";
@@ -885,25 +887,25 @@ const Vending = () => {
                       allowOutsideClick: false,
                       timer: 5000,
                     }).then(() => {});
-                    // if (jumlahError > 0) {
-                    //   paramRefund.note =
-                    //     paramRefund.note +
-                    //     transactions[index].kode_produk +
-                    //     "-" +
-                    //     errorCode +
-                    //     "-" +
-                    //     errStatus +
-                    //     "%0A";
-                    // } else {
-                    //   paramRefund.note =
-                    //     "-" +
-                    //     transactions[index].kode_produk +
-                    //     "-" +
-                    //     errorCode +
-                    //     "-" +
-                    //     errStatus +
-                    //     "%0A";
-                    // }
+                    if (vendTotalError > 0) {
+                      paramRefund["note"] =
+                        paramRefund["note"] +
+                        transactions[index].kode_produk +
+                        "-" +
+                        errorCode +
+                        "-" +
+                        errStatus +
+                        "%0A";
+                    } else {
+                      paramRefund.note =
+                        "-" +
+                        transactions[index].kode_produk +
+                        "-" +
+                        errorCode +
+                        "-" +
+                        errStatus +
+                        "%0A";
+                    }
                   });
               }, 2000);
             });
@@ -919,6 +921,7 @@ const Vending = () => {
   };
 
   function afterCartVendProcess(jumlahError, paramRefund, payment_type) {
+    console.log("after cart SHOW");
     if (jumlahError > 0) {
       //sett qr WA
       console.log("AFTERCART");
@@ -941,6 +944,9 @@ const Vending = () => {
         setTimeout(() => {
           //set display modal payment
           setTimeout(() => {
+            clearTimeout(timerTimeout);
+            clearInterval(timerInterval);
+            setOpenModalPayment(false);
             clearCart();
             setContentQR(null);
             setUpdateData(true);

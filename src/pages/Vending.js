@@ -43,7 +43,7 @@ const Vending = () => {
   const [openModalRefund, setModalRefund] = useState(false);
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
-  let timerPayment = useRef(null);
+  const timerPayment = useRef(null);
 
   let timerTimeout = useRef(null);
   let timerInterval = useRef(null);
@@ -568,8 +568,7 @@ const Vending = () => {
   };
 
   const setCountDownTimer = () => {
-    clearTimeout(timerTimeout);
-    timerPayment = setTimeout(() => {
+    timerPayment.current = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -795,10 +794,9 @@ const Vending = () => {
                   .then((resp) => {
                     console.log("MASUK BUFFER", resp["buffer"]);
                     var textCounterItem =
-                      "Product ke " + index + " / " + TotalItemCart;
+                      "Product ke " + vendTotalItem + " / " + TotalItemCart;
                     if (resp["status"] === true) {
-                      console.log("PRODUK PERTAMA");
-
+                      console.log("Itemnya ada");
                       var apiStockOffline =
                         "slot=" + transactions[index].no_slot;
                       crud
@@ -942,7 +940,7 @@ const Vending = () => {
         console.log("MEMANGGIL AFTER CART");
         console.log("MEMANGGIL AFTER CART 2", vendTotalItem, vendTotalError);
 
-        afterCartVendProcess(jumlahError, paramRefund, payment_type);
+        afterCartVendProcess(vendTotalError, paramRefund, payment_type);
       });
     }
   };

@@ -209,7 +209,6 @@ const Vending = () => {
           },
         ]);
       }
-
       const promo =
         item.status_promo === "1" ? item.harga_promo : item.harga_jual;
       setsubTotal(parseInt(subTotal) + promo);
@@ -595,7 +594,7 @@ const Vending = () => {
 
         /* Read more about handling dismissals below */
       });
-    }, 117 * 1000);
+    }, 145 * 1000);
     //set waktu habis bayar
   };
 
@@ -803,10 +802,10 @@ const Vending = () => {
       };
 
       //buat loop productnya
-      var looper = async function () {
+      async function myFunction() {
+        setVendTotalError(0);
+        setVendTotalItem(0);
         for (let index = 0; index < transactions.length; index++) {
-          setVendTotalError(0);
-          setVendTotalItem(0);
           for (
             let jumProduct = 0;
             jumProduct < transactions[index].qty;
@@ -824,6 +823,7 @@ const Vending = () => {
               "&hmac=" +
               encodeuri;
             await new Promise(function (resolve, reject) {
+              console.log("PROMISE ", "MULAI");
               setTimeout(function () {
                 jumlahItem.current = jumlahItem.current + 1;
                 setVendTotalItem(vendTotalItem + 1);
@@ -833,7 +833,7 @@ const Vending = () => {
                     var textCounterItem =
                       "Product ke " + vendTotalItem + " / " + TotalItemCart;
                     if (resp["status"] === true) {
-                      console.log("Itemnya ada");
+                      console.log("PROMISE ", "AMAN");
                       var apiStockOffline =
                         "slot=" + transactions[index].no_slot;
                       crud
@@ -867,7 +867,7 @@ const Vending = () => {
                       }).then(() => {});
                     } else {
                       SetError(vendTotalError + 1);
-                      console.log("PRODUK ERROR");
+                      console.log("PROMISE ", "ERROR");
                       vmStatus = 0;
                       errorCode = resp["buffer"];
                       errStatus = resp["message"];
@@ -959,14 +959,13 @@ const Vending = () => {
                     jumlahError.current = jumlahError.current + 1;
                     SetError(vendTotalError + 1);
                   });
-                resolve(true);
               }, 3000);
             });
           }
         }
         return true;
-      };
-      looper().then(function () {
+      }
+      myFunction().then(function () {
         afterCartVendProcess(paramRefund, payment_type);
       });
     }
@@ -1044,19 +1043,44 @@ const Vending = () => {
 
     return QR_whatsApp;
   }
+  let hits = 0;
   const clickLoading = () => {
+    hits++;
+    if (hits === 5) {
+      Swal.fire({
+        title: "Anda ingin Memperbaharui Data Terkini ?",
+        icon: "info",
+        showCancelButton: true,
+        cancelButtonText: "Tidak",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        allowOutsideClick: false,
+        confirmButtonText: "Ya",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setUpdateData(true);
+          setSyncSlot(false);
+          setSynBanners(false);
+        } else {
+        }
+
+        hits = 0;
+      });
+    } else {
+      console.log("Hits ", hits);
+    }
+  };
+  const handleIdle = () => {
     setUpdateData(true);
     setSyncSlot(false);
     setSynBanners(false);
-  };
-  const handleIdle = () => {
     setScreensaverActive(true);
   };
   const stay = () => {
     setScreensaverActive(false);
     idleTimer.reset();
   };
-  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 540 });
+  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 620 });
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden" id="hb-vm">

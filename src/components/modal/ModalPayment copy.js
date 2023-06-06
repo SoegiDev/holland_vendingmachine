@@ -30,7 +30,6 @@ const ModalPayment = (props) => {
 
   const [dataUrl, _qrious] = useQrious({ value });
   const [isLoading, setLoading] = useState(true);
-  const [ishabis, setHabis] = useState(false);
   useEffect(() => {
     if (contentQr !== null) {
       setLoading(false);
@@ -44,10 +43,6 @@ const ModalPayment = (props) => {
   const CheckPembayaran = () => {
     //setChoice(false);
     checkPayment();
-  };
-  const HabisWaktu = () => {
-    //setChoice(false);
-    setHabis(true);
   };
   return (
     <>
@@ -67,72 +62,52 @@ const ModalPayment = (props) => {
                 className="w-[90%] px-32 mb-2 items-center"
               />
             </div>
-            {ishabis ? (
-              <div>
-                <div className="flex flex-col w-full">
-                  <p className="text-3xl font-medium items-center text-slate-800 mt-2">
-                    Apakah anda sudah melakukan Pembayaran tapi Produk tidak
-                    keluar? Klik Tombol di atas ini
-                  </p>
-                  <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
-                    <p
-                      className="text-3xl font-medium content-center mt-2"
-                      onClick={() => {
-                        CheckPembayaran();
-                      }}
-                    >
-                      Check Payment
-                    </p>
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-around max-[192px]">
-                <div className="flex flex-col h-96">
-                  <span className="flex w-full h-full items-center">
-                    {isLoading ? (
-                      <span className="flex w-full h-full justify-center">
-                        <img
-                          src={loading}
-                          alt="Landing Page"
-                          className="h-40 w-40 mt-8 items-center animate-spin"
-                        />
-                      </span>
-                    ) : (
+            <div className="flex justify-around max-[192px]">
+              <div className="flex flex-col h-96">
+                <span className="flex w-full h-full items-center">
+                  {isLoading ? (
+                    <span className="flex w-full h-full justify-center">
                       <img
-                        src={dataUrl}
+                        src={loading}
                         alt="Landing Page"
-                        className="h-96 w-96 content-center"
+                        className="h-40 w-40 mt-8 items-center animate-spin"
                       />
+                    </span>
+                  ) : (
+                    <img
+                      src={dataUrl}
+                      alt="Landing Page"
+                      className="h-96 w-96 content-center"
+                    />
+                  )}
+                </span>
+                <span className=" hidden h-20 w-80 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
+                  <p className="text-3xl font-medium justify-center mt-2">
+                    Scan QR
+                  </p>
+                </span>
+              </div>
+              <div className="flex flex-col h-96">
+                <span className="flex w-full h-full items-center">
+                  <CountdownCircleTimer
+                    className="h-64 w-64 content-center"
+                    isPlaying={!isLoading ? true : false}
+                    colors="#ea7a66"
+                    duration={minuteSeconds}
+                    strokeWidth={23}
+                    size={250}
+                    onComplete={() => {
+                      console.log("TIMER SUDAH HABIS");
+                    }}
+                  >
+                    {({ elapsedTime, color }) => (
+                      <span className="text-3xl font-sans text-hollandtints-500">
+                        {renderTime("Detik", getTimeSeconds(elapsedTime))}
+                      </span>
                     )}
-                  </span>
-                  <span className="hidden h-20 w-80 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
-                    <p className="text-3xl font-medium justify-center mt-2">
-                      Scan QR
-                    </p>
-                  </span>
-                </div>
-                <div className="flex flex-col h-96">
-                  <span className="flex w-full h-full items-center">
-                    <CountdownCircleTimer
-                      className="h-64 w-64 content-center"
-                      isPlaying={!isLoading ? true : false}
-                      colors="#ea7a66"
-                      duration={minuteSeconds}
-                      strokeWidth={23}
-                      size={250}
-                      onComplete={() => {
-                        console.log("TIMER SUDAH HABIS");
-                        HabisWaktu();
-                      }}
-                    >
-                      {({ elapsedTime, color }) => (
-                        <span className="text-3xl font-sans text-hollandtints-500">
-                          {renderTime("Detik", getTimeSeconds(elapsedTime))}
-                        </span>
-                      )}
-                    </CountdownCircleTimer>
-                  </span>
+                  </CountdownCircleTimer>
+                </span>
+                {isLoading ? (
                   <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
                     <p
                       className="text-3xl font-medium content-center mt-2"
@@ -145,11 +120,33 @@ const ModalPayment = (props) => {
                       Tutup
                     </p>
                   </span>
-                </div>
+                ) : (
+                  <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
+                    <p
+                      className="text-3xl font-medium content-center mt-2"
+                      onClick={() => {
+                        CheckPembayaran();
+                      }}
+                    >
+                      Check Payment
+                    </p>
+                  </span>
+                )}
               </div>
-            )}
+            </div>
 
             <footer className="bg-white  text-center text-white bottom-0">
+              {isLoading ? (
+                <div></div>
+              ) : (
+                <div className="flex flex-col w-full">
+                  <p className="text-3xl font-medium items-center text-slate-800 mt-2">
+                    Apakah anda sudah melakukan Pembayaran tapi Produk tidak
+                    keluar? Klik Tombol di atas ini
+                  </p>{" "}
+                </div>
+              )}
+
               <div className="flex w-full justify-center">
                 <img
                   src={PaymentGateway}

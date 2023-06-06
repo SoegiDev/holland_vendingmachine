@@ -35,7 +35,7 @@ const ModalPayment = (props) => {
     if (contentQr !== null) {
       setLoading(false);
       setValue(contentQr);
-      setCountDownTimer();
+      setCountDownTimer(true);
     }
   }, [contentQr]);
   const handleQRModel = ({ status }) => {

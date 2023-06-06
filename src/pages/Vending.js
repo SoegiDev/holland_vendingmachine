@@ -43,6 +43,7 @@ const Vending = () => {
   const [openModalRefund, setModalRefund] = useState(false);
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
+  const [paymentOut, setPaymentOut] = useState(false);
   let timerPayment = useRef(null);
 
   let timerTimeout = useRef(null);
@@ -830,7 +831,6 @@ const Vending = () => {
                     }).then(() => {});
                   } else {
                     jumlahError++;
-                    setVendTotalError(vendTotalError + 1);
                     console.log("PRODUK ERROR");
                     vmStatus = 0;
                     errorCode = resp["buffer"];
@@ -1029,6 +1029,12 @@ const Vending = () => {
   };
   const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 540 });
 
+  useEffect(() => {
+    if (!paymentOut) {
+      console.log("TIMEOUT BERJALAN");
+      setCountDownTimer();
+    }
+  }, []);
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden" id="hb-vm">
       {screensaverActive && itemBannersImage !== null ? (
@@ -1087,7 +1093,7 @@ const Vending = () => {
               setOpenModalPayment={setOpenModalPayment}
               contentQr={ContentQR}
               checkPayment={checkPayment}
-              setCountDownTimer={setCountDownTimer}
+              setCountDownTimer={setPaymentOut}
             />
           </Transition>
           <Transition

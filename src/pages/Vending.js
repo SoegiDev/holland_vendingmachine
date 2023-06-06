@@ -36,7 +36,7 @@ const Vending = () => {
   const [TrxCode, setTrxCode] = useState(null);
   const [openModalCart, setOpenModalCart] = useState(false);
 
-  const [vendTotalItem, setVendTotalItem] = useState(0);
+  let [vendTotalItem, setVendTotalItem] = useState(0);
   let [vendTotalError, setVendTotalError] = useState(0);
   let [vendTotalJumlah, setVendTotalJumlah] = useState(0);
   let [vendCounterItem, setVendCounterItem] = useState(0);
@@ -933,6 +933,8 @@ const Vending = () => {
       };
       looper().then(function () {
         console.log("MEMANGGIL AFTER CART");
+        console.log("MEMANGGIL AFTER CART 2", vendTotalItem, vendTotalError);
+
         afterCartVendProcess(jumlahError, paramRefund, payment_type);
       });
     }

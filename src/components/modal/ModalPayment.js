@@ -14,7 +14,6 @@ const ModalPayment = (props) => {
     setOpenModalPayment,
     checkPayment,
     contentQr,
-    setPaymentOut,
   } = props;
   const minuteSeconds = 120;
   const getTimeSeconds = (time) => (minuteSeconds - time) | 0;
@@ -35,7 +34,6 @@ const ModalPayment = (props) => {
     if (contentQr !== null) {
       setLoading(false);
       setValue(contentQr);
-      setPaymentOut();
     }
   }, [contentQr]);
   const handleQRModel = ({ status }) => {

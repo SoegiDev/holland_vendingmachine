@@ -493,6 +493,8 @@ const Vending = () => {
               checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
             }, 3000);
           } else {
+            clearTimeout(timerPayment.current);
+            setOpenModalPayment(false);
             console.log("TIDAK MUNCUL");
             var errInfo = "Yahh, QR Tidak Muncul!";
             var errText = "Silahkan coba kembali..";
@@ -569,6 +571,26 @@ const Vending = () => {
         });
     }, 12000);
 
+    timerPayment.current = setTimeout(() => {
+      console.log("Get TIMEOUT HABIS WAKTU");
+      Swal.fire({
+        icon: "info",
+        title: "Yahhh, Waktu Transaksi Habis!",
+        text: "Silahkan coba kembali. [auto close]",
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        timer: 3000,
+      }).then(() => {
+        if (timerTimeout) clearTimeout(timerTimeout);
+        if (timerInterval) clearInterval(timerInterval);
+        clearCart();
+        setOpenModalPayment(false);
+        setContentQR(null);
+        afterQR("0", "408", "Payment timeout", TrxCode, "SHOPEEPAY");
+
+        /* Read more about handling dismissals below */
+      });
+    }, 117 * 1000);
     //set waktu habis bayar
   };
 
@@ -1028,15 +1050,6 @@ const Vending = () => {
   };
   const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 540 });
 
-  const TampilPayment = () => {
-    setPaymentOut(true);
-  };
-  useEffect(() => {
-    if (paymentOut) {
-      console.log("TIMEOUT BERJALAN");
-      setCountDownTimer();
-    }
-  }, [paymentOut, setCountDownTimer]);
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden" id="hb-vm">
       {screensaverActive && itemBannersImage !== null ? (
@@ -1095,7 +1108,6 @@ const Vending = () => {
               setOpenModalPayment={setOpenModalPayment}
               contentQr={ContentQR}
               checkPayment={checkPayment}
-              setPaymentOut={TampilPayment}
             />
           </Transition>
           <Transition

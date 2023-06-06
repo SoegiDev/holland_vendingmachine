@@ -770,7 +770,7 @@ const Vending = () => {
               "&hmac=" +
               encodeuri;
 
-            timerTimeout.current = setTimeout((jumlahItem, jumlahError) => {
+            setTimeout((jumlahItem, jumlahError) => {
               jumlahItem++;
               EngineVM.RunEngine(apiVend)
                 .then((resp) => {

@@ -67,23 +67,25 @@ const ModalPayment = (props) => {
                 className="w-[90%] px-32 mb-2 items-center"
               />
             </div>
-            {ishabis ? (
+            {ishabis || !ishabis ? (
               <div>
                 <div className="flex flex-col w-full justify-center">
                   <p className="text-3xl font-medium items-center text-slate-800 mt-2">
                     Apakah anda sudah melakukan Pembayaran tapi Produk tidak
                     keluar? Klik Tombol di atas ini
                   </p>
-                  <span className="h-20 w-64 rounded-full items-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
-                    <p
-                      className="text-3xl font-medium content-center mt-2"
-                      onClick={() => {
-                        CheckPembayaran();
-                      }}
-                    >
-                      Check Payment
-                    </p>
-                  </span>
+                  <div className="flex  w-full justify-center mt-2">
+                    <span className="h-20 w-64 items-center rounded-full bg-gray-600 border-4 border-slate-400 text-slate-50 ">
+                      <p
+                        className="text-3xl font-medium mt-2 text-center"
+                        onClick={() => {
+                          CheckPembayaran();
+                        }}
+                      >
+                        Check Payment
+                      </p>
+                    </span>
+                  </div>
                 </div>
               </div>
             ) : (

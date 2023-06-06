@@ -975,7 +975,7 @@ const Vending = () => {
     console.log("after cart SHOW");
     console.log("TIMEOUT", timerPayment);
     if (timerPayment.current) clearTimeout(timerPayment.current);
-    if (jumlahError.current > 0 || vendTotalError > 0) {
+    if (jumlahError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
       console.log("AFTERCART");

@@ -50,6 +50,10 @@ const Vending = () => {
   let timerInterval = useRef(null);
   let jumlahError = useRef(0);
   let jumlahItem = useRef(0);
+
+  const SetError = (number) => {
+    setVendTotalError(number);
+  };
   useEffect(() => {
     const getbanners = () =>
       crud.getDataBannersImage().then((res) => {
@@ -628,7 +632,7 @@ const Vending = () => {
       .then((res) => {
         setLoading(false);
         if (res.message === "SUCCESS") {
-          clearTimeout(timerPayment);
+          clearTimeout(timerPayment.current);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
           new Swal({
@@ -638,7 +642,7 @@ const Vending = () => {
             allowOutsideClick: false,
             timer: 2500,
           }).then(() => {
-            clearTimeout(timerPayment);
+            clearTimeout(timerPayment.current);
             setOpenModalPayment(false);
             setContentQR(null);
             afterQR("0", "409", "Check Payment Pending", TrxCode, "SHOPEEPAY");
@@ -757,9 +761,10 @@ const Vending = () => {
 
   const PaymentSuccess = (trxCode, payment_type) => {
     setPaymentOut(false);
+    clearTimeout(timerPayment.current);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    clearTimeout(timerPayment.current);
+
     setOpenModalPayment(false);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
@@ -778,10 +783,11 @@ const Vending = () => {
     setVendTotalItem(0);
     jumlahError.current = 0;
     jumlahItem.current = 0;
+    clearTimeout(timerPayment);
     console.log("LOG TIMER PAYMENT ", timerPayment);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    if (timerPayment.current) clearTimeout(timerPayment.current);
+    if (timerPayment) clearTimeout(timerPayment);
 
     let totalItem = transactions.length;
     if (totalItem > 0) {
@@ -857,7 +863,7 @@ const Vending = () => {
                       timer: 2000,
                     }).then(() => {});
                   } else {
-                    setVendTotalError(vendTotalError + 1);
+                    SetError(vendTotalError + 1);
                     console.log("PRODUK ERROR");
                     vmStatus = 0;
                     errorCode = resp["buffer"];
@@ -947,7 +953,7 @@ const Vending = () => {
                       "%0A";
                   }
                   jumlahError.current = jumlahError.current + 1;
-                  setVendTotalError(vendTotalError + 1);
+                  SetError(vendTotalError + 1);
                 });
             }, 3000);
           }
@@ -960,7 +966,7 @@ const Vending = () => {
           vendTotalError,
           jumlahError.current
         );
-        afterCartVendProcess(vendTotalError, paramRefund, payment_type);
+        afterCartVendProcess(1, paramRefund, payment_type);
       });
     }
   };

@@ -579,7 +579,7 @@ const Vending = () => {
         if (timerTimeout) clearTimeout(timerTimeout);
         if (timerInterval) clearInterval(timerInterval);
         clearCart();
-        setOpenModalPayment(false);=
+        setOpenModalPayment(false);
         setContentQR(null);
         afterQR("0", "408", "Payment timeout", TrxCode, "SHOPEEPAY");
 

@@ -462,6 +462,7 @@ const Vending = () => {
       allowOutsideClick: false,
       timer: 3000,
     }).then(() => {
+      setOpenModalPayment(true);
       setOpenModalCart(false);
       var trxCode = VMINIT.getID() + "-" + formatDate();
       var apiQRCode = "trx_code=" + trxCode + "&";
@@ -475,17 +476,14 @@ const Vending = () => {
       apiQRCode += "product_name=" + product_name + "&";
       apiQRCode += "qty_product=" + TotalItemCart + "&";
       apiQRCode += "amount=" + subTotal;
-      setLoading(true);
       crud
         .CreateQRShopee(apiQRCode)
         .then((res) => {
           console.log("HASIL", res);
-          setLoading(false);
           console.log(res);
           if (res.message === "SUCCESS") {
             setContentQR(res.results.qrcode);
             setTrxCode(trxCode);
-            setOpenModalPayment(true);
             timerTimeout.current = setTimeout(() => {
               clearTimeout(timerTimeout.current);
               checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
@@ -500,7 +498,6 @@ const Vending = () => {
           // getSlots();
         })
         .catch((er) => {
-          setLoading(false);
           console.log(er);
           setTimeout(() => {
             //--> set logic success/error/time out

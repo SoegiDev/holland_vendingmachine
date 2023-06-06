@@ -5,6 +5,7 @@ import { useQrious } from "react-qrious";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import loading from "../../assets/img/loadingpng.png";
 import { useRef } from "react";
+import { useEffect } from "react";
 
 const ModalPayment = (props) => {
   const {
@@ -25,19 +26,16 @@ const ModalPayment = (props) => {
       </div>
     );
   };
-  const [value, setValue] = useState(contentQr);
+  const [value, setValue] = useState(null);
+
   const [dataUrl, _qrious] = useQrious({ value });
-  const [rundown, setStartRundown] = useState(false);
-  const [openCheck, setOpenCheck] = useState(false);
-  const timer = useRef(null);
-  timer.current = setTimeout(() => {
-    clearTimeout(timer.current);
-    setStartRundown(true);
-    timer.current = setTimeout(() => {
-      clearTimeout(timer.current);
-      setOpenCheck(true);
-    }, 5000);
-  }, 3000);
+  const [isLoading, setLoading] = useState(true);
+  useEffect(() => {
+    if (contentQr !== null) {
+      setLoading(false);
+      setValue(contentQr);
+    }
+  }, [contentQr]);
   const handleQRModel = ({ status }) => {
     //setChoice(false);
     cancelTransaction();
@@ -67,13 +65,7 @@ const ModalPayment = (props) => {
             <div className="flex justify-around max-[192px]">
               <div className="flex flex-col h-96">
                 <span className="flex w-full h-full items-center">
-                  {rundown ? (
-                    <img
-                      src={dataUrl}
-                      alt="Landing Page"
-                      className="h-96 w-96 content-center"
-                    />
-                  ) : (
+                  {isLoading ? (
                     <span className="flex w-full h-full justify-center">
                       <img
                         src={loading}
@@ -81,6 +73,12 @@ const ModalPayment = (props) => {
                         className="h-40 w-40 mt-8 items-center animate-spin"
                       />
                     </span>
+                  ) : (
+                    <img
+                      src={dataUrl}
+                      alt="Landing Page"
+                      className="h-96 w-96 content-center"
+                    />
                   )}
                 </span>
                 <span className="h-20 w-80 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
@@ -91,23 +89,27 @@ const ModalPayment = (props) => {
               </div>
               <div className="flex flex-col h-96">
                 <span className="flex w-full h-full items-center">
-                  <CountdownCircleTimer
-                    className="h-64 w-64 content-center"
-                    isPlaying
-                    colors="#ea7a66"
-                    duration={minuteSeconds}
-                    strokeWidth={23}
-                    size={250}
-                    onComplete={() => {
-                      console.log("TIMER SUDAH HABIS");
-                    }}
-                  >
-                    {({ elapsedTime, color }) => (
-                      <span className="text-3xl font-sans text-hollandtints-500">
-                        {renderTime("Detik", getTimeSeconds(elapsedTime))}
-                      </span>
-                    )}
-                  </CountdownCircleTimer>
+                  {isLoading ? (
+                    <div></div>
+                  ) : (
+                    <CountdownCircleTimer
+                      className="h-64 w-64 content-center"
+                      isPlaying
+                      colors="#ea7a66"
+                      duration={minuteSeconds}
+                      strokeWidth={23}
+                      size={250}
+                      onComplete={() => {
+                        console.log("TIMER SUDAH HABIS");
+                      }}
+                    >
+                      {({ elapsedTime, color }) => (
+                        <span className="text-3xl font-sans text-hollandtints-500">
+                          {renderTime("Detik", getTimeSeconds(elapsedTime))}
+                        </span>
+                      )}
+                    </CountdownCircleTimer>
+                  )}
                 </span>
                 <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
                   <p
@@ -125,7 +127,7 @@ const ModalPayment = (props) => {
             </div>
 
             <footer className="bg-white  text-center text-white bottom-0">
-              {openCheck && (
+              {dataUrl !== null && (
                 <div className="flex flex-col w-full">
                   <p className="text-3xl font-medium items-center text-slate-800 mt-2">
                     Apakah anda sudah melakukan Pembayaran tapi Produk tidak

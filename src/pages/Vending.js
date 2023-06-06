@@ -914,6 +914,7 @@ const Vending = () => {
                     }
                   })
                   .catch((err) => {
+                    console.log("ERRRRRR", err);
                     var vmStatus = 0;
                     var errorCode = 444;
                     var errStatus = "VM_NOT_RESPONDING";
@@ -966,21 +967,16 @@ const Vending = () => {
         return true;
       };
       looper().then(function () {
-        console.log(
-          "MEMANGGIL AFTER CART ",
-          vendTotalError,
-          jumlahError.current
-        );
-        afterCartVendProcess(1, paramRefund, payment_type);
+        afterCartVendProcess(paramRefund, payment_type);
       });
     }
   };
 
-  function afterCartVendProcess(jumlahError, paramRefund, payment_type) {
-    console.log("after cart SHOW");
+  function afterCartVendProcess(paramRefund, payment_type) {
+    console.log("after cart SHOW TOTAL ERROR ", vendTotalError);
     console.log("TIMEOUT", timerPayment);
     if (timerPayment.current) clearTimeout(timerPayment.current);
-    if (jumlahError > 0) {
+    if (vendTotalError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
       console.log("AFTERCART");

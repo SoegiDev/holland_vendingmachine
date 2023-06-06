@@ -561,7 +561,8 @@ const Vending = () => {
   };
 
   const setCountDownTimer = () => {
-    timerTimeout = setTimeout(() => {
+    clearTimeout(timerTimeout);
+    this.timerTimeout = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -571,7 +572,7 @@ const Vending = () => {
         allowOutsideClick: false,
         timer: 3000,
       }).then(() => {
-        clearTimeout(timerTimeout);
+        clearTimeout(this.timerTimeout);
         clearCart();
         setOpenModalPayment(false);
         clearInterval(timerInterval);
@@ -722,9 +723,8 @@ const Vending = () => {
   }
 
   const PaymentSuccess = (trxCode, payment_type) => {
-    clearTimeout(timerTimeout);
+    clearTimeout(this.timerTimeout);
     setOpenModalPayment(false);
-    clearInterval(timerInterval);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
       text: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",

@@ -542,13 +542,15 @@ const Vending = () => {
           console.error("There was an error!", error);
         });
     }, 1000);
-    timerInterval = setInterval(() => {
+    timerInterval.current = setInterval(() => {
       crud
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
-            clearInterval(timerInterval);
+            clearInterval(timerInterval.current);
+            setTrxCode(trxCode);
             PaymentSuccess(trxCode, payment_type);
+            setTrxCode(trxCode);
           } else {
             console.log(res);
           }
@@ -726,10 +728,10 @@ const Vending = () => {
       icon: "success",
       allowOutsideClick: false,
       timer: 3000,
+    }).then(() => {
+      cartVendProcess(trxCode, payment_type);
     });
-    clearInterval(timerInterval.current);
-    clearTimeout(timerTimeout.current);
-    cartVendProcess(trxCode, payment_type);
+
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
 
@@ -902,9 +904,7 @@ const Vending = () => {
           }
         }
         return true;
-      }.then((res) => {
-        afterCartVendProcess(jumlahError, paramRefund, payment_type);
-      });
+      };
       looper().then(function () {
         //console.log(paramRefund);
         afterCartVendProcess(jumlahError, paramRefund, payment_type);

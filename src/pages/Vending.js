@@ -48,6 +48,8 @@ const Vending = () => {
 
   let timerTimeout = useRef(null);
   let timerInterval = useRef(null);
+  let jumlahError = useRef(0);
+  let jumlahItem = useRef(0);
   useEffect(() => {
     const getbanners = () =>
       crud.getDataBannersImage().then((res) => {
@@ -527,6 +529,7 @@ const Vending = () => {
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
+            if (timerPayment.current) clearInterval(timerPayment.current);
             if (timerTimeout) clearTimeout(timerTimeout);
             if (timerInterval) clearInterval(timerInterval);
             PaymentSuccess(trxCode, payment_type);
@@ -550,6 +553,7 @@ const Vending = () => {
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
+            if (timerPayment.current) clearInterval(timerPayment.current);
             if (timerTimeout) clearTimeout(timerTimeout);
             if (timerInterval) clearInterval(timerInterval);
             clearInterval(timerInterval.current);
@@ -750,11 +754,13 @@ const Vending = () => {
   const cartVendProcess = (trxCode, payment_type) => {
     setVendTotalError(0);
     setVendTotalItem(0);
+    jumlahError(0);
+    jumlahItem(0);
     console.log("LOG TIMER PAYMENT ", timerPayment);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
     if (timerPayment.current) clearTimeout(timerPayment.current);
-    var jumlahItem, jumlahError;
+
     let totalItem = transactions.length;
     if (totalItem > 0) {
       //set parameter
@@ -788,8 +794,8 @@ const Vending = () => {
               trxCode +
               "&hmac=" +
               encodeuri;
-            let jumlahError = 0;
             setTimeout(function () {
+              jumlahItem.current++;
               setVendTotalItem(vendTotalItem + 1);
               EngineVM.RunEngine(apiVend)
                 .then((resp) => {
@@ -829,7 +835,7 @@ const Vending = () => {
                       timer: 2000,
                     }).then(() => {});
                   } else {
-                    jumlahError++;
+                    jumlahError.current++;
                     console.log("PRODUK ERROR");
                     vmStatus = 0;
                     errorCode = resp["buffer"];
@@ -853,7 +859,7 @@ const Vending = () => {
                       allowOutsideClick: false,
                       timer: 5000,
                     }).then(() => {
-                      if (jumlahError > 0) {
+                      if (jumlahError.current > 0) {
                         paramRefund["note"] =
                           paramRefund["note"] +
                           "product code: " +
@@ -874,19 +880,9 @@ const Vending = () => {
                           "%0A";
                       }
                     });
-                    console.log(
-                      "VendTotal Error dan Item ",
-                      jumlahError,
-                      vendTotalItem
-                    );
                   }
                 })
                 .catch((err) => {
-                  console.log(
-                    "VendTotal 2 Error dan Item ",
-                    jumlahError,
-                    vendTotalItem
-                  );
                   var vmStatus = 0;
                   var errorCode = 444;
                   var errStatus = "VM_NOT_RESPONDING";
@@ -928,8 +924,8 @@ const Vending = () => {
                       errStatus +
                       "%0A";
                   }
-                  jumlahError++;
-                  setVendTotalError(jumlahError);
+                  jumlahError.current++;
+                  setVendTotalError(jumlahError.current);
                 });
             }, 3000);
           }
@@ -937,10 +933,9 @@ const Vending = () => {
         return true;
       };
       looper().then(function () {
-        console.log("MEMANGGIL AFTER CART");
-        console.log("MEMANGGIL AFTER CART 2", vendTotalItem);
+        console.log("MEMANGGIL AFTER CART", vendTotalItem);
 
-        afterCartVendProcess(vendTotalItem, paramRefund, payment_type);
+        afterCartVendProcess(jumlahError.current, paramRefund, payment_type);
       });
     }
   };

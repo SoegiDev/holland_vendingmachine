@@ -775,10 +775,10 @@ const Vending = () => {
               jumlahItem++;
               EngineVM.RunEngine(apiVend)
                 .then((resp) => {
-                  console.log("MASUK", resp);
+                  console.log("MASUK BUFFER", resp["buffer"]);
                   var textCounterItem =
                     "Product ke " + jumlahItem + " / " + TotalItemCart;
-                  if (resp.status) {
+                  if (resp["status"] === true) {
                     var apiStockOffline = "slot=" + transactions[index].no_slot;
                     crud
                       .VMSTOCK(apiStockOffline)
@@ -787,8 +787,8 @@ const Vending = () => {
                         console.log(e);
                       });
                     var vmStatus = 1;
-                    var errorCode = resp.data.buffer;
-                    var errStatus = resp.data.message;
+                    var errorCode = resp["buffer"];
+                    var errStatus = resp["message"];
                     vmStock(
                       index,
                       vmStatus,
@@ -807,12 +807,12 @@ const Vending = () => {
                       text: myhtml,
                       icon: "success",
                       allowOutsideClick: false,
-                      timer: 3000,
+                      timer: 2000,
                     }).then(() => {});
                   } else {
                     vmStatus = 0;
-                    errorCode = resp.buffer;
-                    errStatus = resp.message;
+                    errorCode = resp["buffer"];
+                    errStatus = resp["message"];
                     vmStock(
                       index,
                       vmStatus,

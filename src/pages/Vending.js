@@ -446,6 +446,7 @@ const Vending = () => {
         setTotalItemCart(0);
         setTransaction([]);
         setTotalItemCart(0);
+        clearTimeout(timerTimeout.current);
         clearTimeout(timerTimeout);
         clearInterval(timerInterval);
         setModalRefund(false);
@@ -983,7 +984,7 @@ const Vending = () => {
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
       setModalRefund(true);
-      setTimeout(() => {
+      timerTimeout.current = setTimeout(() => {
         Swal.fire({
           title: "Waktu Scan Refund Habis!",
           text: "Silahkan Hubungi Call Center Jika Ada Terkendala. [auto close]",
@@ -1000,6 +1001,7 @@ const Vending = () => {
           setTimeout(() => {
             clearTimeout(timerTimeout);
             clearInterval(timerInterval);
+            clearInterval(timerTimeout.current);
             setOpenModalPayment(false);
             setModalRefund(false);
             clearCart();

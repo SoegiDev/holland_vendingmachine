@@ -67,7 +67,7 @@ const ModalPayment = (props) => {
                 className="w-[90%] px-32 mb-2 items-center"
               />
             </div>
-            {ishabis || !ishabis ? (
+            {ishabis ? (
               <div>
                 <div className="flex flex-col w-full justify-center">
                   <p className="text-3xl font-medium items-center text-slate-800 mt-2">

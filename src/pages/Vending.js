@@ -788,110 +788,25 @@ const Vending = () => {
               "&hmac=" +
               encodeuri;
             let jumlahError = 0;
-            await new Promise(function (resolve, reject) {
-              setTimeout(function () {
-                setVendTotalItem(vendTotalItem + 1);
-                EngineVM.RunEngine(apiVend)
-                  .then((resp) => {
-                    console.log("MASUK BUFFER", resp["buffer"]);
-                    var textCounterItem =
-                      "Product ke " + vendTotalItem + " / " + TotalItemCart;
-                    if (resp["status"] === true) {
-                      console.log("Itemnya ada");
-                      var apiStockOffline =
-                        "slot=" + transactions[index].no_slot;
-                      crud
-                        .VMSTOCK(apiStockOffline)
-                        .then((response) => {})
-                        .catch((e) => {
-                          console.log(e);
-                        });
-                      var vmStatus = 1;
-                      var errorCode = resp["buffer"];
-                      var errStatus = resp["message"];
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      var myhtml =
-                        "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
-                        textCounterItem;
-
-                      Swal.fire({
-                        title: "Transaksi Berhasil",
-                        text: myhtml,
-                        icon: "success",
-                        allowOutsideClick: false,
-                        timer: 2000,
-                      }).then(() => {});
-                    } else {
-                      jumlahError++;
-                      setVendTotalError(vendTotalError + 1);
-                      console.log("PRODUK ERROR");
-                      vmStatus = 0;
-                      errorCode = resp["buffer"];
-                      errStatus = resp["message"];
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      myhtml =
-                        "Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
-
-                      Swal.fire({
-                        title: "Vending Machine Issues",
-                        text: myhtml,
-                        icon: "error",
-                        allowOutsideClick: false,
-                        timer: 5000,
-                      }).then(() => {
-                        if (jumlahError > 0) {
-                          paramRefund["note"] =
-                            paramRefund["note"] +
-                            "product code: " +
-                            transactions[index].kode_produk +
-                            ", error code: " +
-                            errorCode +
-                            ", message: " +
-                            errStatus +
-                            "%0A";
-                        } else {
-                          paramRefund["note"] =
-                            "product code: " +
-                            transactions[index].kode_produk +
-                            ", error code: " +
-                            errorCode +
-                            ", message: " +
-                            errStatus +
-                            "%0A";
-                        }
+            setTimeout(function () {
+              setVendTotalItem(vendTotalItem + 1);
+              EngineVM.RunEngine(apiVend)
+                .then((resp) => {
+                  console.log("MASUK BUFFER", resp["buffer"]);
+                  var textCounterItem =
+                    "Product ke " + vendTotalItem + " / " + TotalItemCart;
+                  if (resp["status"] === true) {
+                    console.log("Itemnya ada");
+                    var apiStockOffline = "slot=" + transactions[index].no_slot;
+                    crud
+                      .VMSTOCK(apiStockOffline)
+                      .then((response) => {})
+                      .catch((e) => {
+                        console.log(e);
                       });
-                      console.log(
-                        "VendTotal Error dan Item ",
-                        jumlahError,
-                        vendTotalItem
-                      );
-                    }
-                  })
-                  .catch((err) => {
-                    console.log(
-                      "VendTotal 2 Error dan Item ",
-                      jumlahError,
-                      vendTotalItem
-                    );
-                    var vmStatus = 0;
-                    var errorCode = 444;
-                    var errStatus = "VM_NOT_RESPONDING";
+                    var vmStatus = 1;
+                    var errorCode = resp["buffer"];
+                    var errStatus = resp["message"];
                     vmStock(
                       index,
                       vmStatus,
@@ -902,39 +817,120 @@ const Vending = () => {
                       verify_no
                     );
                     var myhtml =
-                      "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+                      "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
+                      textCounterItem;
+
+                    Swal.fire({
+                      title: "Transaksi Berhasil",
+                      text: myhtml,
+                      icon: "success",
+                      allowOutsideClick: false,
+                      timer: 2000,
+                    }).then(() => {});
+                  } else {
+                    jumlahError++;
+                    setVendTotalError(vendTotalError + 1);
+                    console.log("PRODUK ERROR");
+                    vmStatus = 0;
+                    errorCode = resp["buffer"];
+                    errStatus = resp["message"];
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    myhtml =
+                      "Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
 
                     Swal.fire({
                       title: "Vending Machine Issues",
-                      content: myhtml,
+                      text: myhtml,
                       icon: "error",
                       allowOutsideClick: false,
                       timer: 5000,
-                    }).then(() => {});
-                    if (jumlahError > 0) {
-                      paramRefund["note"] =
-                        paramRefund["note"] +
-                        transactions[index].kode_produk +
-                        "-" +
-                        errorCode +
-                        "-" +
-                        errStatus +
-                        "%0A";
-                    } else {
-                      paramRefund.note =
-                        "-" +
-                        transactions[index].kode_produk +
-                        "-" +
-                        errorCode +
-                        "-" +
-                        errStatus +
-                        "%0A";
-                    }
-                    jumlahError++;
-                  });
-                resolve(true);
-              }, 3000);
-            });
+                    }).then(() => {
+                      if (jumlahError > 0) {
+                        paramRefund["note"] =
+                          paramRefund["note"] +
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      } else {
+                        paramRefund["note"] =
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      }
+                    });
+                    console.log(
+                      "VendTotal Error dan Item ",
+                      jumlahError,
+                      vendTotalItem
+                    );
+                  }
+                })
+                .catch((err) => {
+                  console.log(
+                    "VendTotal 2 Error dan Item ",
+                    jumlahError,
+                    vendTotalItem
+                  );
+                  var vmStatus = 0;
+                  var errorCode = 444;
+                  var errStatus = "VM_NOT_RESPONDING";
+                  vmStock(
+                    index,
+                    vmStatus,
+                    errorCode,
+                    errStatus,
+                    trxCode,
+                    payment_type,
+                    verify_no
+                  );
+                  var myhtml =
+                    "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+
+                  Swal.fire({
+                    title: "Vending Machine Issues",
+                    content: myhtml,
+                    icon: "error",
+                    allowOutsideClick: false,
+                    timer: 5000,
+                  }).then(() => {});
+                  if (jumlahError > 0) {
+                    paramRefund["note"] =
+                      paramRefund["note"] +
+                      transactions[index].kode_produk +
+                      "-" +
+                      errorCode +
+                      "-" +
+                      errStatus +
+                      "%0A";
+                  } else {
+                    paramRefund.note =
+                      "-" +
+                      transactions[index].kode_produk +
+                      "-" +
+                      errorCode +
+                      "-" +
+                      errStatus +
+                      "%0A";
+                  }
+                  jumlahError++;
+                });
+            }, 3000);
           }
         }
         return true;

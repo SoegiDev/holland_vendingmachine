@@ -826,7 +826,7 @@ const Vending = () => {
                       verify_no
                     );
                     myhtml =
-                      "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+                      "Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
 
                     Swal.fire({
                       title: "Vending Machine Issues",
@@ -906,7 +906,7 @@ const Vending = () => {
         return true;
       };
       looper().then(function () {
-        //console.log(paramRefund);
+        console.log("MEMANGGIL AFTER CART");
         afterCartVendProcess(jumlahError, paramRefund, payment_type);
       });
     }

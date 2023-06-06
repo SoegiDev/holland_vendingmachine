@@ -523,6 +523,8 @@ const Vending = () => {
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
+            if (timerTimeout) clearTimeout(timerTimeout);
+            if (timerInterval) clearInterval(timerInterval);
             PaymentSuccess(trxCode, payment_type);
             setTrxCode(trxCode);
             timerTimeout.current = setTimeout(() => {
@@ -544,6 +546,8 @@ const Vending = () => {
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
+            if (timerTimeout) clearTimeout(timerTimeout);
+            if (timerInterval) clearInterval(timerInterval);
             clearInterval(timerInterval.current);
             setTrxCode(trxCode);
             PaymentSuccess(trxCode, payment_type);
@@ -562,7 +566,7 @@ const Vending = () => {
 
   const setCountDownTimer = () => {
     clearTimeout(timerTimeout);
-    this.timerTimeout = setTimeout(() => {
+    timerTimeout = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -572,10 +576,10 @@ const Vending = () => {
         allowOutsideClick: false,
         timer: 3000,
       }).then(() => {
-        clearTimeout(this.timerTimeout);
+        if (timerTimeout) clearTimeout(timerTimeout);
+        if (timerInterval) clearInterval(timerInterval);
         clearCart();
-        setOpenModalPayment(false);
-        clearInterval(timerInterval);
+        setOpenModalPayment(false);=
         setContentQR(null);
         afterQR("0", "408", "Payment timeout", TrxCode, "SHOPEEPAY");
 
@@ -723,7 +727,8 @@ const Vending = () => {
   }
 
   const PaymentSuccess = (trxCode, payment_type) => {
-    clearTimeout(this.timerTimeout);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
     setOpenModalPayment(false);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
@@ -739,6 +744,8 @@ const Vending = () => {
   };
 
   const cartVendProcess = (trxCode, payment_type) => {
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
     var jumlahItem, jumlahError;
     let totalItem = transactions.length;
     if (totalItem > 0) {

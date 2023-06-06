@@ -45,8 +45,8 @@ const Vending = () => {
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
   let timerPayment;
 
-  let timerTimeout = useRef(null);
-  let timerInterval = useRef(null);
+  let timerTimeout;
+  let timerInterval;
   useEffect(() => {
     const getbanners = () =>
       crud.getDataBannersImage().then((res) => {

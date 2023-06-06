@@ -748,7 +748,6 @@ const Vending = () => {
     }).then(() => {
       cartVendProcess(trxCode, payment_type);
     });
-
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
 
@@ -934,8 +933,7 @@ const Vending = () => {
         return true;
       };
       looper().then(function () {
-        console.log("MEMANGGIL AFTER CART", vendTotalItem);
-
+        console.log("MEMANGGIL AFTER CART ", vendTotalError, jumlahError);
         afterCartVendProcess(vendTotalError, paramRefund, payment_type);
       });
     }

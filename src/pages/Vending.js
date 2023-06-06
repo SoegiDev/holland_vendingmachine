@@ -766,7 +766,6 @@ const Vending = () => {
       };
 
       //buat loop productnya
-
       var looper = async function () {
         for (let index = 0; index < transactions.length; index++) {
           setVendTotalError(0);
@@ -929,6 +928,7 @@ const Vending = () => {
                       "%0A";
                   }
                   jumlahError++;
+                  setVendTotalError(jumlahError);
                 });
             }, 3000);
           }
@@ -937,9 +937,9 @@ const Vending = () => {
       };
       looper().then(function () {
         console.log("MEMANGGIL AFTER CART");
-        console.log("MEMANGGIL AFTER CART 2", vendTotalItem, jumlahError);
+        console.log("MEMANGGIL AFTER CART 2", vendTotalItem);
 
-        afterCartVendProcess(jumlahError, paramRefund, payment_type);
+        afterCartVendProcess(vendTotalItem, paramRefund, payment_type);
       });
     }
   };

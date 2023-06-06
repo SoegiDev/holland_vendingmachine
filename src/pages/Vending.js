@@ -779,6 +779,8 @@ const Vending = () => {
                     var textCounterItem =
                       "Product ke " + index + " / " + TotalItemCart;
                     if (resp["status"] === true) {
+                      console.log("PRODUK PERTAMA");
+
                       var apiStockOffline =
                         "slot=" + transactions[index].no_slot;
                       crud
@@ -811,6 +813,7 @@ const Vending = () => {
                         timer: 2000,
                       }).then(() => {});
                     } else {
+                      console.log("PRODUK ERROR");
                       vmStatus = 0;
                       errorCode = resp["buffer"];
                       errStatus = resp["message"];

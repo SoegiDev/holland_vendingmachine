@@ -836,7 +836,7 @@ const Vending = () => {
                       timer: 2000,
                     }).then(() => {});
                   } else {
-                    jumlahError.current = jumlahError.current + 1;
+                    setVendTotalError(vendTotalError + 1);
                     console.log("PRODUK ERROR");
                     vmStatus = 0;
                     errorCode = resp["buffer"];
@@ -860,7 +860,7 @@ const Vending = () => {
                       allowOutsideClick: false,
                       timer: 5000,
                     }).then(() => {
-                      if (jumlahError.current > 0) {
+                      if (vendTotalError > 0) {
                         paramRefund["note"] =
                           paramRefund["note"] +
                           "product code: " +
@@ -906,7 +906,7 @@ const Vending = () => {
                     allowOutsideClick: false,
                     timer: 5000,
                   }).then(() => {});
-                  if (jumlahError.current > 0) {
+                  if (vendTotalError > 0) {
                     paramRefund["note"] =
                       paramRefund["note"] +
                       transactions[index].kode_produk +
@@ -926,7 +926,7 @@ const Vending = () => {
                       "%0A";
                   }
                   jumlahError.current = jumlahError.current + 1;
-                  setVendTotalError(jumlahError.current);
+                  setVendTotalError(vendTotalError + 1);
                 });
             }, 3000);
           }
@@ -936,7 +936,7 @@ const Vending = () => {
       looper().then(function () {
         console.log("MEMANGGIL AFTER CART", vendTotalItem);
 
-        afterCartVendProcess(jumlahError.current, paramRefund, payment_type);
+        afterCartVendProcess(vendTotalError, paramRefund, payment_type);
       });
     }
   };
@@ -945,7 +945,7 @@ const Vending = () => {
     console.log("after cart SHOW");
     console.log("TIMEOUT", timerPayment);
     if (timerPayment.current) clearTimeout(timerPayment.current);
-    if (jumlahError > 0) {
+    if (jumlahError.current > 0 || vendTotalError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
       console.log("AFTERCART");

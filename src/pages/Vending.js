@@ -787,6 +787,7 @@ const Vending = () => {
               trxCode +
               "&hmac=" +
               encodeuri;
+            let jumlahError = 0;
             await new Promise(function (resolve, reject) {
               setTimeout(function () {
                 setVendTotalItem(vendTotalItem + 1);
@@ -829,6 +830,7 @@ const Vending = () => {
                         timer: 2000,
                       }).then(() => {});
                     } else {
+                      jumlahError++;
                       setVendTotalError(vendTotalError + 1);
                       console.log("PRODUK ERROR");
                       vmStatus = 0;
@@ -853,7 +855,7 @@ const Vending = () => {
                         allowOutsideClick: false,
                         timer: 5000,
                       }).then(() => {
-                        if (vendTotalError > 0) {
+                        if (jumlahError > 0) {
                           paramRefund["note"] =
                             paramRefund["note"] +
                             "product code: " +
@@ -876,7 +878,7 @@ const Vending = () => {
                       });
                       console.log(
                         "VendTotal Error dan Item ",
-                        vendTotalError,
+                        jumlahError,
                         vendTotalItem
                       );
                     }
@@ -884,10 +886,9 @@ const Vending = () => {
                   .catch((err) => {
                     console.log(
                       "VendTotal 2 Error dan Item ",
-                      vendTotalError,
+                      jumlahError,
                       vendTotalItem
                     );
-                    setVendTotalError(vendTotalError + 1);
                     var vmStatus = 0;
                     var errorCode = 444;
                     var errStatus = "VM_NOT_RESPONDING";
@@ -910,7 +911,7 @@ const Vending = () => {
                       allowOutsideClick: false,
                       timer: 5000,
                     }).then(() => {});
-                    if (vendTotalError > 0) {
+                    if (jumlahError > 0) {
                       paramRefund["note"] =
                         paramRefund["note"] +
                         transactions[index].kode_produk +
@@ -929,8 +930,10 @@ const Vending = () => {
                         errStatus +
                         "%0A";
                     }
+                    jumlahError++;
                   });
-              }, 2000);
+                resolve(true);
+              }, 3000);
             });
           }
         }
@@ -938,9 +941,9 @@ const Vending = () => {
       };
       looper().then(function () {
         console.log("MEMANGGIL AFTER CART");
-        console.log("MEMANGGIL AFTER CART 2", vendTotalItem, vendTotalError);
+        console.log("MEMANGGIL AFTER CART 2", vendTotalItem, jumlahError);
 
-        afterCartVendProcess(vendTotalError, paramRefund, payment_type);
+        afterCartVendProcess(jumlahError, paramRefund, payment_type);
       });
     }
   };

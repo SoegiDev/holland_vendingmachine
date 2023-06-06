@@ -840,30 +840,41 @@ const Vending = () => {
                         icon: "error",
                         allowOutsideClick: false,
                         timer: 5000,
-                      }).then(() => {});
-                      if (vendTotalError > 0) {
-                        paramRefund["note"] =
-                          paramRefund["note"] +
-                          "product code: " +
-                          transactions[index].kode_produk +
-                          ", error code: " +
-                          errorCode +
-                          ", message: " +
-                          errStatus +
-                          "%0A";
-                      } else {
-                        paramRefund["note"] =
-                          "product code: " +
-                          transactions[index].kode_produk +
-                          ", error code: " +
-                          errorCode +
-                          ", message: " +
-                          errStatus +
-                          "%0A";
-                      }
+                      }).then(() => {
+                        if (vendTotalError > 0) {
+                          paramRefund["note"] =
+                            paramRefund["note"] +
+                            "product code: " +
+                            transactions[index].kode_produk +
+                            ", error code: " +
+                            errorCode +
+                            ", message: " +
+                            errStatus +
+                            "%0A";
+                        } else {
+                          paramRefund["note"] =
+                            "product code: " +
+                            transactions[index].kode_produk +
+                            ", error code: " +
+                            errorCode +
+                            ", message: " +
+                            errStatus +
+                            "%0A";
+                        }
+                      });
+                      console.log(
+                        "VendTotal Error dan Item ",
+                        vendTotalError,
+                        vendTotalItem
+                      );
                     }
                   })
                   .catch((err) => {
+                    console.log(
+                      "VendTotal 2 Error dan Item ",
+                      vendTotalError,
+                      vendTotalItem
+                    );
                     setVendTotalError(vendTotalError + 1);
                     var vmStatus = 0;
                     var errorCode = 444;

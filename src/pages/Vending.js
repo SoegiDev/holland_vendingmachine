@@ -933,7 +933,11 @@ const Vending = () => {
         return true;
       };
       looper().then(function () {
-        console.log("MEMANGGIL AFTER CART ", vendTotalError, jumlahError);
+        console.log(
+          "MEMANGGIL AFTER CART ",
+          vendTotalError,
+          jumlahError.current
+        );
         afterCartVendProcess(vendTotalError, paramRefund, payment_type);
       });
     }
@@ -1032,7 +1036,7 @@ const Vending = () => {
       console.log("TIMEOUT BERJALAN");
       setCountDownTimer();
     }
-  }, []);
+  }, [paymentOut, setCountDownTimer]);
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden" id="hb-vm">
       {screensaverActive && itemBannersImage !== null ? (

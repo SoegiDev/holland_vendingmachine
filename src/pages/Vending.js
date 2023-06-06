@@ -569,7 +569,7 @@ const Vending = () => {
   };
 
   const setCountDownTimer = () => {
-    timerPayment = setTimeout(() => {
+    timerPayment.current = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -589,8 +589,6 @@ const Vending = () => {
         /* Read more about handling dismissals below */
       });
     }, 115 * 1000);
-    if (timerTimeout) clearTimeout(timerTimeout);
-    if (timerInterval) clearInterval(timerInterval);
   };
 
   const checkPayment = () => {
@@ -734,7 +732,7 @@ const Vending = () => {
   const PaymentSuccess = (trxCode, payment_type) => {
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    clearTimeout(timerPayment);
+    clearTimeout(timerPayment.current);
     setOpenModalPayment(false);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
@@ -949,6 +947,7 @@ const Vending = () => {
   function afterCartVendProcess(jumlahError, paramRefund, payment_type) {
     console.log("after cart SHOW");
     console.log("TIMEOUT", timerPayment);
+    if (timerPayment.current) clearTimeout(timerPayment.current);
     if (jumlahError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
@@ -975,6 +974,7 @@ const Vending = () => {
             clearTimeout(timerTimeout);
             clearInterval(timerInterval);
             setOpenModalPayment(false);
+            setModalRefund(false);
             clearCart();
             setContentQR(null);
             setUpdateData(true);

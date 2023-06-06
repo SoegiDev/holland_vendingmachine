@@ -43,7 +43,7 @@ const Vending = () => {
   const [openModalRefund, setModalRefund] = useState(false);
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
-  const timerPayment = useRef(null);
+  let timerPayment;
 
   let timerTimeout = useRef(null);
   let timerInterval = useRef(null);
@@ -568,7 +568,7 @@ const Vending = () => {
   };
 
   const setCountDownTimer = () => {
-    timerPayment.current = setTimeout(() => {
+    timerPayment = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",

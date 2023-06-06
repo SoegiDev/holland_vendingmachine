@@ -137,24 +137,23 @@ const Vending = () => {
           }, 1000);
         }, 1000);
       });
-    timerTimeout.current = setTimeout(() => {
-      clearTimeout(timerTimeout.current);
+    const timerTimeout = setTimeout(() => {
+      clearTimeout(timerTimeout);
       if (!isSyncBanners && !isSyncSlot) {
         if (isUpdateData) {
           console.log("UPDATE DATA TRUE");
           setLoading(true);
-          timerTimeout.current = setTimeout(() => {
-            clearTimeout(timerTimeout.current);
+          const timerTimeout = setTimeout(() => {
+            clearTimeout(timerTimeout);
             console.log("Update Data");
             initBanners();
             clearCart();
           }, 2000);
         } else {
           console.log("UPDATE DATA False");
-          clearTimeout(timerTimeout.current);
           setLoading(true);
-          timerTimeout.current = setTimeout(() => {
-            clearTimeout(timerTimeout.current);
+          const timerTimeout = setTimeout(() => {
+            clearTimeout(timerTimeout);
             getbanners();
           }, 2000);
         }

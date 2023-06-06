@@ -46,7 +46,6 @@ const Vending = () => {
 
   let timerTimeout = useRef(null);
   let timerInterval = useRef(null);
-  var paramRefund = {};
   useEffect(() => {
     const getbanners = () =>
       crud.getDataBannersImage().then((res) => {
@@ -737,11 +736,12 @@ const Vending = () => {
   };
 
   const cartVendProcess = (trxCode, payment_type) => {
+    var jumlahItem, jumlahError;
     let totalItem = transactions.length;
     if (totalItem > 0) {
       //set parameter
       var verify_no = Math.floor(Date.now() / 1000);
-      let jumlahError = 0;
+
       var paramRefund = {
         vm_store: VMINIT.getName(),
         verify_no: verify_no,
@@ -753,7 +753,8 @@ const Vending = () => {
 
       var looper = async function () {
         for (let index = 0; index < transactions.length; index++) {
-          let jumlahItem = 0;
+          jumlahError = 0;
+          jumlahItem = 0;
           for (
             let jumProduct = 0;
             jumProduct < transactions[index].qty;
@@ -770,14 +771,12 @@ const Vending = () => {
               trxCode +
               "&hmac=" +
               encodeuri;
-
-            setTimeout((jumlahItem, jumlahError) => {
-              jumlahItem++;
+            setTimeout(() => {
               EngineVM.RunEngine(apiVend)
                 .then((resp) => {
                   console.log("MASUK BUFFER", resp["buffer"]);
                   var textCounterItem =
-                    "Product ke " + jumlahItem + " / " + TotalItemCart;
+                    "Product ke " + index + " / " + TotalItemCart;
                   if (resp["status"] === true) {
                     var apiStockOffline = "slot=" + transactions[index].no_slot;
                     crud
@@ -832,28 +831,26 @@ const Vending = () => {
                       allowOutsideClick: false,
                       timer: 5000,
                     }).then(() => {});
-                    if (jumlahError > 0) {
-                      paramRefund.note =
-                        paramRefund.note +
-                        "product code: " +
-                        transactions[index].kode_produk +
-                        ", error code: " +
-                        errorCode +
-                        ", message: " +
-                        errStatus +
-                        "%0A";
-                    } else {
-                      paramRefund.note =
-                        "product code: " +
-                        transactions[index].kode_produk +
-                        ", error code: " +
-                        errorCode +
-                        ", message: " +
-                        errStatus +
-                        "%0A";
-                    }
-
-                    jumlahError++;
+                    // if (jumlahError > 0) {
+                    //   paramRefund.note =
+                    //     paramRefund.note +
+                    //     "product code: " +
+                    //     transactions[index].kode_produk +
+                    //     ", error code: " +
+                    //     errorCode +
+                    //     ", message: " +
+                    //     errStatus +
+                    //     "%0A";
+                    // } else {
+                    //   paramRefund.note =
+                    //     "product code: " +
+                    //     transactions[index].kode_produk +
+                    //     ", error code: " +
+                    //     errorCode +
+                    //     ", message: " +
+                    //     errStatus +
+                    //     "%0A";
+                    // }
                   }
                 })
                 .catch((err) => {
@@ -879,27 +876,25 @@ const Vending = () => {
                     allowOutsideClick: false,
                     timer: 5000,
                   }).then(() => {});
-                  if (jumlahError > 0) {
-                    paramRefund.note =
-                      paramRefund.note +
-                      transactions[index].kode_produk +
-                      "-" +
-                      errorCode +
-                      "-" +
-                      errStatus +
-                      "%0A";
-                  } else {
-                    paramRefund.note =
-                      "-" +
-                      transactions[index].kode_produk +
-                      "-" +
-                      errorCode +
-                      "-" +
-                      errStatus +
-                      "%0A";
-                  }
-
-                  jumlahError++;
+                  // if (jumlahError > 0) {
+                  //   paramRefund.note =
+                  //     paramRefund.note +
+                  //     transactions[index].kode_produk +
+                  //     "-" +
+                  //     errorCode +
+                  //     "-" +
+                  //     errStatus +
+                  //     "%0A";
+                  // } else {
+                  //   paramRefund.note =
+                  //     "-" +
+                  //     transactions[index].kode_produk +
+                  //     "-" +
+                  //     errorCode +
+                  //     "-" +
+                  //     errStatus +
+                  //     "%0A";
+                  // }
                 });
             }, 2000);
           }

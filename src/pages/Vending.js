@@ -796,7 +796,7 @@ const Vending = () => {
               "&hmac=" +
               encodeuri;
             setTimeout(function () {
-              jumlahItem.current++;
+              jumlahItem.current = jumlahItem.current + 1;
               setVendTotalItem(vendTotalItem + 1);
               EngineVM.RunEngine(apiVend)
                 .then((resp) => {
@@ -836,7 +836,7 @@ const Vending = () => {
                       timer: 2000,
                     }).then(() => {});
                   } else {
-                    jumlahError.current++;
+                    jumlahError.current = jumlahError.current + 1;
                     console.log("PRODUK ERROR");
                     vmStatus = 0;
                     errorCode = resp["buffer"];
@@ -906,7 +906,7 @@ const Vending = () => {
                     allowOutsideClick: false,
                     timer: 5000,
                   }).then(() => {});
-                  if (jumlahError > 0) {
+                  if (jumlahError.current > 0) {
                     paramRefund["note"] =
                       paramRefund["note"] +
                       transactions[index].kode_produk +
@@ -925,7 +925,7 @@ const Vending = () => {
                       errStatus +
                       "%0A";
                   }
-                  jumlahError.current++;
+                  jumlahError.current = jumlahError.current + 1;
                   setVendTotalError(jumlahError.current);
                 });
             }, 3000);
@@ -1026,6 +1026,9 @@ const Vending = () => {
   };
   const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 540 });
 
+  const TampilPayment = () => {
+    setPaymentOut(true);
+  };
   useEffect(() => {
     if (paymentOut) {
       console.log("TIMEOUT BERJALAN");
@@ -1090,7 +1093,7 @@ const Vending = () => {
               setOpenModalPayment={setOpenModalPayment}
               contentQr={ContentQR}
               checkPayment={checkPayment}
-              setCountDownTimer={setPaymentOut}
+              setPaymentOut={TampilPayment}
             />
           </Transition>
           <Transition

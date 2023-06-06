@@ -734,6 +734,7 @@ const Vending = () => {
   }
 
   const PaymentSuccess = (trxCode, payment_type) => {
+    setPaymentOut(false);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
     clearTimeout(timerPayment.current);
@@ -1026,7 +1027,7 @@ const Vending = () => {
   const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 540 });
 
   useEffect(() => {
-    if (!paymentOut) {
+    if (paymentOut) {
       console.log("TIMEOUT BERJALAN");
       setCountDownTimer();
     }

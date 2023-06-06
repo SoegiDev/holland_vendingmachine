@@ -43,10 +43,10 @@ const Vending = () => {
   const [openModalRefund, setModalRefund] = useState(false);
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
-  let timerPayment;
+  let timerPayment = useRef(null);
 
-  let timerTimeout;
-  let timerInterval;
+  let timerTimeout = useRef(null);
+  let timerInterval = useRef(null);
   useEffect(() => {
     const getbanners = () =>
       crud.getDataBannersImage().then((res) => {
@@ -751,7 +751,7 @@ const Vending = () => {
   const cartVendProcess = (trxCode, payment_type) => {
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    clearTimeout(timerPayment);
+    if (timerPayment) clearTimeout(timerPayment);
     var jumlahItem, jumlahError;
     let totalItem = transactions.length;
     if (totalItem > 0) {

@@ -20,7 +20,7 @@ import ModalRefund from "../components/modal/ModalRefund";
 var CryptoJS = require("crypto-js");
 const Vending = () => {
   const [screensaverActive, setScreensaverActive] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isloading, setLoading] = useState(false);
   const [isSyncSlot, setSyncSlot] = useState(false);
   const [isSyncBanners, setSynBanners] = useState(false);
   const [isUpdateData, setUpdateData] = useState(false);
@@ -35,6 +35,7 @@ const Vending = () => {
   const [openModalPaymnet, setOpenModalPayment] = useState(false);
   const [TrxCode, setTrxCode] = useState(null);
   const [openModalCart, setOpenModalCart] = useState(false);
+  const [overlay, setOverlay] = useState(false);
 
   let [vendTotalItem, setVendTotalItem] = useState(0);
   let [vendTotalError, setVendTotalError] = useState(0);
@@ -44,24 +45,29 @@ const Vending = () => {
 
   const [checkPaymentManual, setCheckPaymentManual] = useState(false);
   const [paymentOut, setPaymentOut] = useState(false);
-  let timerPayment = useRef(null);
 
-  let timerTimeout = useRef(null);
-  let timerInterval = useRef(null);
-  let jumlahError = useRef(0);
-  let jumlahItem = useRef(0);
+  let timerPayment;
+  let timerRefund;
+  let timerTimeout;
 
-  const SetError = (number) => {
-    setVendTotalError(number);
-  };
+  let timerInterval;
+
+  let jumlahError;
+  let jumlahItem;
+  useEffect(() => {
+    console.log("Update TOTal Error");
+  }, [vendTotalError]);
+  useEffect(() => {
+    console.log("Update TOTal Item");
+  }, [vendTotalItem]);
+
   useEffect(() => {
     const getbanners = () =>
       crud.getDataBannersImage().then((res) => {
         console.log("Running Get Banners");
         console.log(res);
         if (res.message === "No Data") {
-          timerTimeout.current = setTimeout(() => {
-            clearTimeout(timerTimeout.current);
+          setTimeout(() => {
             crud
               .initBanners()
               .then((res) => {
@@ -86,8 +92,7 @@ const Vending = () => {
         console.log("Running Get SLOTS");
         console.log(res);
         if (res.message === "No Data") {
-          timerTimeout.current = setTimeout(() => {
-            clearTimeout(timerTimeout.current);
+          setTimeout(() => {
             crud
               .initSlots()
               .then((res) => {
@@ -114,8 +119,7 @@ const Vending = () => {
         console.log("Running Get Banners");
         console.log(res);
         if (res.message === "No Data") {
-          timerTimeout.current = setTimeout(() => {
-            clearTimeout(timerTimeout.current);
+          setTimeout(() => {
             crud.getDataBannersImage().then((res) => {
               console.log("Running Get Banners LOCAL");
               console.log(res.results.data);
@@ -132,38 +136,32 @@ const Vending = () => {
       crud.initSlots().then((res) => {
         console.log("Running Get SLOTS");
         console.log(res);
-        timerTimeout.current = setTimeout(() => {
-          clearTimeout(timerTimeout.current);
-          timerTimeout.current = setTimeout(() => {
-            clearTimeout(timerTimeout.current);
-            crud.getSlots().then((res) => {
-              console.log("Running Get Slots LOCAL");
-              console.log(res.results.data);
-              setItemSlots(res.results.data);
-              setLoading(false);
-            });
-          }, 1000);
+        setTimeout(() => {
+          crud.getSlots().then((res) => {
+            console.log("Running Get Slots LOCAL");
+            console.log(res.results.data);
+            setItemSlots(res.results.data);
+            setLoading(false);
+          });
         }, 1000);
       });
-    const timerTimeout = setTimeout(() => {
-      clearTimeout(timerTimeout);
+    setTimeout(() => {
       if (!isSyncBanners && !isSyncSlot) {
         if (isUpdateData) {
           console.log("UPDATE DATA TRUE");
           setLoading(true);
-          const timerTimeout = setTimeout(() => {
-            clearTimeout(timerTimeout);
+          setTimeout(() => {
             console.log("Update Data");
             initBanners();
             clearCart();
-          }, 2000);
+          }, 1000);
         } else {
           console.log("UPDATE DATA False");
           setLoading(true);
-          const timerTimeout = setTimeout(() => {
+          setTimeout(() => {
             clearTimeout(timerTimeout);
             getbanners();
-          }, 2000);
+          }, 1000);
         }
       }
     }, 1000);
@@ -320,10 +318,10 @@ const Vending = () => {
   //       product.no_slot === item.no_slot
   //         ? {
   //             no_slot: item.no_slot,
-  //             kode_produk: item.kode_produk,
+  //             kode_produk: item.kode_produk,v
   //             name_produk: item.name_produk,
   //             status_promo: item.status_promo,
-  //             harga_promo: item.harga_promo,
+  //             harga_promo: item.harga_promo,vend
   //             harga_jual: item.harga_jual,
   //             issync: 0,
   //             onhand: existItem.onhand + item.qty,
@@ -418,9 +416,10 @@ const Vending = () => {
     setTotalItemCart(0);
     setTransaction([]);
     setTotalItemCart(0);
-    clearTimeout(timerTimeout);
-    clearInterval(timerInterval);
-    clearTimeout(timerPayment);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
     setUpdateData(true);
   };
 
@@ -445,9 +444,10 @@ const Vending = () => {
         setTotalItemCart(0);
         setTransaction([]);
         setTotalItemCart(0);
-        clearTimeout(timerTimeout.current);
-        clearTimeout(timerTimeout);
-        clearInterval(timerInterval);
+        if (timerPayment) clearInterval(timerPayment);
+        if (timerRefund) clearInterval(timerRefund);
+        if (timerTimeout) clearTimeout(timerTimeout);
+        if (timerInterval) clearInterval(timerInterval);
         setModalRefund(false);
         setUpdateData(true);
       } else {
@@ -462,86 +462,79 @@ const Vending = () => {
   };
 
   const setPaymentQR = () => {
-    Swal.fire({
-      icon: "info",
-      title: "Proses QR",
-      text: "......",
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      timer: 3000,
-    }).then(() => {
-      setOpenModalPayment(true);
-      setOpenModalCart(false);
-      var trxCode = VMINIT.getID() + "-" + formatDate();
-      var apiQRCode = "trx_code=" + trxCode + "&";
-      var product_name = "";
+    setOverlay(true);
+    setOpenModalPayment(true);
+    setOpenModalCart(false);
+    var trxCode = VMINIT.getID() + "-" + formatDate();
+    var apiQRCode = "trx_code=" + trxCode + "&";
+    var product_name = "";
 
-      for (let i = 0; i < transactions.length; i++) {
-        var data = transactions[i];
-        product_name += data.name_produk + ",";
-      }
+    for (let i = 0; i < transactions.length; i++) {
+      var data = transactions[i];
+      product_name += data.name_produk + ",";
+    }
 
-      apiQRCode += "product_name=" + product_name + "&";
-      apiQRCode += "qty_product=" + TotalItemCart + "&";
-      apiQRCode += "amount=" + subTotal;
-      crud
-        .CreateQRShopee(apiQRCode)
-        .then((res) => {
-          console.log("HASIL", res);
-          console.log(res);
-          if (res.message === "SUCCESS") {
-            setContentQR(res.results.qrcode);
-            setTrxCode(trxCode);
-            timerTimeout.current = setTimeout(() => {
-              clearTimeout(timerTimeout.current);
-              checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
-            }, 3000);
-          } else {
-            clearTimeout(timerPayment.current);
-            setOpenModalPayment(false);
-            console.log("TIDAK MUNCUL");
-            var errInfo = "Yahh, QR Tidak Muncul!";
-            var errText = "Silahkan coba kembali..";
-            error("460", res.message, errText, errInfo, trxCode, "SHOPEEPAY");
-            failedQR();
-          }
-          // getSlots();
-        })
-        .catch((er) => {
-          console.log(er);
+    apiQRCode += "product_name=" + product_name + "&";
+    apiQRCode += "qty_product=" + TotalItemCart + "&";
+    apiQRCode += "amount=" + subTotal;
+    crud
+      .CreateQRShopee(apiQRCode)
+      .then((res) => {
+        setOverlay(false);
+        console.log("HASIL", res);
+        console.log(res);
+        if (res.message === "SUCCESS") {
+          setContentQR(res.results.qrcode);
+          setTrxCode(trxCode);
           setTimeout(() => {
-            //--> set logic success/error/time out
-            var errInfo = "Waduh, Waktu Habis!";
-            var errText = "Silahkan coba kembali.";
-            error(
-              "470",
-              "Failed Request QR",
-              errText,
-              errInfo,
-              trxCode,
-              "SHOPEEPAY"
-            );
-            failedQR();
+            checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
           }, 3000);
-        });
-    });
+        } else {
+          clearTimeout(timerPayment);
+          setOpenModalPayment(false);
+          console.log("TIDAK MUNCUL");
+          var errInfo = "Yahh, QR Tidak Muncul!";
+          var errText = "Silahkan coba kembali..";
+          error("460", res.message, errText, errInfo, trxCode, "SHOPEEPAY");
+          failedQR();
+        }
+        // getSlots();
+      })
+      .catch((er) => {
+        console.log(er);
+        setTimeout(() => {
+          //--> set logic success/error/time out
+          var errInfo = "Waduh, Waktu Habis!";
+          var errText = "Silahkan coba kembali.";
+          error(
+            "470",
+            "Failed Request QR",
+            errText,
+            errInfo,
+            trxCode,
+            "SHOPEEPAY"
+          );
+          failedQR();
+        }, 3000);
+      });
   };
 
   const checkQRPayment = (trxCode, jumlahItem, jumlahBayar, payment_type) => {
     var apicheck = "trx_code=" + trxCode + "&";
-    timerTimeout.current = setTimeout(() => {
-      clearTimeout(timerTimeout.current);
+    timerTimeout = setTimeout(() => {
+      clearTimeout(timerTimeout);
       crud
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
-            if (timerPayment.current) clearInterval(timerPayment.current);
+            if (timerPayment) clearInterval(timerPayment);
+            if (timerRefund) clearInterval(timerRefund);
             if (timerTimeout) clearTimeout(timerTimeout);
             if (timerInterval) clearInterval(timerInterval);
             PaymentSuccess(trxCode, payment_type);
             setTrxCode(trxCode);
-            timerTimeout.current = setTimeout(() => {
-              clearTimeout(timerTimeout.current);
+            timerTimeout = setTimeout(() => {
+              clearTimeout(timerTimeout);
               checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
             }, 3000);
           } else {
@@ -554,18 +547,17 @@ const Vending = () => {
           console.error("There was an error!", error);
         });
     }, 1000);
-    timerInterval.current = setInterval(() => {
+    timerInterval = setInterval(() => {
       crud
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
-            if (timerPayment.current) clearInterval(timerPayment.current);
+            if (timerPayment) clearInterval(timerPayment);
+            if (timerRefund) clearInterval(timerRefund);
             if (timerTimeout) clearTimeout(timerTimeout);
             if (timerInterval) clearInterval(timerInterval);
-            clearInterval(timerInterval.current);
             setTrxCode(trxCode);
             PaymentSuccess(trxCode, payment_type);
-            setTrxCode(trxCode);
           } else {
             console.log(res);
           }
@@ -575,7 +567,7 @@ const Vending = () => {
         });
     }, 12000);
 
-    timerPayment.current = setTimeout(() => {
+    timerPayment = setTimeout(() => {
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -585,40 +577,15 @@ const Vending = () => {
         allowOutsideClick: false,
         timer: 3000,
       }).then(() => {
-        if (timerTimeout) clearTimeout(timerTimeout);
-        if (timerInterval) clearInterval(timerInterval);
         clearCart();
         setOpenModalPayment(false);
         setContentQR(null);
-        afterQR("0", "408", "Payment timeout", TrxCode, "SHOPEEPAY");
+        afterQR("0", "408", "Payment timeout", trxCode, "SHOPEEPAY");
 
         /* Read more about handling dismissals below */
       });
-    }, 145 * 1000);
+    }, 160 * 1000);
     //set waktu habis bayar
-  };
-
-  const setCountDownTimer = () => {
-    timerPayment.current = setTimeout(() => {
-      console.log("Get TIMEOUT HABIS WAKTU");
-      Swal.fire({
-        icon: "info",
-        title: "Yahhh, Waktu Transaksi Habis!",
-        text: "Silahkan coba kembali. [auto close]",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        timer: 3000,
-      }).then(() => {
-        if (timerTimeout) clearTimeout(timerTimeout);
-        if (timerInterval) clearInterval(timerInterval);
-        clearCart();
-        setOpenModalPayment(false);
-        setContentQR(null);
-        afterQR("0", "408", "Payment timeout", TrxCode, "SHOPEEPAY");
-
-        /* Read more about handling dismissals below */
-      });
-    }, 115 * 1000);
   };
 
   const checkPayment = () => {
@@ -632,7 +599,6 @@ const Vending = () => {
       .then((res) => {
         setLoading(false);
         if (res.message === "SUCCESS") {
-          clearTimeout(timerPayment.current);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
           new Swal({
@@ -642,9 +608,6 @@ const Vending = () => {
             allowOutsideClick: false,
             timer: 2500,
           }).then(() => {
-            clearTimeout(timerPayment.current);
-            setOpenModalPayment(false);
-            setContentQR(null);
             afterQR("0", "409", "Check Payment Pending", TrxCode, "SHOPEEPAY");
             clearCart();
           });
@@ -723,8 +686,10 @@ const Vending = () => {
 
   function failedQR() {
     setLoading(true);
-    clearInterval(timerInterval);
-    clearTimeout(timerTimeout);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
     setTimeout(() => {
       setLoading(false);
     }, 3000);
@@ -761,7 +726,8 @@ const Vending = () => {
 
   const PaymentSuccess = (trxCode, payment_type) => {
     setPaymentOut(false);
-    clearTimeout(timerPayment.current);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
 
@@ -781,13 +747,14 @@ const Vending = () => {
   const cartVendProcess = (trxCode, payment_type) => {
     setVendTotalError(0);
     setVendTotalItem(0);
-    jumlahError.current = 0;
-    jumlahItem.current = 0;
+    jumlahError = 0;
+    jumlahItem = 0;
     clearTimeout(timerPayment);
     console.log("LOG TIMER PAYMENT ", timerPayment);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    if (timerPayment) clearTimeout(timerPayment);
 
     let totalItem = transactions.length;
     if (totalItem > 0) {
@@ -822,102 +789,26 @@ const Vending = () => {
               trxCode +
               "&hmac=" +
               encodeuri;
-            await new Promise(function (resolve, reject) {
-              console.log("PROMISE ", "MULAI");
-              setTimeout(function () {
-                jumlahItem.current = jumlahItem.current + 1;
-                setVendTotalItem(vendTotalItem + 1);
-                EngineVM.RunEngine(apiVend)
-                  .then((resp) => {
-                    console.log("MASUK BUFFER", resp["buffer"]);
-                    var textCounterItem =
-                      "Product ke " + vendTotalItem + " / " + TotalItemCart;
-                    if (resp["status"] === true) {
-                      console.log("PROMISE ", "AMAN");
-                      var apiStockOffline =
-                        "slot=" + transactions[index].no_slot;
-                      crud
-                        .VMSTOCK(apiStockOffline)
-                        .then((response) => {})
-                        .catch((e) => {
-                          console.log(e);
-                        });
-                      var vmStatus = 1;
-                      var errorCode = resp["buffer"];
-                      var errStatus = resp["message"];
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      var myhtml =
-                        "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
-                        textCounterItem;
-
-                      Swal.fire({
-                        title: "Transaksi Berhasil",
-                        text: myhtml,
-                        icon: "success",
-                        allowOutsideClick: false,
-                        timer: 2000,
-                      }).then(() => {});
-                    } else {
-                      SetError(vendTotalError + 1);
-                      console.log("PROMISE ", "ERROR");
-                      vmStatus = 0;
-                      errorCode = resp["buffer"];
-                      errStatus = resp["message"];
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      myhtml =
-                        "Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
-
-                      Swal.fire({
-                        title: "Vending Machine Issues",
-                        text: myhtml,
-                        icon: "error",
-                        allowOutsideClick: false,
-                        timer: 5000,
-                      }).then(() => {
-                        if (vendTotalError > 0) {
-                          paramRefund["note"] =
-                            paramRefund["note"] +
-                            "product code: " +
-                            transactions[index].kode_produk +
-                            ", error code: " +
-                            errorCode +
-                            ", message: " +
-                            errStatus +
-                            "%0A";
-                        } else {
-                          paramRefund["note"] =
-                            "product code: " +
-                            transactions[index].kode_produk +
-                            ", error code: " +
-                            errorCode +
-                            ", message: " +
-                            errStatus +
-                            "%0A";
-                        }
+            console.log("PROMISE ", "MULAI");
+            setTimeout(function () {
+              setVendTotalItem(vendTotalItem + 1);
+              EngineVM.RunEngine(apiVend)
+                .then((resp) => {
+                  console.log("MASUK BUFFER", resp["buffer"]);
+                  var textCounterItem =
+                    "Product ke " + jumProduct + " / " + TotalItemCart;
+                  if (resp["status"] === true) {
+                    console.log("PROMISE ", "AMAN");
+                    var apiStockOffline = "slot=" + transactions[index].no_slot;
+                    crud
+                      .VMSTOCK(apiStockOffline)
+                      .then((response) => {})
+                      .catch((e) => {
+                        console.log(e);
                       });
-                    }
-                  })
-                  .catch((err) => {
-                    console.log("ERRRRRR", err);
-                    var vmStatus = 0;
-                    var errorCode = 444;
-                    var errStatus = "VM_NOT_RESPONDING";
+                    var vmStatus = 1;
+                    var errorCode = resp["buffer"];
+                    var errStatus = resp["message"];
                     vmStock(
                       index,
                       vmStatus,
@@ -928,45 +819,119 @@ const Vending = () => {
                       verify_no
                     );
                     var myhtml =
-                      "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+                      "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
+                      textCounterItem;
+
+                    Swal.fire({
+                      title: "Transaksi Berhasil",
+                      text: myhtml,
+                      icon: "success",
+                      allowOutsideClick: false,
+                      timer: 2000,
+                    }).then(() => {});
+                  } else {
+                    var totalError = vendTotalError;
+                    setVendTotalError(totalError + 1);
+                    console.log("PROMISE ", "ERROR");
+                    vmStatus = 0;
+                    errorCode = resp["buffer"];
+                    errStatus = resp["message"];
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    myhtml =
+                      "Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
 
                     Swal.fire({
                       title: "Vending Machine Issues",
-                      content: myhtml,
+                      text: myhtml,
                       icon: "error",
                       allowOutsideClick: false,
                       timer: 5000,
-                    }).then(() => {});
-                    if (vendTotalError > 0) {
-                      paramRefund["note"] =
-                        paramRefund["note"] +
-                        transactions[index].kode_produk +
-                        "-" +
-                        errorCode +
-                        "-" +
-                        errStatus +
-                        "%0A";
-                    } else {
-                      paramRefund.note =
-                        "-" +
-                        transactions[index].kode_produk +
-                        "-" +
-                        errorCode +
-                        "-" +
-                        errStatus +
-                        "%0A";
-                    }
-                    jumlahError.current = jumlahError.current + 1;
-                    SetError(vendTotalError + 1);
-                  });
-              }, 3000);
-            });
+                    }).then(() => {
+                      var totalError = vendTotalError;
+                      if (totalError > 0) {
+                        paramRefund["note"] =
+                          paramRefund["note"] +
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      } else {
+                        paramRefund["note"] =
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      }
+                    });
+                  }
+                })
+                .catch((err) => {
+                  console.log("ERRRRRR", err);
+                  var vmStatus = 0;
+                  var errorCode = 444;
+                  var errStatus = "VM_NOT_RESPONDING";
+                  vmStock(
+                    index,
+                    vmStatus,
+                    errorCode,
+                    errStatus,
+                    trxCode,
+                    payment_type,
+                    verify_no
+                  );
+                  var myhtml =
+                    "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+
+                  Swal.fire({
+                    title: "Vending Machine Issues",
+                    content: myhtml,
+                    icon: "error",
+                    allowOutsideClick: false,
+                    timer: 5000,
+                  }).then(() => {});
+                  var totalError = vendTotalError;
+                  if (totalError > 0) {
+                    paramRefund["note"] =
+                      paramRefund["note"] +
+                      transactions[index].kode_produk +
+                      "-" +
+                      errorCode +
+                      "-" +
+                      errStatus +
+                      "%0A";
+                  } else {
+                    paramRefund.note =
+                      "-" +
+                      transactions[index].kode_produk +
+                      "-" +
+                      errorCode +
+                      "-" +
+                      errStatus +
+                      "%0A";
+                  }
+                  setVendTotalError(vendTotalError + 1);
+                });
+            }, 3000);
           }
         }
         return true;
       }
       myFunction().then(function () {
-        afterCartVendProcess(paramRefund, payment_type);
+        afterCartVendProcess(paramRefund, "SHOPEEPAY");
       });
     }
   };
@@ -974,7 +939,10 @@ const Vending = () => {
   function afterCartVendProcess(paramRefund, payment_type) {
     console.log("after cart SHOW TOTAL ERROR ", vendTotalError);
     console.log("TIMEOUT", timerPayment);
-    if (timerPayment.current) clearTimeout(timerPayment.current);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
     if (vendTotalError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
@@ -983,7 +951,7 @@ const Vending = () => {
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
       setModalRefund(true);
-      timerTimeout.current = setTimeout(() => {
+      timerTimeout = setTimeout(() => {
         Swal.fire({
           title: "Waktu Scan Refund Habis!",
           text: "Silahkan Hubungi Call Center Jika Ada Terkendala. [auto close]",
@@ -998,9 +966,10 @@ const Vending = () => {
         setTimeout(() => {
           //set display modal payment
           setTimeout(() => {
-            clearTimeout(timerTimeout);
-            clearInterval(timerInterval);
-            clearInterval(timerTimeout.current);
+            if (timerPayment) clearInterval(timerPayment);
+            if (timerRefund) clearInterval(timerRefund);
+            if (timerTimeout) clearTimeout(timerTimeout);
+            if (timerInterval) clearInterval(timerInterval);
             setOpenModalPayment(false);
             setModalRefund(false);
             clearCart();
@@ -1163,7 +1132,8 @@ const Vending = () => {
       ) : (
         <div className="flex w-full h-full justify-center"></div>
       )}
-      {loading && <Loading></Loading>}
+      {isloading && <Loading></Loading>}
+      {overlay && <div className="featuredOverlay" />}
     </div>
   );
 };

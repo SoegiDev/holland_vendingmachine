@@ -14,6 +14,14 @@
   } */
   
   
+  .featuredOverlay {
+    position: absolute;
+    background: black;
+    opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
    cursor-none md:cursor-auto
   .Modal.open{
     animation: bounce-in 1s ease-in;

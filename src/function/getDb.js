@@ -97,7 +97,7 @@ async function VM_TRX(param) {
 }
 async function VMSTOCK(param) {
   var paramAPI = param;
-  const PATH2 = process.env.REACT_APP_LOCAL_VM_SLOT;
+  const PATH2 = process.env.REACT_APP_LOCAL_VM_STOCK;
   const requestOptions = {
     method: "GET",
     headers: { "Content-Type": "application/json" },

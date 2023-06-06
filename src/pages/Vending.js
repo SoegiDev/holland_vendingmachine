@@ -722,12 +722,13 @@ const Vending = () => {
   }
 
   const PaymentSuccess = (trxCode, payment_type) => {
+    setOpenModalPayment(false);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
       text: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
       icon: "success",
       allowOutsideClick: false,
-      timer: 3000,
+      timer: 5000,
     }).then(() => {
       cartVendProcess(trxCode, payment_type);
     });

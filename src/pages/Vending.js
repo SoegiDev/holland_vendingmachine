@@ -749,6 +749,8 @@ const Vending = () => {
   };
 
   const cartVendProcess = (trxCode, payment_type) => {
+    setVendTotalError(0);
+    setVendTotalItem(0);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
     if (timerPayment) clearTimeout(timerPayment);
@@ -946,7 +948,9 @@ const Vending = () => {
 
   function afterCartVendProcess(jumlahError, paramRefund, payment_type) {
     console.log("after cart SHOW");
+    console.log("TIMEOUT", timerPayment);
     if (jumlahError > 0) {
+      console.log("error JUMLAH", jumlahError);
       //sett qr WA
       console.log("AFTERCART");
       setOpenModalPayment(false);

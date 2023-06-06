@@ -750,9 +750,10 @@ const Vending = () => {
   const cartVendProcess = (trxCode, payment_type) => {
     setVendTotalError(0);
     setVendTotalItem(0);
+    console.log("LOG TIMER PAYMENT ", timerPayment);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    if (timerPayment) clearTimeout(timerPayment);
+    if (timerPayment.current) clearTimeout(timerPayment.current);
     var jumlahItem, jumlahError;
     let totalItem = transactions.length;
     if (totalItem > 0) {

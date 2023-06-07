@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { useEffect, useRef, useState } from "react";
 import useIdle from "../hooks/useIdleTimeout";
 import ScreenSaver from "../components/ScreenSaver";
@@ -772,6 +773,7 @@ const Vending = () => {
       async function myFunction() {
         setVendTotalError(0);
         setVendTotalItem(0);
+        let totalErrors;
         for (let index = 0; index < transactions.length; index++) {
           for (
             let jumProduct = 0;
@@ -832,6 +834,7 @@ const Vending = () => {
                   } else {
                     var totalError = vendTotalError;
                     setVendTotalError(totalError + 1);
+                    totalErrors++;
                     console.log("PROMISE ", "ERROR");
                     vmStatus = 0;
                     errorCode = resp["buffer"];
@@ -923,27 +926,27 @@ const Vending = () => {
                       errStatus +
                       "%0A";
                   }
-                  setVendTotalError(vendTotalError + 1);
+                  totalErrors++;
                 });
             }, 3000);
           }
         }
-        return true;
+        return totalErrors;
       }
-      myFunction().then(function () {
-        afterCartVendProcess(paramRefund, "SHOPEEPAY");
+      myFunction().then((resp) => {
+        afterCartVendProcess(resp, paramRefund, "SHOPEEPAY");
       });
     }
   };
 
-  function afterCartVendProcess(paramRefund, payment_type) {
-    console.log("after cart SHOW TOTAL ERROR ", vendTotalError);
+  function afterCartVendProcess(totalError, paramRefund, payment_type) {
+    console.log("after cart SHOW TOTAL ERROR ", totalError);
     console.log("TIMEOUT", timerPayment);
     if (timerPayment) clearInterval(timerPayment);
     if (timerRefund) clearInterval(timerRefund);
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
-    if (vendTotalError > 0) {
+    if (totalError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
       console.log("AFTERCART");

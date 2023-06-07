@@ -308,6 +308,7 @@ const Vending = () => {
       }
     }
   };
+
   const deleteItem = (item) => {
     if (transactions.length <= 1) {
       //  OpenModalCancel();
@@ -341,11 +342,9 @@ const Vending = () => {
       }
     });
   };
-
   const tutupRefund = ({ props }) => {
-    console.log("TUTUP REFUDN");
+    console.log("TUTUP REFUND");
   };
-
   function requestPayment() {
     setisOverlayOn(true);
     setOpenModalPayment(true);
@@ -353,12 +352,10 @@ const Vending = () => {
     var trxCode = VMINIT.getID() + "-" + formatDate();
     var apiQRCode = "trx_code=" + trxCode + "&";
     var product_name = "";
-
     for (let i = 0; i < transactions.length; i++) {
       var data = transactions[i];
       product_name += data.name_produk + ",";
     }
-
     apiQRCode += "product_name=" + product_name + "&";
     apiQRCode += "qty_product=" + TotalItemCart + "&";
     apiQRCode += "amount=" + subTotal;
@@ -433,32 +430,32 @@ const Vending = () => {
 
   const checkQRPayment = (trxCode, jumlahItem, jumlahBayar, payment_type) => {
     var apicheck = "trx_code=" + trxCode + "&";
-    timerTimeout = setTimeout(() => {
-      clearTimeout(timerTimeout);
-      crud
-        .PaymentCheckQRShopee(apicheck)
-        .then((res) => {
-          if (res.message === "SUCCESS") {
-            if (timerPayment) clearInterval(timerPayment);
-            if (timerRefund) clearInterval(timerRefund);
-            if (timerTimeout) clearTimeout(timerTimeout);
-            if (timerInterval) clearInterval(timerInterval);
-            PaymentSuccess(trxCode, payment_type);
-            setTrxCode(trxCode);
-            timerTimeout = setTimeout(() => {
-              clearTimeout(timerTimeout);
-              checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
-            }, 3000);
-          } else {
-            console.log("TAMPIL STATUS");
-          }
-          // getSlots();
-        })
-        .catch((error) => {
-          this.setState({ errorMessage: error.toString() });
-          console.error("There was an error!", error);
-        });
-    }, 1000);
+    // timerTimeout = setTimeout(() => {
+    //   clearTimeout(timerTimeout);
+    //   crud
+    //     .PaymentCheckQRShopee(apicheck)
+    //     .then((res) => {
+    //       if (res.message === "SUCCESS") {
+    //         if (timerPayment) clearInterval(timerPayment);
+    //         if (timerRefund) clearInterval(timerRefund);
+    //         if (timerTimeout) clearTimeout(timerTimeout);
+    //         if (timerInterval) clearInterval(timerInterval);
+    //         setTrxCode(trxCode);
+    //         PaymentSuccess(trxCode, payment_type);
+    //         timerTimeout = setTimeout(() => {
+    //           clearTimeout(timerTimeout);
+    //           checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
+    //         }, 3000);
+    //       } else {
+    //         console.log("TAMPIL STATUS");
+    //       }
+    //       // getSlots();
+    //     })
+    //     .catch((error) => {
+    //       this.setState({ errorMessage: error.toString() });
+    //       console.error("There was an error!", error);
+    //     });
+    // }, 1000);
     timerInterval = setInterval(() => {
       crud
         .PaymentCheckQRShopee(apicheck)
@@ -511,8 +508,10 @@ const Vending = () => {
       .VM_CHECKPAYMENT(apicheck)
       .then((res) => {
         if (res.message === "SUCCESS") {
-          if (timerPayment) clearTimeout(timerPayment);
-          setOverlay(false);
+          if (timerPayment) clearInterval(timerPayment);
+          if (timerRefund) clearInterval(timerRefund);
+          if (timerTimeout) clearTimeout(timerTimeout);
+          if (timerInterval) clearInterval(timerInterval);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
           setOverlay(false);
@@ -640,9 +639,9 @@ const Vending = () => {
     setPaymentOut(false);
     setOpenModalPayment(false);
     Swal.fire({
-      title: "PEMBAYARAN SUKSES",
-      text: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
+      title: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
       icon: "success",
+      height: "300",
       allowOutsideClick: false,
     });
     cartVendProcess(trxCode, payment_type);
@@ -650,6 +649,7 @@ const Vending = () => {
   };
   const cartVendProcess = (trxCode, payment_type) => {
     let Koleksi = [];
+    let totalErrors;
     let totalItem = transactions.length;
     if (totalItem > 0) {
       //set parameter
@@ -666,7 +666,7 @@ const Vending = () => {
       async function myFunction() {
         setVendTotalError(0);
         setVendTotalItem(0);
-        let totalErrors;
+
         for (let index = 0; index < transactions.length; index++) {
           console.log("Produck", transactions[index].no_slot);
           for (
@@ -674,6 +674,7 @@ const Vending = () => {
             jumProduct < transactions[index].qty;
             jumProduct++
           ) {
+            totalErrors++;
             let secret = trxCode + "elmy2605" + transactions[index].no_slot;
             let hash = CryptoJS.HmacSHA256(trxCode, secret);
             let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
@@ -693,11 +694,13 @@ const Vending = () => {
             }, 3000);
           }
         }
-        return Koleksi;
+        return totalErrors;
       }
       console.log(Koleksi);
       let run = myFunction();
-      run.then((res) => afterCartVendProcess(res, paramRefund, "SHOPEEPAY"));
+      run.then((res) =>
+        afterCartVendProcess(totalErrors, paramRefund, "SHOPEEPAY")
+      );
       //  await myFunction().then((resp) => {
       //     afterCartVendProcess(resp, paramRefund, "SHOPEEPAY");
       //   });

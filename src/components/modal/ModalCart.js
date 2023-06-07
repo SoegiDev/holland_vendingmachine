@@ -14,7 +14,7 @@ const ModalCart = (props) => {
   const [openPayment, setOpenPayment] = useState(false);
 
   const {
-    itemsTransaction,
+    transactions,
     addTransaction,
     setPaymentQR,
     setToOpenCart,
@@ -58,7 +58,7 @@ const ModalCart = (props) => {
 
           <div className="flex-1 no-scrollbar overflow-y-auto">
             <ul>
-              {itemsTransaction.map((item, index) => (
+              {transactions.map((item, index) => (
                 <MyItems
                   key={index}
                   Data={item}

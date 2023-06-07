@@ -649,6 +649,7 @@ const Vending = () => {
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
   const cartVendProcess = (trxCode, payment_type) => {
+    let Koleksi = [];
     let totalItem = transactions.length;
     if (totalItem > 0) {
       //set parameter
@@ -688,11 +689,13 @@ const Vending = () => {
             console.log("SET  ", jumProduct);
             setTimeout(function () {
               console.log("PRODUCt ITEM", transactions[index].no_slot);
+              Koleksi.push({ product: transactions[index].no_slot });
             }, 3000);
           }
         }
-        return totalErrors;
+        return Koleksi;
       }
+      console.log(Koleksi);
       let run = myFunction();
       run.then((res) => afterCartVendProcess(res, paramRefund, "SHOPEEPAY"));
       //  await myFunction().then((resp) => {

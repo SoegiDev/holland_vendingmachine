@@ -1,11 +1,11 @@
 import React from "react";
 
 const ContentFooter = (props) => {
-  const { itemsTransaction, setToOpenCart, totalItemCart } = props;
+  const { transactions, openMocalCart, totalItemCart } = props;
 
   const handleCancelClick = () => {
-    if (itemsTransaction.length > 0) {
-      setToOpenCart(true);
+    if (transactions.length > 0) {
+      openMocalCart(true);
     }
   };
   return (
@@ -16,7 +16,7 @@ const ContentFooter = (props) => {
       >
         <div
           className={`flex justify-center p-4 ${
-            itemsTransaction.length > 0 && "animate-pulse"
+            transactions.length > 0 && "animate-pulse"
           }`}
         >
           <span className="mr-2 items-center">
@@ -39,7 +39,7 @@ const ContentFooter = (props) => {
           <span className="items-center ml-2">
             <h3 className="text-3xl font-medium">Keranjang</h3>
           </span>
-          {itemsTransaction.length > 0 && (
+          {transactions.length > 0 && (
             <span className="items-center ml-2">
               <h3 className="text-3xl font-medium justify-center p-1 ml-4 h-12 w-12 rounded-full shadow-lg bg-hollandshades-700 -translate-y-10">
                 {totalItemCart}

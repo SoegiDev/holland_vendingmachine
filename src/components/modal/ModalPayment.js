@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PaymentGateway from "../../assets/img/payment-gateway.png";
 import qris__template from "../../assets/img/template-qris.png";
-import { useQrious } from "react-qrious";
+import { QRious, useQrious } from "react-qrious";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import loading from "../../assets/img/loadingpng.png";
 import { useRef } from "react";
@@ -13,7 +13,7 @@ const ModalPayment = (props) => {
     cancelTransaction,
     setOpenModalPayment,
     checkPayment,
-    contentQr,
+    contentPaymnetQR,
   } = props;
   const minuteSeconds = 120;
   const getTimeSeconds = (time) => (minuteSeconds - time) | 0;
@@ -32,11 +32,12 @@ const ModalPayment = (props) => {
   const [isLoading, setLoading] = useState(true);
   const [ishabis, setHabis] = useState(false);
   useEffect(() => {
-    if (contentQr !== null) {
+    if (contentPaymnetQR !== null) {
       setLoading(false);
-      setValue(contentQr);
+      setValue(contentPaymnetQR);
     }
-  }, [contentQr]);
+  }, [contentPaymnetQR]);
+  console.log("BARCODE ", dataUrl, value);
   const handleQRModel = ({ status }) => {
     //setChoice(false);
     cancelTransaction();
@@ -69,23 +70,21 @@ const ModalPayment = (props) => {
             </div>
             {ishabis ? (
               <div>
-                <div className="flex flex-col w-full justify-center">
+                <div className="flex flex-col w-full">
                   <p className="text-3xl font-medium items-center text-slate-800 mt-2">
                     Apakah anda sudah melakukan Pembayaran tapi Produk tidak
                     keluar? Klik Tombol di atas ini
                   </p>
-                  <div className="flex  w-full justify-center mt-2">
-                    <span className="h-20 w-64 items-center rounded-full bg-gray-600 border-4 border-slate-400 text-slate-50 ">
-                      <p
-                        className="text-3xl font-medium mt-2 text-center"
-                        onClick={() => {
-                          CheckPembayaran();
-                        }}
-                      >
-                        Check Payment
-                      </p>
-                    </span>
-                  </div>
+                  <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
+                    <p
+                      className="text-3xl font-medium content-center mt-2"
+                      onClick={() => {
+                        CheckPembayaran();
+                      }}
+                    >
+                      Check Payment
+                    </p>
+                  </span>
                 </div>
               </div>
             ) : (
@@ -101,10 +100,9 @@ const ModalPayment = (props) => {
                         />
                       </span>
                     ) : (
-                      <img
-                        src={dataUrl}
-                        alt="Landing Page"
-                        className="h-96 w-96 content-center"
+                      <QRious
+                        value={value}
+                        className="h-96 w-96 mt-8 items-center"
                       />
                     )}
                   </span>

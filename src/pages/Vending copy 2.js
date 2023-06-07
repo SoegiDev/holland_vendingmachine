@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable no-loop-func */
+import React, { useEffect, useRef, useState } from "react";
 import useIdle from "../hooks/useIdleTimeout";
 import ScreenSaver from "../components/ScreenSaver";
 import Loading from "../components/modal/Loading";
 import crud from "../function/getDb";
-
+import EngineVM from "../function/vmEngine";
 import Content from "../components/Content";
 import TopHeader from "../components/TopHeader";
 import Header from "../components/Header";
@@ -11,161 +12,163 @@ import RunningText from "../components/RunningText";
 import ContentFooter from "../components/ContentFooter";
 import Footer from "../components/Footer";
 import Swal from "sweetalert2";
+import { formatDate } from "../model/DateFormat";
+import VMINIT from "../services/init";
 import { Transition } from "@headlessui/react";
 import ModalCart from "../components/modal/ModalCart";
 import ModalPayment from "../components/modal/ModalPayment";
 import ModalRefund from "../components/modal/ModalRefund";
-import { formatDate } from "../model/DateFormat";
-import VMINIT from "../services/init";
-import EngineVM from "../function/vmEngine";
-
 var CryptoJS = require("crypto-js");
-
 const Vending = () => {
   const [screensaverActive, setScreensaverActive] = useState(false);
-  const [isloading] = useState(false);
-
+  const [isloading, setLoading] = useState(false);
+  const [isSyncSlot, setSyncSlot] = useState(false);
+  const [isSyncBanners, setSynBanners] = useState(false);
   const [isUpdateData, setUpdateData] = useState(false);
   const [itemSlots, setItemSlots] = useState([]);
   const [itemBannersImage, setItemBannersImage] = useState([]);
-  //ITEMCART
+  const [transactions, setTransaction] = useState([]);
+
   const [subTotal, setsubTotal] = useState(0);
   const [TotalItemCart, setTotalItemCart] = useState(0);
-  const [transactions, setTransaction] = useState([]);
-  const [isoverlay, setOverlay] = useState(false);
-  const [TrxCode, setTrxCode] = useState(null);
-  let [vendTotalItem, setVendTotalItem] = useState(0);
-  let [vendTotalError, setVendTotalError] = useState(0);
-  const [openModalPaymnet, setOpenModalPayment] = useState(false);
-  const [isOverlayOn, setisOverlayOn] = useState(false);
 
   const [ContentQR, setContentQR] = useState(null);
+  const [openModalPaymnet, setOpenModalPayment] = useState(false);
+  const [TrxCode, setTrxCode] = useState(null);
+  const [openModalCart, setOpenModalCart] = useState(false);
+  const [overlay, setOverlay] = useState(false);
 
-  const [paymentOut, setPaymentOut] = useState(false);
-  // MODAL
-  const [openModalCart, setopenModalCart] = useState(false);
+  let [vendTotalItem, setVendTotalItem] = useState(0);
+  let [vendTotalError, setVendTotalError] = useState(0);
+  let [vendTotalJumlah, setVendTotalJumlah] = useState(0);
+  let [vendCounterItem, setVendCounterItem] = useState(0);
   const [openModalRefund, setModalRefund] = useState(false);
-  // PAYMENT
 
-  let toModalPayment;
-  let toModalCart;
-  let toModalRefund;
+  const [checkPaymentManual, setCheckPaymentManual] = useState(false);
+  const [paymentOut, setPaymentOut] = useState(false);
 
+  let timerPayment;
   let timerRefund;
   let timerTimeout;
+
   let timerInterval;
-  let timerPayment;
+
   let jumlahError;
-  const [message, setmessage] = useState("Event");
-
-  const handleIdle = () => {
-    setScreensaverActive(true);
-  };
-  const stay = () => {
-    setScreensaverActive(false);
-  };
-  const refreshPage = () => {
-    console.log("REFRESH DATA");
-    setOverlay(true);
-    setTimeout(() => {
-      window.location.reload(true);
-      setOverlay(false);
-    }, 3000);
-  };
-  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 2000 });
-
-  const { idleRefreshData } = useIdle({
-    onIdle: refreshPage,
-    idleTime: 1000,
-  });
-
-  // const logOutUser = () => {
-  //   console.log("LOGs");
-  // };
-  // const startTimer = () => {
-  //   if (timerId) clearTimeout(timerId);
-  //   timerId = setTimeout(logOutUser, 3000);
-  // };
-
-  // const stopTimer = () => {
-  //   if (timerId) {
-  //     clearTimeout(timerId);
-  //   }
-  // };
-
-  // const setLoad = () => {
-  //   console.log("Set Overlay");
-  //   setLoading(true);
-  //   setOverlay(true);
-  //   if (timerId2) clearTimeout(timerId2);
-  //   console.log("MUlai Oeveraly");
-  //   timerId2 = setTimeout(() => {
-  //     setOverlay(false);
-  //     console.log("Selesai Overlay");
-  //     setLoading(false);
-  //   }, 3000);
-  // };
+  let jumlahItem;
+  useEffect(() => {
+    console.log("Update TOTal Error");
+  }, [vendTotalError]);
+  useEffect(() => {
+    console.log("Update TOTal Item");
+  }, [vendTotalItem]);
 
   useEffect(() => {
-    const getDataBannerLocal = async () => {
-      if (itemBannersImage.length === 0) {
-        setOverlay(true);
-        crud.getDataBannersImage().then((res) => {
-          console.log(res);
-          if (res.message === "No Data") {
-            setOverlay(false);
-            console.log("DATA BANNERS KOSONG");
-          } else {
-            console.log("DATA BANNER", res);
-            setOverlay(false);
-            console.log("OVERLAY DONE");
-            setItemBannersImage(false);
-          }
-        });
-      } else {
-        console.log("Data Image sudah ada");
-        console.log(itemBannersImage);
-      }
-    };
-    const getDataSlotsLocal = async () => {
-      if (itemSlots.length === 0) {
-        crud.getDataSlots().then((res) => {
-          console.log("Running Get SLOTS");
-          console.log(res);
-          if (res.message === "No Data") {
-            console.log("Data SLots Local Kosong");
-          } else {
-            console.log("Set Slot");
-            setOverlay(false);
+    const getbanners = () =>
+      crud.getDataBannersImage().then((res) => {
+        console.log("Running Get Banners");
+        console.log(res);
+        if (res.message === "No Data") {
+          setTimeout(() => {
+            crud
+              .initBanners()
+              .then((res) => {
+                console.log("Running Get Banners LOCAL");
+                console.log(res.results.data);
+                setItemBannersImage(res.results.data);
+                setSynBanners(true);
+                getSlots();
+              })
+              .catch((error) => {
+                this.setState({ errorMessage: error.toString() });
+                console.error("There was an error!", error);
+              });
+          }, 1000);
+        } else {
+          setItemBannersImage(res.results.data);
+          getSlots();
+        }
+      });
+    const getSlots = () =>
+      crud.getDataSlots().then((res) => {
+        console.log("Running Get SLOTS");
+        console.log(res);
+        if (res.message === "No Data") {
+          setTimeout(() => {
+            crud
+              .initSlots()
+              .then((res) => {
+                console.log("Running Get Slots LOCAL");
+                console.log("Data Slot INIT", res);
+                setItemSlots(res.results.data);
+                setSyncSlot(true);
+                setLoading(false);
+              })
+              .catch((error) => {
+                this.setState({ errorMessage: error.toString() });
+                console.error("There was an error!", error);
+              });
+          }, 1000);
+        } else {
+          console.log("Get slot");
+          setItemSlots(res.results.data);
+          setSyncSlot(true);
+          setLoading(false);
+        }
+      });
+    const initBanners = () =>
+      crud.initBanners().then((res) => {
+        console.log("Running Get Banners");
+        console.log(res);
+        if (res.message === "No Data") {
+          setTimeout(() => {
+            crud.getDataBannersImage().then((res) => {
+              console.log("Running Get Banners LOCAL");
+              console.log(res.results.data);
+              setItemBannersImage(res.results.data);
+              initSlots();
+            });
+          }, 1000);
+        } else {
+          console.log("ERROR NO CONNECTION");
+          getbanners();
+        }
+      });
+    const initSlots = () =>
+      crud.initSlots().then((res) => {
+        console.log("Running Get SLOTS");
+        console.log(res);
+        setTimeout(() => {
+          crud.getSlots().then((res) => {
+            console.log("Running Get Slots LOCAL");
+            console.log(res.results.data);
             setItemSlots(res.results.data);
-          }
-        });
-      } else {
-        console.log("Data Slot sudah ada");
-        console.log(itemBannersImage);
+            setLoading(false);
+          });
+        }, 1000);
+      });
+    setTimeout(() => {
+      if (!isSyncBanners && !isSyncSlot) {
+        if (isUpdateData) {
+          console.log("UPDATE DATA TRUE");
+          setLoading(true);
+          setTimeout(() => {
+            console.log("Update Data");
+            initBanners();
+            clearCart();
+          }, 1000);
+        } else {
+          console.log("UPDATE DATA False");
+          setLoading(true);
+          setTimeout(() => {
+            clearTimeout(timerTimeout);
+            getbanners();
+          }, 1000);
+        }
       }
-    };
-    getDataBannerLocal();
-    getDataSlotsLocal();
+    }, 1000);
+    return () => {};
   });
-  //   const fetchData2 = async () => {
-  //     crud.getDataSlots().then((res) => {
-  //       console.log("Running Get SLOTS");
-  //       console.log(res);
-  //       if (res.message === "No Data") {
-  //         console.log("Data SLots Local Kosong");
-  //       } else {
-  //         console.log("Set Slot");
-  //         setSyncSlot(true);
-  //         setOverlay(false);
-  //         setItemSlots(res.results.data);
-  //       }
-  //     });
-  //   };
-  //   if (!isSyncSlot) {
-  //     fetchData();
-  //   }
-  // });
+
   const addTransaction = (item, tambah) => {
     console.log(itemBannersImage);
     const existItem = transactions.find(
@@ -175,17 +178,10 @@ const Vending = () => {
       if (item.onhand === 0) {
         console.log("STOCK SUDAH ABIS");
         Swal.fire({
-          title: `Stock ${item.name_produk} Sudah Habis`,
-          width: 300,
-          height: 400,
-          padding: "3em",
-          color: "#716add",
-          background: "#fff",
-          backdrop: `
-            rgba(0,0,123,0.4)
-            left top
-            no-repeat
-          `,
+          title: `Stock Product ${item.name_produk} Sudah Habis`,
+          text: "Silahkan Pilih Produk lainnya",
+          icon: "success",
+          timer: 3000,
         });
       } else {
         setTransaction([
@@ -222,19 +218,9 @@ const Vending = () => {
         if (stock <= 0) {
           console.log("STOCK SUDAH ABIS");
           Swal.fire({
-            title: `Stock ${item.name_produk} Sudah Habis`,
-            width: 400,
-            heightAuto: 300,
-            padding: "3em",
-            color: "#716add",
-            background: "#fff url(/images/trees.png)",
-            backdrop: `
-              rgba(0,0,123,0.4)
-              url("/images/nyan-cat.gif")
-              left top
-              no-repeat
-            `,
-            allowOutsideClick: false,
+            title: `Stock Product ${item.name_produk} Sudah Habis`,
+            text: "Silahkan Pilih Produk lainnya",
+            icon: "success",
             timer: 3000,
           });
         } else {
@@ -308,9 +294,10 @@ const Vending = () => {
       }
     }
   };
+
   const deleteItem = (item) => {
     if (transactions.length <= 1) {
-      //  OpenModalCancel();
+      OpenModalCancel();
     } else {
       setTransaction(
         transactions.filter((cart) => cart.no_slot !== item.no_slot)
@@ -324,10 +311,78 @@ const Vending = () => {
     }
   };
 
-  const batalkanKeranjang = ({ props }) => {
+  // const updateSlotsOnHand = (item) => {
+  //   const existItem = itemSlots.find((slot) => slot.no_slot === item.no_slot);
+  //   console.log("UPDATE SLOTS ", item, existItem);
+  //   setItemSlots(
+  //     itemSlots.map((product) =>
+  //       product.no_slot === item.no_slot
+  //         ? {
+  //             no_slot: item.no_slot,
+  //             kode_produk: item.kode_produk,v
+  //             name_produk: item.name_produk,
+  //             status_promo: item.status_promo,
+  //             harga_promo: item.harga_promo,vend
+  //             harga_jual: item.harga_jual,
+  //             issync: 0,
+  //             onhand: existItem.onhand + item.qty,
+  //             image: item.image,
+  //             created: item.created,
+  //             updated: item.updated,
+  //           }
+  //         : product
+  //     )
+  //   );
+  // };
+  // const updateSlotContent = (item, tambah) => {
+  //   if (tambah) {
+  //     setItemSlots(
+  //       itemSlots.map((product) =>
+  //         product.no_slot === item.no_slot
+  //           ? {
+  //               no_slot: item.no_slot,
+  //               kode_produk: item.kode_produk,
+  //               name_produk: item.name_produk,
+  //               status_promo: item.status_promo,
+  //               harga_promo: item.harga_promo,
+  //               harga_jual: item.harga_jual,
+  //               issync: 0,
+  //               onhand: item.onhand + 1,
+  //               image: item.image,
+  //               created: item.created,
+  //               updated: item.updated,
+  //             }
+  //           : product
+  //       )
+  //     );
+  //   } else {
+  //     console.log("STOCK ", item.onhand);
+  //     setItemSlots(
+  //       itemSlots.map((product) =>
+  //         product.no_slot === item.no_slot
+  //           ? {
+  //               no_slot: item.no_slot,
+  //               kode_produk: item.kode_produk,
+  //               name_produk: item.name_produk,
+  //               status_promo: item.status_promo,
+  //               harga_promo: item.harga_promo,
+  //               harga_jual: item.harga_jual,
+  //               issync: 0,
+  //               onhand: item.onhand - 1,
+  //               image: item.image,
+  //               created: item.created,
+  //               updated: item.updated,
+  //             }
+  //           : product
+  //       )
+  //     );
+  //   }
+  // };
+
+  const OpenModalCancel = () => {
     Swal.fire({
-      title: "Batalkan Keranjang",
-      text: "Kamu Akan Membatalkan Keranjang ?",
+      title: "Batalkan Transaksi",
+      text: "Kamu Akan Membatalkan Transaksi ?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -337,19 +392,80 @@ const Vending = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         clearCart();
+        setOpenModalCart(false);
+        setOpenModalPayment(false);
+        clearInterval(timerInterval);
+        clearTimeout(timerTimeout);
+        clearTimeout(timerPayment);
+        Swal.fire({
+          title: "Transaksi Batal!",
+          text: "Anda Telah membatalkan Transaksi.",
+          icon: "success",
+          timer: 3000,
+        });
+        if (TrxCode !== null) {
+          afterQR("0", "107", "Transaction Cancelled", TrxCode, "SHOPEEPAY");
+          setTrxCode(null);
+        }
       } else {
       }
     });
   };
 
-  const tutupRefund = ({ props }) => {
-    console.log("TUTUP REFUDN");
+  const clearCart = () => {
+    setsubTotal(0);
+    setTotalItemCart(0);
+    setTransaction([]);
+    setTotalItemCart(0);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
+    setUpdateData(true);
   };
 
-  const requestPayment = () => {
-    setisOverlayOn(true);
+  const TutupRefund = () => {
+    Swal.fire({
+      title: "Proses Refund Telah Selesai ?",
+      text: "",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Refund Selesai",
+          text: "",
+          icon: "success",
+          timer: 2000,
+        });
+        setsubTotal(0);
+        setTotalItemCart(0);
+        setTransaction([]);
+        setTotalItemCart(0);
+        if (timerPayment) clearInterval(timerPayment);
+        if (timerRefund) clearInterval(timerRefund);
+        if (timerTimeout) clearTimeout(timerTimeout);
+        if (timerInterval) clearInterval(timerInterval);
+        setModalRefund(false);
+        setUpdateData(true);
+      } else {
+        Swal.fire({
+          title: "Silahkan dilanjutkan",
+          text: "",
+          icon: "info",
+          timer: 2000,
+        });
+      }
+    });
+  };
+
+  const setPaymentQR = () => {
+    setOverlay(true);
     setOpenModalPayment(true);
-    setopenModalCart(false);
+    setOpenModalCart(false);
     var trxCode = VMINIT.getID() + "-" + formatDate();
     var apiQRCode = "trx_code=" + trxCode + "&";
     var product_name = "";
@@ -365,7 +481,7 @@ const Vending = () => {
     crud
       .CreateQRShopee(apiQRCode)
       .then((res) => {
-        setisOverlayOn(false);
+        setOverlay(false);
         console.log("HASIL", res);
         console.log(res);
         if (res.message === "SUCCESS") {
@@ -402,33 +518,6 @@ const Vending = () => {
           failedQR();
         }, 3000);
       });
-  };
-
-  const BatalkanPembayaran = () => {
-    Swal.fire({
-      title: "Batalkan Transaksi",
-      text: "Kamu Akan Membatalkan Transaksi ?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      allowOutsideClick: false,
-      confirmButtonText: "Ya Batalkan",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "Transaksi Batal!",
-          text: "Anda Telah membatalkan Transaksi.",
-          icon: "success",
-          timer: 3000,
-        });
-        if (TrxCode !== null) {
-          afterQR("0", "107", "Transaction Cancelled", TrxCode, "SHOPEEPAY");
-          setTrxCode(null);
-        }
-      } else {
-      }
-    });
   };
 
   const checkQRPayment = (trxCode, jumlahItem, jumlahBayar, payment_type) => {
@@ -480,7 +569,6 @@ const Vending = () => {
     }, 12000);
 
     timerPayment = setTimeout(() => {
-      setisOverlayOn(true);
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -490,32 +578,30 @@ const Vending = () => {
         allowOutsideClick: false,
         timer: 3000,
       }).then(() => {
-        afterQR("0", "408", "Payment timeout", trxCode, "SHOPEEPAY");
         clearCart();
         setOpenModalPayment(false);
         setContentQR(null);
-        setisOverlayOn(false);
+        afterQR("0", "408", "Payment timeout", trxCode, "SHOPEEPAY");
+
         /* Read more about handling dismissals below */
       });
-    }, 116 * 1000);
+    }, 160 * 1000);
     //set waktu habis bayar
   };
 
-  const requestCheckPayment = () => {
-    setOverlay(true);
+  const checkPayment = () => {
+    setLoading(true);
     setTimeout(() => {
-      setOverlay(false);
+      setLoading(false);
     }, 2000);
     var apicheck = "trx_code=" + TrxCode + "&";
     crud
       .VM_CHECKPAYMENT(apicheck)
       .then((res) => {
+        setLoading(false);
         if (res.message === "SUCCESS") {
-          if (timerPayment) clearTimeout(timerPayment);
-          setOverlay(false);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
-          setOverlay(false);
           new Swal({
             title: "Pembayaran anda belum terverifikasi oleh Payment Gateway.",
             text: "Silahkan coba kembali. [auto close]",
@@ -523,7 +609,6 @@ const Vending = () => {
             allowOutsideClick: false,
             timer: 2500,
           }).then(() => {
-            if (timerPayment) clearTimeout(timerPayment);
             afterQR("0", "409", "Check Payment Pending", TrxCode, "SHOPEEPAY");
             clearCart();
           });
@@ -533,7 +618,6 @@ const Vending = () => {
         console.error("There was an error!", error);
       });
   };
-
   const afterQR = (vmStatus, errorCode, errStatus, trxCode, payment_type) => {
     //set verify_no
     console.log(vmStatus, errorCode, errStatus, trxCode, payment_type);
@@ -554,12 +638,6 @@ const Vending = () => {
     }
   };
 
-  function failedQR() {
-    setOverlay(true);
-    setTimeout(() => {
-      setOverlay(false);
-    }, 3000);
-  }
   const vmStock = (
     itemNo,
     vmStatus,
@@ -607,6 +685,17 @@ const Vending = () => {
       });
   };
 
+  function failedQR() {
+    setLoading(true);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  }
+
   function error(
     errorCode,
     errStatus,
@@ -638,17 +727,36 @@ const Vending = () => {
 
   const PaymentSuccess = (trxCode, payment_type) => {
     setPaymentOut(false);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
+
     setOpenModalPayment(false);
     Swal.fire({
       title: "PEMBAYARAN SUKSES",
       text: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
       icon: "success",
       allowOutsideClick: false,
+      timer: 5000,
+    }).then(() => {
+      cartVendProcess(trxCode, payment_type);
     });
-    cartVendProcess(trxCode, payment_type);
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
+
   const cartVendProcess = (trxCode, payment_type) => {
+    setVendTotalError(0);
+    setVendTotalItem(0);
+    jumlahError = 0;
+    jumlahItem = 0;
+    clearTimeout(timerPayment);
+    console.log("LOG TIMER PAYMENT ", timerPayment);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
+
     let totalItem = transactions.length;
     if (totalItem > 0) {
       //set parameter
@@ -685,7 +793,141 @@ const Vending = () => {
               encodeuri;
             console.log("PROMISE ", "MULAI");
             setTimeout(function () {
-              console.log(`${secret} ${hashInBase64} ${hash} ${encodeuri}`);
+              setVendTotalItem(vendTotalItem + 1);
+              EngineVM.RunEngine(apiVend)
+                .then((resp) => {
+                  console.log("MASUK BUFFER", resp["buffer"]);
+                  var textCounterItem =
+                    "Product ke " + jumProduct + " / " + TotalItemCart;
+                  if (resp["status"] === true) {
+                    console.log("PROMISE ", "AMAN");
+                    var apiStockOffline = "slot=" + transactions[index].no_slot;
+                    crud
+                      .VMSTOCK(apiStockOffline)
+                      .then((response) => {})
+                      .catch((e) => {
+                        console.log(e);
+                      });
+                    var vmStatus = 1;
+                    var errorCode = resp["buffer"];
+                    var errStatus = resp["message"];
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    var myhtml =
+                      "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
+                      textCounterItem;
+
+                    Swal.fire({
+                      title: "Transaksi Berhasil",
+                      text: myhtml,
+                      icon: "success",
+                      allowOutsideClick: false,
+                      timer: 2000,
+                    }).then(() => {});
+                  } else {
+                    var totalError = vendTotalError;
+                    setVendTotalError(totalError + 1);
+                    totalErrors++;
+                    console.log("PROMISE ", "ERROR");
+                    vmStatus = 0;
+                    errorCode = resp["buffer"];
+                    errStatus = resp["message"];
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    myhtml =
+                      "Maaf, Produk tidak jatuh.. Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
+
+                    Swal.fire({
+                      title: "Vending Machine Issues",
+                      text: myhtml,
+                      icon: "error",
+                      allowOutsideClick: false,
+                      timer: 5000,
+                    }).then(() => {
+                      var totalError = vendTotalError;
+                      if (totalError > 0) {
+                        paramRefund["note"] =
+                          paramRefund["note"] +
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      } else {
+                        paramRefund["note"] =
+                          "product code: " +
+                          transactions[index].kode_produk +
+                          ", error code: " +
+                          errorCode +
+                          ", message: " +
+                          errStatus +
+                          "%0A";
+                      }
+                    });
+                  }
+                })
+                .catch((err) => {
+                  console.log("ERRRRRR", err);
+                  var vmStatus = 0;
+                  var errorCode = 444;
+                  var errStatus = "VM_NOT_RESPONDING";
+                  vmStock(
+                    index,
+                    vmStatus,
+                    errorCode,
+                    errStatus,
+                    trxCode,
+                    payment_type,
+                    verify_no
+                  );
+                  var myhtml =
+                    "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+
+                  Swal.fire({
+                    title: "Vending Machine Issues",
+                    content: myhtml,
+                    icon: "error",
+                    allowOutsideClick: false,
+                    timer: 5000,
+                  }).then(() => {});
+                  var totalError = vendTotalError;
+                  if (totalError > 0) {
+                    paramRefund["note"] =
+                      paramRefund["note"] +
+                      transactions[index].kode_produk +
+                      "-" +
+                      errorCode +
+                      "-" +
+                      errStatus +
+                      "%0A";
+                  } else {
+                    paramRefund.note =
+                      "-" +
+                      transactions[index].kode_produk +
+                      "-" +
+                      errorCode +
+                      "-" +
+                      errStatus +
+                      "%0A";
+                  }
+                  totalErrors++;
+                });
             }, 3000);
           }
         }
@@ -775,58 +1017,66 @@ const Vending = () => {
 
     return QR_whatsApp;
   }
+  let hits = 0;
+  const clickLoading = () => {
+    hits++;
+    if (hits === 5) {
+      Swal.fire({
+        title: "Anda ingin Memperbaharui Data Terkini ?",
+        icon: "info",
+        showCancelButton: true,
+        cancelButtonText: "Tidak",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        allowOutsideClick: false,
+        confirmButtonText: "Ya",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setUpdateData(true);
+          setSyncSlot(false);
+          setSynBanners(false);
+        } else {
+        }
 
-  const clearCart = () => {
-    setsubTotal(0);
-    setTotalItemCart(0);
-    setTransaction([]);
-    setTotalItemCart(0);
-    if (timerPayment) clearInterval(timerPayment);
-    if (timerRefund) clearInterval(timerRefund);
-    if (timerTimeout) clearTimeout(timerTimeout);
-    if (timerInterval) clearInterval(timerInterval);
-    setisOverlayOn(false);
+        hits = 0;
+      });
+    } else {
+      console.log("Hits ", hits);
+    }
   };
+  const handleIdle = () => {
+    setUpdateData(true);
+    setSyncSlot(false);
+    setSynBanners(false);
+    setScreensaverActive(true);
+  };
+  const stay = () => {
+    setScreensaverActive(false);
+    idleTimer.reset();
+  };
+  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 620 });
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden" id="hb-vm">
-      {screensaverActive ? (
+      {screensaverActive && itemBannersImage !== null ? (
         <ScreenSaver stay={stay} images={itemBannersImage}></ScreenSaver>
-      ) : (
-        // <div className="flex w-full justify-center">
-        //   <button
-        //     className="text-2xl rounded-2xl content-center bg-hollandtints-800 text-white"
-        //     onClick={() => {
-        //       startTimer();
-        //       setLoad();
-        //       setSyncSlot(false);
-        //     }}
-        //   >
-        //     <p className="p-6">Start TEST</p>
-        //   </button>
-
-        //   <button
-        //     className="text-2xl rounded-2xl content-center bg-hollandtints-800 text-white"
-        //     onClick={() => {
-        //       stopTimer();
-        //     }}
-        //   >
-        //     <p className="p-6">Stop TEST</p>
-        //   </button>
-        // </div>
+      ) : itemBannersImage !== null && itemSlots !== null ? (
         <div className="landscape:hidden w-screen">
           <TopHeader />
           <Header />
-          <RunningText />
-          {itemSlots.length > 0 && (
-            <Content slots={itemSlots} addCart={addTransaction}></Content>
-          )}
+          <div
+            onClick={() => {
+              clickLoading();
+            }}
+          >
+            <RunningText />
+          </div>
+          <Content slots={itemSlots} addCart={addTransaction}></Content>
           <ContentFooter
-            transactions={transactions}
-            openMocalCart={setopenModalCart}
+            itemsTransaction={transactions}
+            setToOpenCart={setOpenModalCart}
             totalItemCart={TotalItemCart}
           />
-          <Footer />
           <Transition
             show={openModalCart}
             enter="transition-opacity duration-500"
@@ -838,13 +1088,13 @@ const Vending = () => {
           >
             <ModalCart
               className="transition-transform delay-700 duration-700 ease-in-out"
-              transactions={transactions}
+              itemsTransaction={transactions}
               addTransaction={addTransaction}
-              openMocalCart={setopenModalCart}
-              batalkanKeranjang={batalkanKeranjang}
+              setToOpenCart={setOpenModalCart}
+              cancelTransaction={OpenModalCancel}
               deletedItem={deleteItem}
               subTotal={subTotal}
-              requstPayment={requestPayment}
+              setPaymentQR={setPaymentQR}
               totalItemCart={TotalItemCart}
             />
           </Transition>
@@ -860,9 +1110,10 @@ const Vending = () => {
             <ModalPayment
               className="transition-transform delay-700 duration-700 ease-in-out"
               itemsTransaction={transactions}
-              cancelTransaction={BatalkanPembayaran}
-              contentPaymnetQR={ContentQR}
-              requestCheckPayment={requestCheckPayment}
+              cancelTransaction={OpenModalCancel}
+              setOpenModalPayment={setOpenModalPayment}
+              contentQr={ContentQR}
+              checkPayment={checkPayment}
             />
           </Transition>
           <Transition
@@ -876,15 +1127,18 @@ const Vending = () => {
           >
             <ModalRefund
               className="transition-transform delay-700 duration-700 ease-in-out"
-              tutupRefund={tutupRefund}
-              contentPaymnetQR={ContentQR}
+              TutupRefund={TutupRefund}
+              setModalRefund={setModalRefund}
+              contentQr={ContentQR}
             />
           </Transition>
+          <Footer />
         </div>
+      ) : (
+        <div className="flex w-full h-full justify-center"></div>
       )}
       {isloading && <Loading></Loading>}
-      {isoverlay && <Loading className="featuredOverlay"></Loading>}
-      {isOverlayOn && <div className="featuredOverlay"></div>}
+      {overlay && <div className="featuredOverlay" />}
     </div>
   );
 };

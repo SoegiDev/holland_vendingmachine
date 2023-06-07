@@ -667,6 +667,7 @@ const Vending = () => {
         setVendTotalItem(0);
         let totalErrors;
         for (let index = 0; index < transactions.length; index++) {
+          console.log("Produck", transactions[index].no_slot);
           for (
             let jumProduct = 0;
             jumProduct < transactions[index].qty;
@@ -676,6 +677,7 @@ const Vending = () => {
             let hash = CryptoJS.HmacSHA256(trxCode, secret);
             let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
             let encodeuri = encodeURIComponent(hashInBase64);
+            console.log("PRODUCt ITEM", transactions[index].no_slot);
             // let apiVend =
             //   "vend?slot=" +
             //   transactions[index].no_slot +
@@ -685,7 +687,7 @@ const Vending = () => {
             //   encodeuri;
             console.log("SET  ", jumProduct);
             setTimeout(function () {
-              console.log(`${secret} ${hashInBase64} ${hash} ${encodeuri}`);
+              console.log("PRODUCt ITEM", transactions[index].no_slot);
             }, 3000);
           }
         }

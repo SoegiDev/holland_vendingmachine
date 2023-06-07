@@ -933,9 +933,11 @@ const Vending = () => {
         }
         return totalErrors;
       }
-      myFunction().then((resp) => {
-        afterCartVendProcess(resp, paramRefund, "SHOPEEPAY");
-      });
+      let run = myFunction();
+      run.then((res) => afterCartVendProcess(res, paramRefund, "SHOPEEPAY"));
+      //  await myFunction().then((resp) => {
+      //     afterCartVendProcess(resp, paramRefund, "SHOPEEPAY");
+      //   });
     }
   };
 

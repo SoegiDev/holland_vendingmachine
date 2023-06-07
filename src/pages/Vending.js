@@ -676,14 +676,14 @@ const Vending = () => {
             let hash = CryptoJS.HmacSHA256(trxCode, secret);
             let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
             let encodeuri = encodeURIComponent(hashInBase64);
-            let apiVend =
-              "vend?slot=" +
-              transactions[index].no_slot +
-              "&data=" +
-              trxCode +
-              "&hmac=" +
-              encodeuri;
-            console.log("PROMISE ", "MULAI");
+            // let apiVend =
+            //   "vend?slot=" +
+            //   transactions[index].no_slot +
+            //   "&data=" +
+            //   trxCode +
+            //   "&hmac=" +
+            //   encodeuri;
+            console.log("SET  ", jumProduct);
             setTimeout(function () {
               console.log(`${secret} ${hashInBase64} ${hash} ${encodeuri}`);
             }, 3000);

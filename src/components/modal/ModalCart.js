@@ -16,7 +16,7 @@ const ModalCart = (props) => {
   const {
     transactions,
     addTransaction,
-    SetrequstPayment,
+    setPayment,
     setToOpenCart,
     cancelTransaction,
     subTotal,
@@ -27,10 +27,10 @@ const ModalCart = (props) => {
   };
 
   const handleModalBeli = () => {
-    SetrequstPayment();
+    setPayment();
   };
   const TutupLoading = () => {
-    SetrequstPayment();
+    setPayment();
     timer.current = setTimeout(() => {
       clearTimeout(timer.current);
       setOpenPayment(false);

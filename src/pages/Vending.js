@@ -346,7 +346,7 @@ const Vending = () => {
     console.log("TUTUP REFUDN");
   };
 
-  const requestPayment = () => {
+  function requestPayment() {
     setisOverlayOn(true);
     setOpenModalPayment(true);
     setopenModalCart(false);
@@ -402,7 +402,7 @@ const Vending = () => {
           failedQR();
         }, 3000);
       });
-  };
+  }
 
   const BatalkanPembayaran = () => {
     Swal.fire({
@@ -844,7 +844,7 @@ const Vending = () => {
               batalkanKeranjang={batalkanKeranjang}
               deletedItem={deleteItem}
               subTotal={subTotal}
-              requstPayment={requestPayment}
+              setPayment={requestPayment}
               totalItemCart={TotalItemCart}
             />
           </Transition>

@@ -780,12 +780,12 @@ const Vending = () => {
                         payment_type,
                         verify_no
                       );
-                      innerHTML =
+                      var innerHTML2 =
                         "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
 
                       Swal.fire({
                         title: "Vending Machine Issues",
-                        text: innerHTML,
+                        text: innerHTML2,
                         icon: "error",
                         showConfirmButton: false,
                         allowOutsideClick: false,
@@ -878,7 +878,7 @@ const Vending = () => {
         console.log("LENGTH ", result, total);
         console.log("PRODUCT ERROR ", ProductError);
         console.log("REFUND PRODUCT ", paramRefund);
-        afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
+        //   afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
       });
     }
   };

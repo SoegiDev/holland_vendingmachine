@@ -42,10 +42,13 @@ const Vending = () => {
 
   const [ContentQR, setContentQR] = useState(null);
 
+  const [jumlahError, setJumlahError] = useState(0);
+
   const [paymentOut, setPaymentOut] = useState(false);
   // MODAL
   const [openModalCart, setopenModalCart] = useState(false);
   const [openModalRefund, setModalRefund] = useState(false);
+
   // PAYMENT
 
   let toModalPayment;
@@ -56,7 +59,6 @@ const Vending = () => {
   let timerTimeout;
   let timerInterval;
   let timerPayment;
-  let jumlahError;
   const [message, setmessage] = useState("Event");
 
   const handleIdle = () => {
@@ -113,12 +115,14 @@ const Vending = () => {
     if (timerPayment) clearInterval(timerPayment);
     if (timerTimeout) clearInterval(timerTimeout);
     if (timerRefund) clearInterval(timerRefund);
+    window.location.reload(true);
   }
   const clearCart = () => {
     setsubTotal(0);
     setTotalItemCart(0);
     setTransaction([]);
     setTotalItemCart(0);
+    setContentQR(null);
   };
   useEffect(() => {
     const getDataBannerLocal = async () => {
@@ -320,7 +324,7 @@ const Vending = () => {
   const deleteItem = (item) => {
     if (transactions.length <= 1) {
       //  OpenModalCancel();
-      batalkanKeranjang();
+      batalkanKeranjang({ item: item });
     } else {
       setTransaction(
         transactions.filter((cart) => cart.no_slot !== item.no_slot)
@@ -346,6 +350,7 @@ const Vending = () => {
       confirmButtonText: "Ya Batalkan",
     }).then((result) => {
       if (result.isConfirmed) {
+        setopenModalCart(false);
         clearCart();
       } else {
       }
@@ -355,9 +360,9 @@ const Vending = () => {
     console.log("TUTUP REFUND");
   };
   function requestPayment() {
-    setisOverlayOn(true);
-    setOpenModalPayment(true);
     setopenModalCart(false);
+    setOverlay(true);
+    setOpenModalPayment(true);
     var trxCode = VMINIT.getID() + "-" + formatDate();
     var apiQRCode = "trx_code=" + trxCode + "&";
     var product_name = "";
@@ -371,9 +376,8 @@ const Vending = () => {
     crud
       .CreateQRShopee(apiQRCode)
       .then((res) => {
-        setisOverlayOn(false);
-        console.log("HASIL", res);
-        console.log(res);
+        setOverlay(false);
+        console.log("Request QR CODE", res);
         if (res.message === "SUCCESS") {
           setContentQR(res.results.qrcode);
           setTrxCode(trxCode);
@@ -381,9 +385,9 @@ const Vending = () => {
             checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
           }, 3000);
         } else {
-          clearTimeout(timerPayment);
+          setOverlay(false);
           setOpenModalPayment(false);
-          console.log("TIDAK MUNCUL");
+          console.log(" QR TIDAK MUNCUL");
           var errInfo = "Yahh, QR Tidak Muncul!";
           var errText = "Silahkan coba kembali..";
           error("460", res.message, errText, errInfo, trxCode, "SHOPEEPAY");
@@ -422,11 +426,13 @@ const Vending = () => {
       confirmButtonText: "Ya Batalkan",
     }).then((result) => {
       if (result.isConfirmed) {
+        setOpenModalPayment(false);
+        clearCart();
         Swal.fire({
           title: "Transaksi Batal!",
           text: "Anda Telah membatalkan Transaksi.",
           icon: "success",
-          timer: 3000,
+          timer: 2000,
         });
         if (TrxCode !== null) {
           afterQR("0", "107", "Transaction Cancelled", TrxCode, "SHOPEEPAY");
@@ -486,7 +492,7 @@ const Vending = () => {
     }, 12000);
 
     timerPayment = setTimeout(() => {
-      setisOverlayOn(true);
+      setOverlay(true);
       console.log("Get TIMEOUT HABIS WAKTU");
       Swal.fire({
         icon: "info",
@@ -499,8 +505,7 @@ const Vending = () => {
         afterQR("0", "408", "Payment timeout", trxCode, "SHOPEEPAY");
         clearCart();
         setOpenModalPayment(false);
-        setContentQR(null);
-        setisOverlayOn(false);
+        setOverlay(false);
         /* Read more about handling dismissals below */
       });
     }, 116 * 1000);
@@ -650,25 +655,35 @@ const Vending = () => {
     Swal.fire({
       title: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
       icon: "success",
-      height: "300",
       allowOutsideClick: false,
+    });
+    Swal.fire({
+      title: "Pembayaran berhasil, MOHON DITUNGGU YA !!!",
+      allowOutsideClick: false,
+      showClass: {
+        popup: "animate__animated animate__fadeInDown",
+      },
+      hideClass: {
+        popup: "animate__animated animate__fadeOutUp",
+      },
     });
     cartVendProcess(trxCode, payment_type);
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
-  const cartVendProcess = (trxCode, payment_type) => {
-    let Koleksi = [];
-    let totalErrors;
-    let totalItem = transactions.length;
-    if (totalItem > 0) {
-      //set parameter
-      var verify_no = Math.floor(Date.now() / 1000);
 
-      var paramRefund = {
+  const cartVendProcess = (trxCode, payment_type) => {
+    var paramRefund = {};
+    var ProductError = [];
+    let errorNumbers = 0;
+    let totalItem = transactions.length;
+    let counterTextItem = null;
+    if (totalItem > 0) {
+      var verify_no = Math.floor(Date.now() / 1000);
+      paramRefund = {
         vm_store: VMINIT.getName(),
         verify_no: verify_no,
         note: "",
-        transactionId: TrxCode,
+        transactionId: trxCode,
       };
 
       //buat loop productnya
@@ -683,42 +698,133 @@ const Vending = () => {
             jumProduct < transactions[index].qty;
             jumProduct++
           ) {
-            totalErrors++;
-            let secret = trxCode + "elmy2605" + transactions[index].no_slot;
-            let hash = CryptoJS.HmacSHA256(trxCode, secret);
-            let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
-            let encodeuri = encodeURIComponent(hashInBase64);
-            console.log("PRODUCt ITEM", transactions[index].no_slot);
-            // let apiVend =
-            //   "vend?slot=" +
-            //   transactions[index].no_slot +
-            //   "&data=" +
-            //   trxCode +
-            //   "&hmac=" +
-            //   encodeuri;
-            console.log("SET  ", jumProduct);
-            setTimeout(function () {
-              console.log("PRODUCt ITEM", transactions[index].no_slot);
-              Koleksi.push({ product: transactions[index].no_slot });
-            }, 3000);
+            await new Promise(function (resolve, reject) {
+              setTimeout(function () {
+                let secret = trxCode + "elmy2605" + transactions[index].no_slot;
+                let hash = CryptoJS.HmacSHA256(trxCode, secret);
+                let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+                let encodeuri = encodeURIComponent(hashInBase64);
+                let apiStockOffline = "";
+                let vmStatus = 0;
+                let errorCode = null;
+                let errStatus = null;
+                let apiVend =
+                  "vend?slot=" +
+                  transactions[index].no_slot +
+                  "&data=" +
+                  trxCode +
+                  "&hmac=" +
+                  encodeuri;
+                EngineVM.RunEngine(apiVend).then((response) => {
+                  var counterTextItem =
+                    "Product ke " + (jumProduct + 1) + " / " + TotalItemCart;
+                  console.log(
+                    "START LOOPING VEND",
+                    transactions[index].no_slot
+                  );
+                  if (response.status) {
+                    apiStockOffline = "slot=" + transactions[index].no_slot;
+                    crud
+                      .VMSTOCK(apiStockOffline)
+                      .then((response) => {
+                        console.log("API STOCK OFFLINE", response);
+                      })
+                      .catch((e) => {
+                        console.log(e);
+                      });
+                    vmStatus = 1;
+                    errorCode = response.buffer;
+                    errStatus = response.message;
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    var innerHTML =
+                      "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
+                      counterTextItem;
+
+                    Swal.fire({
+                      title: "Transaksi Berhasil",
+                      text: innerHTML,
+                      icon: "success",
+                      showConfirmButton: false,
+                      allowOutsideClick: false,
+                      timer: 3000,
+                    }).then(() => {});
+                  } else {
+                    vmStatus = 0;
+                    errorCode = response.buffer;
+                    errStatus = response.message;
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    innerHTML =
+                      "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+
+                    Swal.fire({
+                      title: "Vending Machine Issues",
+                      text: innerHTML,
+                      icon: "error",
+                      showConfirmButton: false,
+                      allowOutsideClick: false,
+                      timer: 3000,
+                    }).then(() => {});
+                    if (ProductError.length > 0) {
+                      paramRefund["note"] =
+                        paramRefund["note"] +
+                        "product code: " +
+                        transactions[index].kode_produk +
+                        ", error code: " +
+                        errorCode +
+                        ", message: " +
+                        errStatus +
+                        "%0A";
+                    } else {
+                      paramRefund["note"] =
+                        "product code: " +
+                        transactions[index].kode_produk +
+                        ", error code: " +
+                        errorCode +
+                        ", message: " +
+                        errStatus +
+                        "%0A";
+                    }
+
+                    ProductError.push({ product: transactions[index].no_slot });
+                  }
+                });
+
+                console.log("END LOOPING ");
+                resolve(true);
+              }, 3000);
+            });
           }
         }
-        return totalErrors;
+        return true;
       }
-      console.log(Koleksi);
-      let run = myFunction();
-      run.then((res) =>
-        afterCartVendProcess(totalErrors, paramRefund, "SHOPEEPAY")
-      );
-      //  await myFunction().then((resp) => {
-      //     afterCartVendProcess(resp, paramRefund, "SHOPEEPAY");
-      //   });
+      myFunction().then((total) => {
+        var result = ProductError.length;
+        console.log("NEXT AFTER CART VEND PROCESSS ", total);
+        console.log("LENGTH ", result, total);
+        console.log("PRODUCT ERROR ", ProductError);
+        console.log("REFUND PRODUCT ", paramRefund);
+        afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
+      });
     }
   };
 
   function afterCartVendProcess(totalError, paramRefund, payment_type) {
-    console.log("after cart SHOW TOTAL ERROR ", totalError);
-    console.log("TIMEOUT", timerPayment);
     if (timerPayment) clearInterval(timerPayment);
     if (timerRefund) clearInterval(timerRefund);
     if (timerTimeout) clearTimeout(timerTimeout);
@@ -726,8 +832,9 @@ const Vending = () => {
     if (totalError > 0) {
       console.log("error JUMLAH", jumlahError);
       //sett qr WA
-      console.log("AFTERCART");
+      console.log("SCAN REFUDN");
       setOpenModalPayment(false);
+      Swal.close();
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
       setModalRefund(true);
@@ -737,7 +844,7 @@ const Vending = () => {
           text: "Silahkan Hubungi Call Center Jika Ada Terkendala. [auto close]",
           icon: "success",
           allowOutsideClick: false,
-          timer: 2500,
+          timer: 5000,
         });
 
         //Hapus QR and clear Interval Payment
@@ -746,22 +853,19 @@ const Vending = () => {
         setTimeout(() => {
           //set display modal payment
           setTimeout(() => {
-            if (timerPayment) clearInterval(timerPayment);
-            if (timerRefund) clearInterval(timerRefund);
-            if (timerTimeout) clearTimeout(timerTimeout);
-            if (timerInterval) clearInterval(timerInterval);
             setOpenModalPayment(false);
             setModalRefund(false);
+            clearResistence();
             clearCart();
-            setContentQR(null);
-            setUpdateData(true);
           }, 7000);
         }, 500);
       }, 80 * 1000);
     } else {
       setTimeout(() => {
+        setOpenModalPayment(false);
+        setModalRefund(false);
+        clearResistence();
         clearCart();
-        setUpdateData();
       }, 7000);
     }
   }

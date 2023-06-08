@@ -6,14 +6,13 @@ import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import loading from "../../assets/img/loadingpng.png";
 import { useRef } from "react";
 import { useEffect } from "react";
-
+import QRCode from "react-qr-code";
 const ModalPayment = (props) => {
   const {
     itemsTransaction,
     cancelTransaction,
-    setOpenModalPayment,
-    checkPayment,
     contentPaymnetQR,
+    requestCheckPayment,
   } = props;
   const minuteSeconds = 120;
   const getTimeSeconds = (time) => (minuteSeconds - time) | 0;
@@ -37,14 +36,14 @@ const ModalPayment = (props) => {
       setValue(contentPaymnetQR);
     }
   }, [contentPaymnetQR]);
-  console.log("BARCODE ", dataUrl, value);
-  const handleQRModel = ({ status }) => {
+
+  const handleQRModel = () => {
     //setChoice(false);
     cancelTransaction();
   };
   const CheckPembayaran = () => {
     //setChoice(false);
-    checkPayment();
+    requestCheckPayment();
   };
   const HabisWaktu = () => {
     //setChoice(false);
@@ -96,19 +95,36 @@ const ModalPayment = (props) => {
                         <img
                           src={loading}
                           alt="Landing Page"
-                          className="h-40 w-40 mt-8 items-center animate-spin"
+                          className="h-64 w-64 content_center animate-spin"
                         />
                       </span>
                     ) : (
-                      <QRious
+                      // <QRious
+                      //   value={value}
+                      //   className="h-64 w-64 content_center"
+                      // />
+                      <QRCode
+                        size={256}
+                        style={{
+                          height: "auto",
+                          maxWidth: "100%",
+                          width: "100%",
+                        }}
                         value={value}
-                        className="h-96 w-96 mt-8 items-center"
+                        viewBox={`0 0 256 256`}
                       />
                     )}
                   </span>
-                  <span className="hidden h-20 w-80 rounded-xl justify-center bg-slate-900 border-4 border-white text-slate-50 ">
-                    <p className="text-3xl font-medium justify-center mt-2">
-                      Scan QR
+                  <span className="h-20 w-64 rounded-full justify-center bg-gray-900 border-4 border-slate-400 text-slate-50 ">
+                    <p
+                      className="text-3xl font-medium content-center mt-2"
+                      onClick={() =>
+                        handleQRModel({
+                          status: false,
+                        })
+                      }
+                    >
+                      SCAN QR
                     </p>
                   </span>
                 </div>
@@ -136,11 +152,7 @@ const ModalPayment = (props) => {
                   <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
                     <p
                       className="text-3xl font-medium content-center mt-2"
-                      onClick={() =>
-                        handleQRModel({
-                          status: false,
-                        })
-                      }
+                      onClick={() => handleQRModel()}
                     >
                       Tutup
                     </p>

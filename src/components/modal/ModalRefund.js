@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import PaymentGateway from "../../assets/img/payment-gateway.png";
 import qris__template from "../../assets/img/template-qris.png";
-import { useQrious } from "react-qrious";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import loading from "../../assets/img/loadingpng.png";
 import { useRef } from "react";
-
+import QRCode from "react-qr-code";
 const ModalRefund = (props) => {
-  const { TutupRefund, contentQr } = props;
+  const { tutupRefund, contentPaymnetQR } = props;
   const minuteSeconds = 120;
   const getTimeSeconds = (time) => (minuteSeconds - time) | 0;
 
@@ -19,8 +18,7 @@ const ModalRefund = (props) => {
       </div>
     );
   };
-  const [value, setValue] = useState(contentQr);
-  const [dataUrl, _qrious] = useQrious({ value });
+  const [value, setValue] = useState(contentPaymnetQR);
   const [rundown, setStartRundown] = useState(false);
   const [openCheck, setOpenCheck] = useState(false);
   const timer = useRef(null);
@@ -35,7 +33,7 @@ const ModalRefund = (props) => {
   const handleRefund = ({ status }) => {
     //setChoice(false);
     console.log("Close");
-    TutupRefund();
+    tutupRefund();
   };
   return (
     <>
@@ -60,10 +58,15 @@ const ModalRefund = (props) => {
               <div className="flex flex-col h-96">
                 <span className="flex w-full h-full items-center">
                   {rundown ? (
-                    <img
-                      src={dataUrl}
-                      alt="Landing Page"
-                      className="h-96 w-96 content-center"
+                    <QRCode
+                      size={256}
+                      style={{
+                        height: "auto",
+                        maxWidth: "100%",
+                        width: "100%",
+                      }}
+                      value={value}
+                      viewBox={`0 0 256 256`}
                     />
                   ) : (
                     <span className="flex w-full h-full justify-center">

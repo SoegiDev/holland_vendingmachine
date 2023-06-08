@@ -686,9 +686,7 @@ const Vending = () => {
   const cartVendProcess = (trxCode, payment_type) => {
     var paramRefund = {};
     var ProductError = [];
-    let errorNumbers = 0;
     let totalItem = transactions.length;
-    let counterTextItem = null;
     if (totalItem > 0) {
       var verify_no = Math.floor(Date.now() / 1000);
       paramRefund = {
@@ -710,119 +708,43 @@ const Vending = () => {
             jumProduct < transactions[index].qty;
             jumProduct++
           ) {
-            await new Promise(function (resolve, reject) {
-              setTimeout(function () {
-                let secret = trxCode + "elmy2605" + transactions[index].no_slot;
-                let hash = CryptoJS.HmacSHA256(trxCode, secret);
-                let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
-                let encodeuri = encodeURIComponent(hashInBase64);
-                let apiStockOffline = "";
-                let vmStatus = 0;
-                let errorCode = null;
-                let errStatus = null;
-                let apiVend =
-                  "vend?slot=" +
-                  transactions[index].no_slot +
-                  "&data=" +
-                  trxCode +
-                  "&hmac=" +
-                  encodeuri;
-                EngineVM.RunEngine(apiVend)
-                  .then((response) => {
-                    var counterTextItem =
-                      "Product ke " + jumProduct + " / " + TotalItemCart;
-                    console.log(
-                      "START LOOPING VEND",
-                      transactions[index].no_slot
-                    );
-                    if (response.status) {
-                      apiStockOffline = "slot=" + transactions[index].no_slot;
-                      crud
-                        .VMSTOCK(apiStockOffline)
-                        .then((response) => {
-                          console.log("API STOCK OFFLINE", response);
-                        })
-                        .catch((e) => {
-                          console.log(e);
-                        });
-                      vmStatus = 1;
-                      errorCode = response.buffer;
-                      errStatus = response.message;
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      var innerHTML =
-                        "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
-                        counterTextItem;
-
-                      Swal.fire({
-                        title: "Transaksi Berhasil",
-                        text: innerHTML,
-                        icon: "success",
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        timer: 3000,
-                      }).then(() => {});
-                    } else {
-                      vmStatus = 0;
-                      errorCode = response.buffer;
-                      errStatus = response.message;
-                      vmStock(
-                        index,
-                        vmStatus,
-                        errorCode,
-                        errStatus,
-                        trxCode,
-                        payment_type,
-                        verify_no
-                      );
-                      innerHTML =
-                        "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
-
-                      Swal.fire({
-                        title: "Vending Machine Issues",
-                        text: innerHTML,
-                        icon: "error",
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        timer: 3000,
-                      }).then(() => {});
-                      if (ProductError.length > 0) {
-                        paramRefund["note"] =
-                          paramRefund["note"] +
-                          "product code: " +
-                          transactions[index].kode_produk +
-                          ", error code: " +
-                          errorCode +
-                          ", message: " +
-                          errStatus +
-                          "%0A";
-                      } else {
-                        paramRefund["note"] =
-                          "product code: " +
-                          transactions[index].kode_produk +
-                          ", error code: " +
-                          errorCode +
-                          ", message: " +
-                          errStatus +
-                          "%0A";
-                      }
-
-                      ProductError.push({
-                        product: transactions[index].no_slot,
+            setTimeout(() => {
+              let secret = trxCode + "elmy2605" + transactions[index].no_slot;
+              let hash = CryptoJS.HmacSHA256(trxCode, secret);
+              let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+              let encodeuri = encodeURIComponent(hashInBase64);
+              let apiStockOffline = "";
+              let vmStatus = 0;
+              let errorCode = null;
+              let errStatus = null;
+              let apiVend =
+                "vend?slot=" +
+                transactions[index].no_slot +
+                "&data=" +
+                trxCode +
+                "&hmac=" +
+                encodeuri;
+              EngineVM.RunEngine(apiVend)
+                .then((response) => {
+                  var counterTextItem =
+                    "Product ke " + jumProduct + " / " + TotalItemCart;
+                  console.log(
+                    "START LOOPING VEND",
+                    transactions[index].no_slot
+                  );
+                  if (response.status) {
+                    apiStockOffline = "slot=" + transactions[index].no_slot;
+                    crud
+                      .VMSTOCK(apiStockOffline)
+                      .then((response) => {
+                        console.log("API STOCK OFFLINE", response);
+                      })
+                      .catch((e) => {
+                        console.log(e);
                       });
-                    }
-                  })
-                  .catch((e) => {
-                    vmStatus = 0;
-                    errorCode = 444;
-                    errStatus = "VM_NOT_RESPONDING";
+                    vmStatus = 1;
+                    errorCode = response.buffer;
+                    errStatus = response.message;
                     vmStock(
                       index,
                       vmStatus,
@@ -833,6 +755,31 @@ const Vending = () => {
                       verify_no
                     );
                     var innerHTML =
+                      "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
+                      counterTextItem;
+
+                    Swal.fire({
+                      title: "Transaksi Berhasil",
+                      text: innerHTML,
+                      icon: "success",
+                      showConfirmButton: false,
+                      allowOutsideClick: false,
+                      timer: 3000,
+                    }).then(() => {});
+                  } else {
+                    vmStatus = 0;
+                    errorCode = response.buffer;
+                    errStatus = response.message;
+                    vmStock(
+                      index,
+                      vmStatus,
+                      errorCode,
+                      errStatus,
+                      trxCode,
+                      payment_type,
+                      verify_no
+                    );
+                    innerHTML =
                       "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
 
                     Swal.fire({
@@ -864,23 +811,72 @@ const Vending = () => {
                         "%0A";
                     }
 
-                    ProductError.push({ product: transactions[index].no_slot });
-                  });
-                console.log("END LOOPING ");
-                resolve(true);
-              }, 3000);
-            });
+                    ProductError.push({
+                      product: transactions[index].no_slot,
+                    });
+                  }
+                })
+                .catch((e) => {
+                  vmStatus = 0;
+                  errorCode = 444;
+                  errStatus = "VM_NOT_RESPONDING";
+                  vmStock(
+                    index,
+                    vmStatus,
+                    errorCode,
+                    errStatus,
+                    trxCode,
+                    payment_type,
+                    verify_no
+                  );
+                  var innerHTML =
+                    "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+
+                  Swal.fire({
+                    title: "Vending Machine Issues",
+                    text: innerHTML,
+                    icon: "error",
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    timer: 3000,
+                  }).then(() => {});
+                  if (ProductError.length > 0) {
+                    paramRefund["note"] =
+                      paramRefund["note"] +
+                      "product code: " +
+                      transactions[index].kode_produk +
+                      ", error code: " +
+                      errorCode +
+                      ", message: " +
+                      errStatus +
+                      "%0A";
+                  } else {
+                    paramRefund["note"] =
+                      "product code: " +
+                      transactions[index].kode_produk +
+                      ", error code: " +
+                      errorCode +
+                      ", message: " +
+                      errStatus +
+                      "%0A";
+                  }
+
+                  ProductError.push({ product: transactions[index].no_slot });
+                });
+              console.log("END LOOPING ");
+            }, 4000);
           }
         }
         return true;
       }
-      myFunction().then((total) => {
-        var result = ProductError.length;
-        console.log("NEXT AFTER CART VEND PROCESSS ", total);
-        console.log("LENGTH ", result, total);
-        console.log("PRODUCT ERROR ", ProductError);
-        console.log("REFUND PRODUCT ", paramRefund);
-        afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
+      myFunction().then((res) => {
+        if (res) {
+          var result = ProductError.length;
+          console.log("NEXT AFTER CART VEND PROCESSS ", result);
+          console.log("PRODUCT ERROR ", ProductError);
+          console.log("REFUND PRODUCT ", paramRefund);
+          afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
+        }
       });
     }
   };

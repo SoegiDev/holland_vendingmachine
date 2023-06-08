@@ -25,7 +25,6 @@ const Vending = () => {
   const [screensaverActive, setScreensaverActive] = useState(false);
   const [isloading] = useState(false);
 
-  const [networkError, setNetworkError] = useState(false);
   const [isUpdateData, setUpdateData] = useState(false);
   const [itemSlots, setItemSlots] = useState([]);
   const [itemBannersImage, setItemBannersImage] = useState([]);
@@ -61,7 +60,6 @@ const Vending = () => {
 
   const handleIdle = () => {
     setScreensaverActive(true);
-    idleTimer.reset();
   };
   const stay = () => {
     setScreensaverActive(false);
@@ -108,73 +106,68 @@ const Vending = () => {
   //   }, 3000);
   // };
 
-  function clearResistence() {
-    if (timerInterval) clearInterval(timerInterval);
-    if (timerPayment) clearInterval(timerPayment);
-    if (timerTimeout) clearInterval(timerTimeout);
-    if (timerRefund) clearInterval(timerRefund);
-  }
-  const clearCart = () => {
-    setsubTotal(0);
-    setTotalItemCart(0);
-    setTransaction([]);
-    setTotalItemCart(0);
-  };
   useEffect(() => {
     const getDataBannerLocal = async () => {
-      if (itemBannersImage.length === 0 && !networkError) {
+      if (itemBannersImage.length === 0) {
         setOverlay(true);
-        crud
-          .getDataBannersImage()
-          .then((res) => {
-            if (res.message === "No Data") {
-              setOverlay(false);
-              console.log("DATA BANNERS DB KOSONG");
-            } else {
-              setOverlay(false);
-              setItemBannersImage(false);
-            }
-          })
-          .catch((e) => {
+        crud.getDataBannersImage().then((res) => {
+          console.log(res);
+          if (res.message === "No Data") {
             setOverlay(false);
-            console.log(e.message);
-            setNetworkError(true);
-          });
+            console.log("DATA BANNERS KOSONG");
+          } else {
+            console.log("DATA BANNER", res);
+            setOverlay(false);
+            console.log("OVERLAY DONE");
+            setItemBannersImage(false);
+          }
+        });
       } else {
-        console.log("Data Image Exist");
-        setOverlay(false);
+        console.log("Data Image sudah ada");
+        console.log(itemBannersImage);
       }
     };
     const getDataSlotsLocal = async () => {
-      setOverlay(true);
-      if (itemSlots.length === 0 && !networkError) {
-        crud
-          .getDataSlots()
-          .then((res) => {
-            console.log("Running Get SLOTS");
-            console.log(res);
-            if (res.message === "No Data") {
-              setOverlay(false);
-              console.log("Data Slot DB KOSONG");
-            } else {
-              setOverlay(false);
-              setItemSlots(res.results.data);
-            }
-          })
-          .catch((e) => {
-            console.log(e);
+      if (itemSlots.length === 0) {
+        crud.getDataSlots().then((res) => {
+          console.log("Running Get SLOTS");
+          console.log(res);
+          if (res.message === "No Data") {
+            console.log("Data SLots Local Kosong");
+          } else {
+            console.log("Set Slot");
             setOverlay(false);
-          });
+            setItemSlots(res.results.data);
+          }
+        });
       } else {
-        console.log("Data Slot Exist ");
-        setOverlay(false);
+        console.log("Data Slot sudah ada");
+        console.log(itemBannersImage);
       }
     };
     getDataBannerLocal();
     getDataSlotsLocal();
   });
+  //   const fetchData2 = async () => {
+  //     crud.getDataSlots().then((res) => {
+  //       console.log("Running Get SLOTS");
+  //       console.log(res);
+  //       if (res.message === "No Data") {
+  //         console.log("Data SLots Local Kosong");
+  //       } else {
+  //         console.log("Set Slot");
+  //         setSyncSlot(true);
+  //         setOverlay(false);
+  //         setItemSlots(res.results.data);
+  //       }
+  //     });
+  //   };
+  //   if (!isSyncSlot) {
+  //     fetchData();
+  //   }
+  // });
   const addTransaction = (item, tambah) => {
-    console.log("add ", item, tambah);
+    console.log(itemBannersImage);
     const existItem = transactions.find(
       (slot) => slot.no_slot === item.no_slot
     );
@@ -184,8 +177,7 @@ const Vending = () => {
         Swal.fire({
           title: `Stock ${item.name_produk} Sudah Habis`,
           width: 300,
-          height: 200,
-          timer: 1000,
+          height: 400,
           padding: "3em",
           color: "#716add",
           background: "#fff",
@@ -320,7 +312,6 @@ const Vending = () => {
   const deleteItem = (item) => {
     if (transactions.length <= 1) {
       //  OpenModalCancel();
-      batalkanKeranjang();
     } else {
       setTransaction(
         transactions.filter((cart) => cart.no_slot !== item.no_slot)
@@ -792,6 +783,18 @@ const Vending = () => {
 
     return QR_whatsApp;
   }
+
+  const clearCart = () => {
+    setsubTotal(0);
+    setTotalItemCart(0);
+    setTransaction([]);
+    setTotalItemCart(0);
+    if (timerPayment) clearInterval(timerPayment);
+    if (timerRefund) clearInterval(timerRefund);
+    if (timerTimeout) clearTimeout(timerTimeout);
+    if (timerInterval) clearInterval(timerInterval);
+    setisOverlayOn(false);
+  };
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden" id="hb-vm">

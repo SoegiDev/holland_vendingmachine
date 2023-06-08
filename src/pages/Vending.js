@@ -709,7 +709,7 @@ const Vending = () => {
             jumProduct++
           ) {
             await new Promise(function (resolve, reject) {
-              setTimeout(() => {
+              setTimeout(function () {
                 let secret = trxCode + "elmy2605" + transactions[index].no_slot;
                 let hash = CryptoJS.HmacSHA256(trxCode, secret);
                 let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
@@ -865,20 +865,20 @@ const Vending = () => {
                     ProductError.push({ product: transactions[index].no_slot });
                   });
                 console.log("END LOOPING ");
-              }, 4000);
+                resolve(true);
+              }, 3000);
             });
           }
         }
         return true;
       }
-      myFunction().then((res) => {
-        if (res) {
-          var result = ProductError.length;
-          console.log("NEXT AFTER CART VEND PROCESSS ", result);
-          console.log("PRODUCT ERROR ", ProductError);
-          console.log("REFUND PRODUCT ", paramRefund);
-          afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
-        }
+      myFunction().then((total) => {
+        var result = ProductError.length;
+        console.log("NEXT AFTER CART VEND PROCESSS ", total);
+        console.log("LENGTH ", result, total);
+        console.log("PRODUCT ERROR ", ProductError);
+        console.log("REFUND PRODUCT ", paramRefund);
+        afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
       });
     }
   };

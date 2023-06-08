@@ -35,8 +35,6 @@ const Vending = () => {
   const [transactions, setTransaction] = useState([]);
   const [isoverlay, setOverlay] = useState(false);
   const [TrxCode, setTrxCode] = useState(null);
-  let [vendTotalItem, setVendTotalItem] = useState(0);
-  let [vendTotalError, setVendTotalError] = useState(0);
   const [openModalPaymnet, setOpenModalPayment] = useState(false);
   const [isOverlayOn, setisOverlayOn] = useState(false);
 
@@ -488,10 +486,8 @@ const Vending = () => {
         .PaymentCheckQRShopee(apicheck)
         .then((res) => {
           if (res.message === "SUCCESS") {
-            if (timerPayment) clearInterval(timerPayment);
-            if (timerRefund) clearInterval(timerRefund);
-            if (timerTimeout) clearTimeout(timerTimeout);
             if (timerInterval) clearInterval(timerInterval);
+            if (timerPayment) clearTimeout(timerPayment);
             setTrxCode(trxCode);
             PaymentSuccess(trxCode, payment_type);
           } else {
@@ -534,10 +530,8 @@ const Vending = () => {
       .VM_CHECKPAYMENT(apicheck)
       .then((res) => {
         if (res.message === "SUCCESS") {
-          if (timerPayment) clearInterval(timerPayment);
-          if (timerRefund) clearInterval(timerRefund);
-          if (timerTimeout) clearTimeout(timerTimeout);
           if (timerInterval) clearInterval(timerInterval);
+          if (timerPayment) clearTimeout(timerPayment);
           PaymentSuccess(TrxCode, "SHOPEEPAY");
         } else {
           setOverlay(false);
@@ -697,10 +691,7 @@ const Vending = () => {
       };
 
       //buat loop productnya
-      async function myFunction() {
-        setVendTotalError(0);
-        setVendTotalItem(0);
-
+      var looper = async function () {
         for (let index = 0; index < transactions.length; index++) {
           console.log("Produck", transactions[index].no_slot);
           for (
@@ -734,6 +725,7 @@ const Vending = () => {
                       transactions[index].no_slot
                     );
                     if (response.status) {
+                      console.log("SUCCESS");
                       apiStockOffline = "slot=" + transactions[index].no_slot;
                       crud
                         .VMSTOCK(apiStockOffline)
@@ -768,6 +760,7 @@ const Vending = () => {
                         timer: 3000,
                       }).then(() => {});
                     } else {
+                      console.log("ERROR");
                       vmStatus = 0;
                       errorCode = response.buffer;
                       errStatus = response.message;
@@ -818,6 +811,7 @@ const Vending = () => {
                     }
                   })
                   .catch((e) => {
+                    console.log("CATCH ");
                     vmStatus = 0;
                     errorCode = 444;
                     errStatus = "VM_NOT_RESPONDING";
@@ -864,30 +858,29 @@ const Vending = () => {
 
                     ProductError.push({ product: transactions[index].no_slot });
                   });
-                console.log("END LOOPING ");
                 resolve(true);
               }, 3000);
             });
           }
         }
+        console.log("END LOOPING ");
         return true;
-      }
-      myFunction().then((total) => {
+      };
+
+      looper().then(function () {
         var result = ProductError.length;
-        console.log("NEXT AFTER CART VEND PROCESSS ", total);
-        console.log("LENGTH ", result, total);
-        console.log("PRODUCT ERROR ", ProductError);
-        console.log("REFUND PRODUCT ", paramRefund);
-        //   afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
+        //console.log(paramRefund);
+        afterCartVendProcess(result, paramRefund, payment_type);
       });
+      // myFunction().then((total) => {
+      //   var result = ProductError.length;
+      //   console.log("NEXT AFTER CART VEND PROCESSS ", result);
+      //   //   afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
+      // });
     }
   };
 
   function afterCartVendProcess(totalError, paramRefund, payment_type) {
-    if (timerPayment) clearInterval(timerPayment);
-    if (timerRefund) clearInterval(timerRefund);
-    if (timerTimeout) clearTimeout(timerTimeout);
-    if (timerInterval) clearInterval(timerInterval);
     if (totalError > 0) {
       console.log("error JUMLAH", totalError);
       //sett qr WA

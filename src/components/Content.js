@@ -32,6 +32,7 @@ const Content = (props) => {
 const MyItems = ({ slot, addTransaction }) => {
   const [isAddItemClass, setAdditemClass] = useState(false);
 
+  console.log(`http://localhost:3000/images/${slot.name_produk}.jpg`);
   const handleAddTransaction = () => {
     setAdditemClass(!isAddItemClass);
     // setTimeout(() => button.classList.remove("item-added"), 1000);
@@ -54,7 +55,7 @@ const MyItems = ({ slot, addTransaction }) => {
           <p className="text-lg font-bold text-white">{slot.no_slot}</p>
         </div>
         <img
-          src={slot.image}
+          src={`http://localhost:3000/images/${slot.name_produk}.jpg`}
           alt="Landing Page"
           className="h-40 w-full"
           onClick={() => {
@@ -125,7 +126,7 @@ const MyItemsChild = ({ slot, addTransaction }) => {
           <p className="text-lg font-bold text-white">{slot.no_slot}</p>
         </div>
         <img
-          src={slot.image}
+          src={`http://localhost:3000/images/${slot.name_produk}.jpg`}
           alt="Landing Page"
           className="w-full h-20"
           onClick={() => {

@@ -30,10 +30,10 @@ const ModalRefund = (props) => {
       setOpenCheck(true);
     }, 4000);
   }, 3000);
-  const handleRefund = ({ status }) => {
+  const handleRefund = (props) => {
     //setChoice(false);
     console.log("Close");
-    tutupRefund();
+    tutupRefund(props);
   };
   return (
     <>

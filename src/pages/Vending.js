@@ -357,7 +357,19 @@ const Vending = () => {
     });
   };
   const tutupRefund = ({ props }) => {
-    console.log("TUTUP REFUND");
+    Swal.fire({
+      text: "Proses Refund Telah Selesai?",
+      icon: "warning",
+      buttons: ["Tidak", "Iya"],
+      dangerMode: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setModalRefund(false);
+        clearCart();
+        clearResistence();
+      } else {
+      }
+    });
   };
   function requestPayment() {
     setopenModalCart(false);
@@ -879,7 +891,7 @@ const Vending = () => {
     if (timerTimeout) clearTimeout(timerTimeout);
     if (timerInterval) clearInterval(timerInterval);
     if (totalError > 0) {
-      console.log("error JUMLAH", jumlahError);
+      console.log("error JUMLAH", totalError);
       //sett qr WA
       console.log("SCAN REFUDN");
       setOpenModalPayment(false);

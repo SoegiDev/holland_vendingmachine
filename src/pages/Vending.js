@@ -691,7 +691,8 @@ const Vending = () => {
                         verify_no
                       );
                       var innerHTML =
-                        "Silahkan ambil produk anda dibawah . ..  . <br><br>";
+                        "Silahkan ambil produk anda dibawah . ..." +
+                        textCounterItem;
 
                       Swal.fire({
                         title: "Transaksi Berhasil",
@@ -716,7 +717,7 @@ const Vending = () => {
                         verify_no
                       );
                       var innerHTML2 =
-                        "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+                        "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
 
                       Swal.fire({
                         title: "Vending Machine Issues",
@@ -766,7 +767,7 @@ const Vending = () => {
                       verify_no
                     );
                     var innerHTML =
-                      "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih<br><br>";
+                      "Maaf, Produk tidak jatuh..<br> Untuk Keluhan dan Pengajuan Refund Hubungi di Call Center (021) 691 8181, atau no CS yang ada dilayar VM.. Terimakasih";
 
                     Swal.fire({
                       title: "Vending Machine Issues",
@@ -851,8 +852,17 @@ const Vending = () => {
         }, 500);
       }, 80 * 1000);
     } else {
+      Swal.fire({
+        title: "Terimakasih , Transaksi Anda Sudah Selesai !!",
+        text: "Silahkan Hubungi Call Center Jika Ada Terkendala.",
+        icon: "success",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        timer: 10000,
+      });
       setisOverlayOn(false);
       setTimeout(() => {
+        Swal.close();
         setOpenModalPayment(false);
         setModalRefund(false);
         clearResistence();

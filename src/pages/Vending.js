@@ -110,56 +110,46 @@ const Vending = () => {
   };
   useEffect(() => {
     const getDataBannerLocal = async () => {
-      if (itemBannersImage.length === 0 && !networkError) {
-        setOverlay(true);
-        crud
-          .getDataBannersImage()
-          .then((res) => {
-            setNetworkError(false);
-            if (res.message === "No Data") {
-              setOverlay(false);
-              console.log("DATA BANNERS DB KOSONG");
-            } else {
-              setOverlay(false);
-              setItemBannersImage(false);
-            }
-          })
-          .catch((e) => {
+      setOverlay(true);
+      crud
+        .getDataBannersImage()
+        .then((res) => {
+          setNetworkError(false);
+          if (res.message === "No Data") {
             setOverlay(false);
-            console.log(e.message);
-            setNetworkError(true);
-          });
-      } else {
-        console.log("Data Image Exist");
-        setOverlay(false);
-      }
+            console.log("DATA BANNERS DB KOSONG");
+          } else {
+            setOverlay(false);
+            setItemBannersImage(false);
+          }
+        })
+        .catch((e) => {
+          setOverlay(false);
+          console.log(e.message);
+          setNetworkError(true);
+        });
     };
     const getDataSlotsLocal = async () => {
       setOverlay(true);
-      if (itemSlots.length === 0 && !networkError) {
-        crud
-          .getDataSlots()
-          .then((res) => {
-            setNetworkError(false);
-            console.log("Running Get SLOTS");
-            console.log(res);
-            if (res.message === "No Data") {
-              setOverlay(false);
-              console.log("Data Slot DB KOSONG");
-            } else {
-              setOverlay(false);
-              setItemSlots(res.results.data);
-            }
-          })
-          .catch((e) => {
-            console.log(e);
+      crud
+        .getDataSlots()
+        .then((res) => {
+          setNetworkError(false);
+          console.log("Running Get SLOTS");
+          console.log(res);
+          if (res.message === "No Data") {
             setOverlay(false);
-            setNetworkError(true);
-          });
-      } else {
-        console.log("Data Slot Exist ");
-        setOverlay(false);
-      }
+            console.log("Data Slot DB KOSONG");
+          } else {
+            setOverlay(false);
+            setItemSlots(res.results.data);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          setOverlay(false);
+          setNetworkError(true);
+        });
     };
     getDataBannerLocal();
     getDataSlotsLocal();

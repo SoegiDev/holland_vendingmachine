@@ -23,7 +23,7 @@ var CryptoJS = require("crypto-js");
 
 const Vending = () => {
   const [screensaverActive, setScreensaverActive] = useState(false);
-  const [isloading] = useState(false);
+  const [isloading, setLoading] = useState(false);
 
   const [networkError, setNetworkError] = useState(false);
   const [isUpdateData, setUpdateData] = useState(false);
@@ -79,17 +79,34 @@ const Vending = () => {
   });
 
   function clearResistence() {
-    if (timerInterval) clearInterval(timerInterval);
-    if (timerPayment) clearInterval(timerPayment);
-    if (timerTimeout) clearInterval(timerTimeout);
-    if (timerRefund) clearInterval(timerRefund);
+    console.log("Mulai Clear resistence");
+    setOverlay(true);
+    const bersihkan = async () => {
+      if (timerRefund) clearTimeout(timerRefund);
+      if (timerPayment) clearTimeout(timerPayment);
+      if (timerTimeout) clearTimeout(timerTimeout);
+      if (timerInterval) clearInterval(timerInterval);
+    };
+    bersihkan().then(() => {
+      setOverlay(false);
+      console.log("END CLEAR RESIDENC");
+    });
   }
   const clearCart = () => {
-    setsubTotal(0);
-    setTotalItemCart(0);
-    setTransaction([]);
-    setTotalItemCart(0);
-    setContentQR(null);
+    console.log("Mulai Clear Cart");
+    setOverlay(true);
+    const bersihkan = async () => {
+      setsubTotal(0);
+      setTotalItemCart(0);
+      setTransaction([]);
+      setTotalItemCart(0);
+      setContentQR(null);
+      reloadData();
+    };
+    bersihkan().then(() => {
+      setOverlay(false);
+      console.log("END CLEAR CART");
+    });
   };
   useEffect(() => {
     const getDataBannerLocal = async () => {
@@ -98,6 +115,7 @@ const Vending = () => {
         crud
           .getDataBannersImage()
           .then((res) => {
+            setNetworkError(false);
             if (res.message === "No Data") {
               setOverlay(false);
               console.log("DATA BANNERS DB KOSONG");
@@ -122,6 +140,7 @@ const Vending = () => {
         crud
           .getDataSlots()
           .then((res) => {
+            setNetworkError(false);
             console.log("Running Get SLOTS");
             console.log(res);
             if (res.message === "No Data") {
@@ -135,6 +154,7 @@ const Vending = () => {
           .catch((e) => {
             console.log(e);
             setOverlay(false);
+            setNetworkError(true);
           });
       } else {
         console.log("Data Slot Exist ");
@@ -144,6 +164,37 @@ const Vending = () => {
     getDataBannerLocal();
     getDataSlotsLocal();
   }, []);
+  const reloadData = () => {
+    const slotsData = async () => {
+      setOverlay(true);
+      if (itemSlots.length === 0 && !networkError) {
+        crud
+          .getDataSlots()
+          .then((res) => {
+            setNetworkError(false);
+            console.log("Running Get SLOTS");
+            console.log(res);
+            if (res.message === "No Data") {
+              setOverlay(false);
+              console.log("Data Slot DB KOSONG");
+            } else {
+              setOverlay(false);
+              setItemSlots(res.results.data);
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+            setOverlay(false);
+            setNetworkError(true);
+          });
+      } else {
+        console.log("Data Slot Exist ");
+        setOverlay(false);
+      }
+    };
+    slotsData();
+    clearTimeout(timerRefund);
+  };
   const addTransaction = (item, tambah) => {
     console.log("add ", item, tambah);
     const existItem = transactions.find(
@@ -327,13 +378,15 @@ const Vending = () => {
     Swal.fire({
       text: "Proses Refund Telah Selesai?",
       icon: "warning",
-      buttons: ["Tidak", "Iya"],
-      dangerMode: true,
+      showConfirmButton: true,
+      confirmButtonText: "Ya Selesai",
+      cancelButtonText: "Belum Selesai",
+      showCancelButton: true,
     }).then((result) => {
       if (result.isConfirmed) {
         setModalRefund(false);
         clearCart();
-        clearResistence();
+        window.location.reload(false);
       } else {
       }
     });
@@ -406,6 +459,8 @@ const Vending = () => {
       if (result.isConfirmed) {
         setOpenModalPayment(false);
         clearCart();
+        clearResistence();
+        window.location.reload(false);
         Swal.fire({
           title: "Transaksi Batal!",
           text: "Anda Telah membatalkan Transaksi.",
@@ -802,7 +857,7 @@ const Vending = () => {
                     ProductError.push(1);
                     resolve();
                   });
-              }, 2000)
+              }, 3000)
             );
           }
         }
@@ -819,16 +874,13 @@ const Vending = () => {
 
   function afterCartVendProcess(totalError, paramRefund, payment_type) {
     if (totalError > 0) {
-      console.log("error JUMLAH", totalError);
-      //sett qr WA
-      console.log("SCAN REFUDN");
       setOpenModalPayment(false);
       Swal.close();
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
       setModalRefund(true);
       setisOverlayOn(false);
-      timerTimeout = setTimeout(() => {
+      timerRefund = setTimeout(() => {
         Swal.fire({
           title: "Waktu Scan Refund Habis!",
           text: "Silahkan Hubungi Call Center Jika Ada Terkendala. [auto close]",
@@ -867,6 +919,7 @@ const Vending = () => {
         setModalRefund(false);
         clearResistence();
         clearCart();
+        window.location.reload(false);
       }, 7000);
     }
   }
@@ -903,31 +956,11 @@ const Vending = () => {
       {screensaverActive ? (
         <ScreenSaver stay={stay} images={itemBannersImage}></ScreenSaver>
       ) : (
-        // <div className="flex w-full justify-center">
-        //   <button
-        //     className="text-2xl rounded-2xl content-center bg-hollandtints-800 text-white"
-        //     onClick={() => {
-        //       startTimer();
-        //       setLoad();
-        //       setSyncSlot(false);
-        //     }}
-        //   >
-        //     <p className="p-6">Start TEST</p>
-        //   </button>
-
-        //   <button
-        //     className="text-2xl rounded-2xl content-center bg-hollandtints-800 text-white"
-        //     onClick={() => {
-        //       stopTimer();
-        //     }}
-        //   >
-        //     <p className="p-6">Stop TEST</p>
-        //   </button>
-        // </div>
         <div className="landscape:hidden w-screen">
           <TopHeader />
           <Header />
           <RunningText />
+          {isloading && <Loading></Loading>}
           {itemSlots.length > 0 && (
             <Content slots={itemSlots} addCart={addTransaction}></Content>
           )}
@@ -992,7 +1025,7 @@ const Vending = () => {
           </Transition>
         </div>
       )}
-      {isloading && <Loading></Loading>}
+
       {isoverlay && <Loading className="featuredOverlay"></Loading>}
       {isOverlayOn && <div className="featuredOverlay"></div>}
     </div>

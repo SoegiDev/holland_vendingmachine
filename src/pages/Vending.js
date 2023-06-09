@@ -40,8 +40,6 @@ const Vending = () => {
 
   const [ContentQR, setContentQR] = useState(null);
 
-  const [jumlahError, setJumlahError] = useState(0);
-
   const [paymentOut, setPaymentOut] = useState(false);
   // MODAL
   const [openModalCart, setopenModalCart] = useState(false);
@@ -67,53 +65,24 @@ const Vending = () => {
     setScreensaverActive(false);
   };
   const refreshPage = () => {
-    console.log("REFRESH DATA");
     setOverlay(true);
     setTimeout(() => {
       window.location.reload(true);
       setOverlay(false);
     }, 3000);
   };
-  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 2000 });
+  const { idleTimer } = useIdle({ onIdle: handleIdle, idleTime: 800 });
 
   const { idleRefreshData } = useIdle({
     onIdle: refreshPage,
-    idleTime: 1000,
+    idleTime: 600,
   });
-
-  // const logOutUser = () => {
-  //   console.log("LOGs");
-  // };
-  // const startTimer = () => {
-  //   if (timerId) clearTimeout(timerId);
-  //   timerId = setTimeout(logOutUser, 3000);
-  // };
-
-  // const stopTimer = () => {
-  //   if (timerId) {
-  //     clearTimeout(timerId);
-  //   }
-  // };
-
-  // const setLoad = () => {
-  //   console.log("Set Overlay");
-  //   setLoading(true);
-  //   setOverlay(true);
-  //   if (timerId2) clearTimeout(timerId2);
-  //   console.log("MUlai Oeveraly");
-  //   timerId2 = setTimeout(() => {
-  //     setOverlay(false);
-  //     console.log("Selesai Overlay");
-  //     setLoading(false);
-  //   }, 3000);
-  // };
 
   function clearResistence() {
     if (timerInterval) clearInterval(timerInterval);
     if (timerPayment) clearInterval(timerPayment);
     if (timerTimeout) clearInterval(timerTimeout);
     if (timerRefund) clearInterval(timerRefund);
-    window.location.reload(true);
   }
   const clearCart = () => {
     setsubTotal(0);
@@ -174,7 +143,7 @@ const Vending = () => {
     };
     getDataBannerLocal();
     getDataSlotsLocal();
-  });
+  }, []);
   const addTransaction = (item, tambah) => {
     console.log("add ", item, tambah);
     const existItem = transactions.find(
@@ -371,7 +340,6 @@ const Vending = () => {
   };
   function requestPayment() {
     setopenModalCart(false);
-    setOverlay(true);
     setOpenModalPayment(true);
     var trxCode = VMINIT.getID() + "-" + formatDate();
     var apiQRCode = "trx_code=" + trxCode + "&";
@@ -455,32 +423,6 @@ const Vending = () => {
 
   const checkQRPayment = (trxCode, jumlahItem, jumlahBayar, payment_type) => {
     var apicheck = "trx_code=" + trxCode + "&";
-    // timerTimeout = setTimeout(() => {
-    //   clearTimeout(timerTimeout);
-    //   crud
-    //     .PaymentCheckQRShopee(apicheck)
-    //     .then((res) => {
-    //       if (res.message === "SUCCESS") {
-    //         if (timerPayment) clearInterval(timerPayment);
-    //         if (timerRefund) clearInterval(timerRefund);
-    //         if (timerTimeout) clearTimeout(timerTimeout);
-    //         if (timerInterval) clearInterval(timerInterval);
-    //         setTrxCode(trxCode);
-    //         PaymentSuccess(trxCode, payment_type);
-    //         timerTimeout = setTimeout(() => {
-    //           clearTimeout(timerTimeout);
-    //           checkQRPayment(trxCode, TotalItemCart, subTotal, "SHOPEEPAY");
-    //         }, 3000);
-    //       } else {
-    //         console.log("TAMPIL STATUS");
-    //       }
-    //       // getSlots();
-    //     })
-    //     .catch((error) => {
-    //       this.setState({ errorMessage: error.toString() });
-    //       console.error("There was an error!", error);
-    //     });
-    // }, 1000);
     timerInterval = setInterval(() => {
       crud
         .PaymentCheckQRShopee(apicheck)
@@ -497,7 +439,7 @@ const Vending = () => {
         .catch((error) => {
           console.error("There was an error!", error);
         });
-    }, 12000);
+    }, 8000);
 
     timerPayment = setTimeout(() => {
       setOverlay(true);
@@ -516,7 +458,7 @@ const Vending = () => {
         setOverlay(false);
         /* Read more about handling dismissals below */
       });
-    }, 116 * 1000);
+    }, 173 * 1000);
     //set waktu habis bayar
   };
 
@@ -658,28 +600,25 @@ const Vending = () => {
   const PaymentSuccess = (trxCode, payment_type) => {
     setPaymentOut(false);
     setOpenModalPayment(false);
-    Swal.fire({
-      title: "PEMBAYARAN BERHASIL , MOHON DITUNGGU YA !!!",
-      icon: "success",
-      allowOutsideClick: false,
-    });
+
     Swal.fire({
       title: "Pembayaran berhasil, MOHON DITUNGGU YA !!!",
+      width: 600,
+      padding: "3em",
+      color: "#EEE2DE",
+      background: "#B31312",
       allowOutsideClick: false,
-      showClass: {
-        popup: "animate__animated animate__fadeInDown",
-      },
-      hideClass: {
-        popup: "animate__animated animate__fadeOutUp",
-      },
+      showConfirmButton: false,
     });
     cartVendProcess(trxCode, payment_type);
     //afterCartVendProcess(2, "asdasdsad,asdsadsadsad", "SHOPPEPAY");
   };
 
   const cartVendProcess = (trxCode, payment_type) => {
+    setisOverlayOn(true);
     var paramRefund = {};
     var ProductError = [];
+    var JumlahItem = [];
     let totalItem = transactions.length;
     if (totalItem > 0) {
       var verify_no = Math.floor(Date.now() / 1000);
@@ -689,18 +628,18 @@ const Vending = () => {
         note: "",
         transactionId: trxCode,
       };
-
       //buat loop productnya
-      var looper = async function () {
+      async function RunVendingMachine() {
+        console.log("MULAI");
         for (let index = 0; index < transactions.length; index++) {
-          console.log("Produck", transactions[index].no_slot);
-          for (
-            let jumProduct = 0;
-            jumProduct < transactions[index].qty;
-            jumProduct++
-          ) {
-            await new Promise(function (resolve, reject) {
-              setTimeout(function () {
+          JumlahItem.push(index);
+          let produk = transactions[index].qty;
+          for (let i = 0; i < produk; i++) {
+            const element = transactions[index].no_slot;
+            const urutan = transactions[index].qty + " - " + i;
+            await new Promise((resolve, reject) =>
+              setTimeout(() => {
+                console.log("BADAN KE ", element, urutan);
                 let secret = trxCode + "elmy2605" + transactions[index].no_slot;
                 let hash = CryptoJS.HmacSHA256(trxCode, secret);
                 let hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
@@ -716,14 +655,18 @@ const Vending = () => {
                   trxCode +
                   "&hmac=" +
                   encodeuri;
+                const requestOptions = {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
+                  timeout: 4500,
+                  //  body: JSON.stringify({ title: "React POST Request Example" }),
+                };
+                var textCounterItem = null;
+
                 EngineVM.RunEngine(apiVend)
                   .then((response) => {
-                    var counterTextItem =
-                      "Product ke " + jumProduct + " / " + TotalItemCart;
-                    console.log(
-                      "START LOOPING VEND",
-                      transactions[index].no_slot
-                    );
+                    textCounterItem =
+                      "Product ke " + JumlahItem.length + " / " + TotalItemCart;
                     if (response.status) {
                       console.log("SUCCESS");
                       apiStockOffline = "slot=" + transactions[index].no_slot;
@@ -748,8 +691,7 @@ const Vending = () => {
                         verify_no
                       );
                       var innerHTML =
-                        "Silahkan ambil produk anda dibawah . ..  . <br><br>" +
-                        counterTextItem;
+                        "Silahkan ambil produk anda dibawah . ..  . <br><br>";
 
                       Swal.fire({
                         title: "Transaksi Berhasil",
@@ -760,7 +702,7 @@ const Vending = () => {
                         timer: 3000,
                       }).then(() => {});
                     } else {
-                      console.log("ERROR");
+                      console.log("PRODUCT");
                       vmStatus = 0;
                       errorCode = response.buffer;
                       errStatus = response.message;
@@ -780,6 +722,8 @@ const Vending = () => {
                         title: "Vending Machine Issues",
                         text: innerHTML2,
                         icon: "error",
+                        color: "#EEE2DE",
+                        background: "#B31312",
                         showConfirmButton: false,
                         allowOutsideClick: false,
                         timer: 3000,
@@ -804,14 +748,11 @@ const Vending = () => {
                           errStatus +
                           "%0A";
                       }
-
-                      ProductError.push({
-                        product: transactions[index].no_slot,
-                      });
+                      ProductError.push(1);
                     }
+                    resolve();
                   })
-                  .catch((e) => {
-                    console.log("CATCH ");
+                  .catch((error) => {
                     vmStatus = 0;
                     errorCode = 444;
                     errStatus = "VM_NOT_RESPONDING";
@@ -831,6 +772,8 @@ const Vending = () => {
                       title: "Vending Machine Issues",
                       text: innerHTML,
                       icon: "error",
+                      color: "#EEE2DE",
+                      background: "#B31312",
                       showConfirmButton: false,
                       allowOutsideClick: false,
                       timer: 3000,
@@ -855,28 +798,21 @@ const Vending = () => {
                         errStatus +
                         "%0A";
                     }
-
-                    ProductError.push({ product: transactions[index].no_slot });
+                    ProductError.push(1);
+                    resolve();
                   });
-                resolve(true);
-              }, 3000);
-            });
+              }, 2000)
+            );
           }
         }
-        console.log("END LOOPING ");
-        return true;
-      };
+        return ProductError.length;
+      }
 
-      looper().then(function () {
+      RunVendingMachine().then((res) => {
         var result = ProductError.length;
-        //console.log(paramRefund);
+        console.log("HASIL ", result, res);
         afterCartVendProcess(result, paramRefund, payment_type);
       });
-      // myFunction().then((total) => {
-      //   var result = ProductError.length;
-      //   console.log("NEXT AFTER CART VEND PROCESSS ", result);
-      //   //   afterCartVendProcess(result, paramRefund, "SHOPEEPAY");
-      // });
     }
   };
 
@@ -890,12 +826,14 @@ const Vending = () => {
       var QR_refund_wa = refund_wa(paramRefund, payment_type);
       setContentQR(QR_refund_wa);
       setModalRefund(true);
+      setisOverlayOn(false);
       timerTimeout = setTimeout(() => {
         Swal.fire({
           title: "Waktu Scan Refund Habis!",
           text: "Silahkan Hubungi Call Center Jika Ada Terkendala. [auto close]",
           icon: "success",
           allowOutsideClick: false,
+          showConfirmButton: false,
           timer: 5000,
         });
 
@@ -913,6 +851,7 @@ const Vending = () => {
         }, 500);
       }, 80 * 1000);
     } else {
+      setisOverlayOn(false);
       setTimeout(() => {
         setOpenModalPayment(false);
         setModalRefund(false);

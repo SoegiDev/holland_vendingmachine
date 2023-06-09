@@ -155,7 +155,7 @@ const MyItems = ({ Data, handleModalConfirm, addTransaction, deletedItem }) => {
         <div className="flex w-1/4 h-44 justify-center m-2">
           <span className="flex w-32 items-center">
             <img
-              src={Data.image}
+              src={`http://localhost:3000/images/${Data.name_produk}.jpg`}
               alt="Landing Page"
               className="h-32 w-full border content-center rounded-3xl shadow-lg"
             />

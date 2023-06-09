@@ -74,16 +74,18 @@ const ModalPayment = (props) => {
                     Apakah anda sudah melakukan Pembayaran tapi Produk tidak
                     keluar? Klik Tombol di atas ini
                   </p>
-                  <span className="h-20 w-64 rounded-full justify-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
-                    <p
-                      className="text-3xl font-medium content-center mt-2"
-                      onClick={() => {
-                        CheckPembayaran();
-                      }}
-                    >
-                      Check Payment
-                    </p>
-                  </span>
+                  <div className="flex w-full justify-center mt-4">
+                    <span className="h-20 w-64 rounded-full items-center bg-gray-600 border-4 border-slate-400 text-slate-50 ">
+                      <p
+                        className="text-3xl font-medium text-center mt-4 mb-2"
+                        onClick={() => {
+                          CheckPembayaran();
+                        }}
+                      >
+                        Check Payment
+                      </p>
+                    </span>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -99,10 +101,6 @@ const ModalPayment = (props) => {
                         />
                       </span>
                     ) : (
-                      // <QRious
-                      //   value={value}
-                      //   className="h-64 w-64 content_center"
-                      // />
                       <QRCode
                         size={256}
                         style={{

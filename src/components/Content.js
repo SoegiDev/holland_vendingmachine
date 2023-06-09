@@ -31,8 +31,6 @@ const Content = (props) => {
 
 const MyItems = ({ slot, addTransaction }) => {
   const [isAddItemClass, setAdditemClass] = useState(false);
-
-  console.log(`http://localhost:3000/images/${slot.name_produk}.jpg`);
   const handleAddTransaction = () => {
     setAdditemClass(!isAddItemClass);
     // setTimeout(() => button.classList.remove("item-added"), 1000);

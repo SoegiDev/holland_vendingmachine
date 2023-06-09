@@ -6,6 +6,7 @@ async function RunEngine(param) {
   const requestOptions = {
     method: "GET",
     headers: { "Content-Type": "application/json" },
+    timeout: 5000,
     //  body: JSON.stringify({ title: "React POST Request Example" }),
   };
   const response = await fetch(
